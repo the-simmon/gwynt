@@ -21,7 +21,7 @@ class CardCollection:
     def repr_list(self) -> List[int]:
         result = []
         for row, cards in self.cards.items():
-            result.extend(CardCollection._one_hot_from_row(row, cards))
+            result.extend(self._one_hot_from_row(row, cards))
         return result
 
     def _one_hot_from_row(self, row: CombatRow, cards: List[Card]) -> List[int]:
