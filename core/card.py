@@ -11,23 +11,27 @@ class CombatRow(OneHotEnum):
 
 class Ability(OneHotEnum):
     NONE = 0
-    HERO = 1
-    MEDIC = 2
-    MORALE_BOOST = 3
-    MUSTER = 4
-    SPY = 5
-    TIGHT_BOND = 6
-    SCORCH = 7
-    WEATHER = 8
-    EMPTY_PLACEHOLDER = 9
+    EMPTY_PLACEHOLDER = 1
+    HERO = 2
+    MEDIC = 3
+    MORALE_BOOST = 4
+    MUSTER = 5
+    SPY = 6
+    TIGHT_BOND = 7
+    SCORCH = 8
+    CLEAR_WEATHER = 9
+    FROST = 10
+    FOG = 11
+    RAIN = 12
 
 
 class Card:
 
-    def __init__(self, combat_row: CombatRow, damage: int, ability: Ability):
+    def __init__(self, combat_row: CombatRow, damage: int, ability: Ability, muster: str = None):
         self.combat_row = combat_row
         self.damage = damage
         self.ability = ability
+        self.muster = muster
 
     def repr_list(self) -> List[int]:
         return [self.damage] + self.ability.one_hot()
@@ -37,19 +41,5 @@ class Card:
         return Card(row, 0, Ability.EMPTY_PLACEHOLDER).repr_list()
 
 
-class Weather(OneHotEnum):
-    CLEAR = 0
-    FROST = 1
-    FOG = 2
-    RAIN = 3
 
-
-class WeatherCard(Card):
-
-    def __init__(self, weather: Weather):
-        super().__init__(damage=0, ability=Ability.WEATHER)
-        self.weather = weather
-
-    def repr_list(self) -> List[int]:
-        return [self.damage] + self.ability.one_hot() + self.weather.one_hot()
 

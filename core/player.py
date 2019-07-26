@@ -1,3 +1,4 @@
+import random
 from typing import List
 from .cardcollection import CardCollection
 from .card import Card
@@ -18,6 +19,9 @@ class Player:
         self.deck = CardCollection(max_cards=22, cards=cards)
         self.graveyard = CardCollection(max_cards=22, cards=[])
         self.active_cards = CardCollection(max_cards=10, cards=[])
+
+    def pick_random_from_deck(self):
+        self.active_cards.add(random.choice(self.deck.cards))
 
     def repr_list(self, include_deck=False) -> List[int]:
         result = self.faction.one_hot() + self.graveyard.repr_list() + self.active_cards.repr_list()
