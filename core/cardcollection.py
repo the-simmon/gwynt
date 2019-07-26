@@ -16,7 +16,7 @@ class CardCollection:
         self.cards[row].append(card)
 
     def remove(self, row: CombatRow, card: Card):
-        self.cards[row].pop(card)
+        self.cards[row].remove(card)
 
     def repr_list(self) -> List[int]:
         result = []

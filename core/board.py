@@ -55,8 +55,8 @@ class Board:
         player = self._get_selected_player(player_id)
 
         if card.ability is Ability.SPY:
-            player = self._get_enemy_player(player_id)
-            self.cards[player].add(row, card)
+            enemy = self._get_enemy_player(player_id)
+            self.cards[enemy].add(row, card)
         else:
             self.cards[player].add(row, card)
 
