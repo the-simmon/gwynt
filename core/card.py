@@ -19,10 +19,11 @@ class Ability(OneHotEnum):
     SPY = 6
     TIGHT_BOND = 7
     SCORCH = 8
-    CLEAR_WEATHER = 9
-    FROST = 10
-    FOG = 11
-    RAIN = 12
+    COMMANDERS_HORN = 9
+    CLEAR_WEATHER = 10
+    FROST = 11
+    FOG = 12
+    RAIN = 13
 
 
 class Card:

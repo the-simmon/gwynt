@@ -7,7 +7,7 @@ from .cardcollection import CardCollection
 from .player import Player
 
 
-class Weather(OneHotEnum):
+class _Weather(OneHotEnum):
     CLEAR = 0
     FROST = 1
     FOG = 2
@@ -20,24 +20,24 @@ class Weather(OneHotEnum):
         return False
 
     @classmethod
-    def ability_to_weather(cls, ability: Ability) -> Weather:
+    def ability_to_weather(cls, ability: Ability) -> OneHotEnum:
         if ability is Ability.CLEAR_WEATHER:
-            return Weather.CLEAR
+            return _Weather.CLEAR
         elif ability is Ability.FROST:
-            return Weather.FROST
+            return _Weather.FROST
         elif ability is Ability.FOG:
-            return Weather.FOG
+            return _Weather.FOG
         elif ability is Ability.RAIN:
-            return Weather.RAIN
+            return _Weather.RAIN
 
         raise ValueError
 
 
 class Board:
 
-    def __init__(self):
+    def __init__(self, player1, player2):
         self.cards: DefaultDict[Player, CardCollection] = defaultdict(CardCollection)
-        self.weather: Weather = Weather.CLEAR
+        self.weather: _Weather = _Weather.CLEAR
 
     def add(self, player: Player, row: CombatRow, card: Card, player2: Player = None):
         if player2:
@@ -54,8 +54,8 @@ class Board:
 
         if ability is Ability.NONE:
             pass
-        elif Weather.ability_is_weather(ability):
-            self.weather = Weather.ability_to_weather(ability)
+        elif _Weather.ability_is_weather(ability):
+            self.weather = _Weather.ability_to_weather(ability)
         elif ability is Ability.MEDIC:
             raise NotImplementedError
         elif ability is Ability.MUSTER:
@@ -80,5 +80,5 @@ class Board:
         cards_to_add.extend(search_and_remove(card, player.deck))
 
         for card in cards_to_add:
-            self.add(card)
+            self.add(player, card.combat_row, card)
 
