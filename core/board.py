@@ -35,21 +35,38 @@ class _Weather(OneHotEnum):
 
 class Board:
 
-    def __init__(self, player1, player2):
+    def __init__(self, player1: Player, player2: Player):
         self.cards: DefaultDict[Player, CardCollection] = defaultdict(CardCollection)
         self.weather: _Weather = _Weather.CLEAR
+        self.player1 = player1
+        self.player2 = player2
 
-    def add(self, player: Player, row: CombatRow, card: Card, player2: Player = None):
-        if player2:
-            self.cards[player2].add(row, card)
+    def _get_selected_player(self, player_id: int):
+        if player_id is 0:
+            return self.player1
+        return self.player2
+
+    def _get_enemy_player(self, player_id):
+        if player_id is 0:
+            return self.player2
+        return self.player1
+
+    def add(self, player_id: int, row: CombatRow, card: Card):
+        player = self._get_selected_player(player_id)
+
+        if card.ability is Ability.SPY:
+            player = self._get_enemy_player(player_id)
+            self.cards[player].add(row, card)
         else:
             self.cards[player].add(row, card)
+
         self._check_ability(player, card)
 
-    def remove(self, player: Player, row: CombatRow, card: Card):
+    def remove(self, player_id: int, row: CombatRow, card: Card):
+        player = self._get_selected_player(player_id)
         self.cards[player].remove(row, card)
 
-    def _check_ability(self, player: Player, card: Card):
+    def _check_ability(self, player: Player, card: Card) -> bool:
         ability = card.ability
 
         if ability is Ability.NONE:
