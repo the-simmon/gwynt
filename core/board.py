@@ -7,7 +7,7 @@ from .cardcollection import CardCollection
 from .player import Player
 
 
-class _Weather(OneHotEnum):
+class Weather(OneHotEnum):
     CLEAR = 0
     FROST = 1
     FOG = 2
@@ -22,13 +22,13 @@ class _Weather(OneHotEnum):
     @classmethod
     def ability_to_weather(cls, ability: Ability) -> OneHotEnum:
         if ability is Ability.CLEAR_WEATHER:
-            return _Weather.CLEAR
+            return Weather.CLEAR
         elif ability is Ability.FROST:
-            return _Weather.FROST
+            return Weather.FROST
         elif ability is Ability.FOG:
-            return _Weather.FOG
+            return Weather.FOG
         elif ability is Ability.RAIN:
-            return _Weather.RAIN
+            return Weather.RAIN
 
         raise ValueError
 
@@ -37,7 +37,7 @@ class Board:
 
     def __init__(self, player1: Player, player2: Player):
         self.cards: DefaultDict[Player, CardCollection] = defaultdict(CardCollection)
-        self.weather: _Weather = _Weather.CLEAR
+        self.weather: Weather = Weather.CLEAR
         self.player1 = player1
         self.player2 = player2
 
@@ -71,8 +71,8 @@ class Board:
 
         if ability is Ability.NONE:
             pass
-        elif _Weather.ability_is_weather(ability):
-            self.weather = _Weather.ability_to_weather(ability)
+        elif Weather.ability_is_weather(ability):
+            self.weather = Weather.ability_to_weather(ability)
         elif ability is Ability.MEDIC:
             raise NotImplementedError
         elif ability is Ability.MUSTER:
@@ -99,3 +99,29 @@ class Board:
         for card in cards_to_add:
             self.add(player, card.combat_row, card)
 
+    def _check_scorch(self, card: Card, player: Player):
+        enemy = self._get_enemy_player(player)
+        if card.combat_row is CombatRow.SPECIAL:
+            self._scorch_highest_card(enemy)
+            self._scorch_highest_card(player)
+        else:
+            enemy_damage = self.cards[enemy].calculate_damage_for_row(card.combat_row, self.weather)
+            if enemy_damage > 10:
+                self._scorch_highest_card(enemy, card.combat_row)
+
+    def _scorch_highest_card(self, player: Player, selected_row: CombatRow = None):
+        max_damage = 0
+        if selected_row:
+            max_damage = max([card.damage for card in self.cards[player][selected_row]])
+            self._remove_damage_from_row(player, selected_row, max_damage)
+        else:
+            max_row = None
+            for row, cards in self.cards.items():
+                damage = max([card.damage for card in self.cards[player][row]])
+                if damage > max_damage:
+                    max_damage = damage
+                    max_row = row
+            self._remove_damage_from_row(player, max_row, max_damage)
+
+    def _remove_damage_from_row(self, player: Player, row: CombatRow, damage: int) -> List[Card]:
+        return [card for card in self.cards[player][row] if card.damage is not damage]
