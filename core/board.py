@@ -15,7 +15,8 @@ class Weather(OneHotEnum):
 
     @classmethod
     def ability_is_weather(cls, ability: Ability):
-        if ability is Ability.CLEAR_WEATHER or ability is Ability.FROST or ability is Ability.RAIN or ability is Ability.FOG:
+        if ability is Ability.CLEAR_WEATHER or ability is Ability.FROST or ability is Ability.RAIN or \
+                ability is Ability.FOG:
             return True
         return False
 
@@ -41,12 +42,12 @@ class Board:
         self.player1 = player1
         self.player2 = player2
 
-    def _get_selected_player(self, player_id: int):
+    def _get_selected_player(self, player_id: int) -> Player:
         if player_id is 0:
             return self.player1
         return self.player2
 
-    def _get_enemy_player(self, player_id):
+    def _get_enemy_player(self, player_id) -> Player:
         if player_id is 0:
             return self.player2
         return self.player1
@@ -80,7 +81,7 @@ class Board:
         elif ability is Ability.SPY:
             player.pick_random_from_deck()
         elif ability is Ability.SCORCH:
-            raise NotImplementedError
+            self._check_scorch(card, player)
 
     def _check_muster(self, player: Player, card: Card):
 
@@ -116,7 +117,7 @@ class Board:
             self._remove_damage_from_row(player, selected_row, max_damage)
         else:
             max_row = None
-            for row, cards in self.cards.items():
+            for row, cards in self.cards[player].cards:
                 damage = max([card.damage for card in self.cards[player][row]])
                 if damage > max_damage:
                     max_damage = damage
