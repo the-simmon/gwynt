@@ -42,32 +42,24 @@ class Board:
         self.player1 = player1
         self.player2 = player2
 
-    def _get_selected_player(self, player_id: int) -> Player:
-        if player_id is 0:
-            return self.player1
-        return self.player2
-
-    def _get_enemy_player(self, player_id) -> Player:
-        if player_id is 0:
+    def _get_enemy_player(self, player: Player) -> Player:
+        if player.id is self.player1.id:
             return self.player2
         return self.player1
 
-    def add(self, player_id: int, row: CombatRow, card: Card):
-        player = self._get_selected_player(player_id)
-
+    def add(self, player: Player, row: CombatRow, card: Card):
         if card.ability is Ability.SPY:
-            enemy = self._get_enemy_player(player_id)
+            enemy = self._get_enemy_player(player)
             self.cards[enemy].add(row, card)
         else:
             self.cards[player].add(row, card)
 
         self._check_ability(player, card)
 
-    def remove(self, player_id: int, row: CombatRow, card: Card):
-        player = self._get_selected_player(player_id)
+    def remove(self, player: Player, row: CombatRow, card: Card):
         self.cards[player].remove(row, card)
 
-    def _check_ability(self, player: Player, card: Card) -> bool:
+    def _check_ability(self, player: Player, card: Card):
         ability = card.ability
 
         if ability is Ability.NONE:
@@ -113,12 +105,12 @@ class Board:
     def _scorch_highest_card(self, player: Player, selected_row: CombatRow = None):
         max_damage = 0
         if selected_row:
-            max_damage = max([card.damage for card in self.cards[player][selected_row]])
+            max_damage = max([card.damage for card in self.cards[player].cards[selected_row]])
             self._remove_damage_from_row(player, selected_row, max_damage)
         else:
             max_row = None
             for row, cards in self.cards[player].cards:
-                damage = max([card.damage for card in self.cards[player][row]])
+                damage = max([card.damage for card in self.cards[player].cards[row]])
                 if damage > max_damage:
                     max_damage = damage
                     max_row = row

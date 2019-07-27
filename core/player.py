@@ -14,7 +14,8 @@ class Faction(OneHotEnum):
 
 class Player:
 
-    def __init__(self, faction: Faction, cards: List[Card]):
+    def __init__(self, id: int, faction: Faction, cards: List[Card]):
+        self.id = id
         self.faction = faction
         self.deck = CardCollection(max_cards=22, cards=cards)
         self.graveyard = CardCollection(max_cards=22, cards=[])
