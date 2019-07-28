@@ -48,7 +48,11 @@ class CardCollection:
         return result
 
     def calculate_damage_for_row(self, row: CombatRow, weather: Weather) -> int:
-        _calculate_damage_for_row(self.cards[row], weather)
+        cards = _calculate_damage_for_row(self.cards[row], weather)
+        return sum([card.damage for card in cards])
+
+    def get_damage_adjusted_cards(self, row: CombatRow, weather: Weather) -> List[Card]:
+        return _calculate_damage_for_row(self.cards[row], weather)
 
     def __len__(self):
         length = 0
@@ -57,7 +61,7 @@ class CardCollection:
         return length
 
 
-def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> int:
+def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> List[Card]:
 
     def check_weather(cards: List[Card], weather: Weather) -> List[Card]:
         affected_row = None
@@ -113,4 +117,4 @@ def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> int:
     cards = check_tight_bond(cards)
     cards = check_other_abilities(cards)
 
-    return sum([card.damage for card in cards])
+    return cards

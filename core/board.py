@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import DefaultDict, List
+from typing import DefaultDict, List, Tuple
 
 from .one_hot_enum import OneHotEnum
 from .card import CombatRow, Card, Ability
@@ -95,26 +95,47 @@ class Board:
     def _check_scorch(self, card: Card, player: Player):
         enemy = self._get_enemy_player(player)
         if card.combat_row is CombatRow.SPECIAL:
-            self._scorch_highest_card(enemy)
-            self._scorch_highest_card(player)
+            self._scorch_special()
         else:
             enemy_damage = self.cards[enemy].calculate_damage_for_row(card.combat_row, self.weather)
             if enemy_damage > 10:
                 self._scorch_highest_card(enemy, card.combat_row)
 
-    def _scorch_highest_card(self, player: Player, selected_row: CombatRow = None):
+    def _scorch_highest_card(self, player: Player, selected_row: CombatRow):
         max_damage = 0
-        if selected_row:
-            max_damage = max([card.damage for card in self.cards[player].cards[selected_row]])
-            self._remove_damage_from_row(player, selected_row, max_damage)
-        else:
-            max_row = None
-            for row, cards in self.cards[player].cards:
-                damage = max([card.damage for card in self.cards[player].cards[row]])
+        max_row = None
+        max_index = 0
+        for row in self.cards[player].cards.keys():
+            index, damage = _get_highest_index_and_damage(self.cards[player].get_damage_adjusted_cards(selected_row, self.weather))
+            if damage > max_damage:
+                max_damage = damage
+                max_row = row
+                max_index = index
+        self.cards[player].cards[max_row].pop(max_index)
+
+    def _scorch_special(self):
+        max_damage = 0
+        for player in [self.player1, self.player2]:
+            for row in self.cards[player].cards.keys():
+                _, damage = _get_highest_index_and_damage(self.cards[player].get_damage_adjusted_cards(row, self.weather))
                 if damage > max_damage:
                     max_damage = damage
-                    max_row = row
-            self._remove_damage_from_row(player, max_row, max_damage)
+        self._scorch_by_damage(max_damage)
 
-    def _remove_damage_from_row(self, player: Player, row: CombatRow, damage: int) -> List[Card]:
-        return [card for card in self.cards[player][row] if card.damage is not damage]
+    def _scorch_by_damage(self, scorch_damage):
+        for player in [self.player1, self.player2]:
+            for row in self.cards[player].cards.keys():
+                for index, card in enumerate(self.cards[player].get_damage_adjusted_cards(row, self.weather)):
+                    if card.damage is scorch_damage and card.ability is not Ability.HERO:
+                        self.cards[player].cards[row].pop(index)
+
+
+def _get_highest_index_and_damage(cards: List[Card]) -> Tuple[int, int]:
+    max_damage = 0
+    index = 0
+
+    for i, card in enumerate(cards):
+        if card.damage > max_damage and card.ability is not Ability.HERO:
+            max_damage = card.damage
+            index = i
+    return index, max_damage
