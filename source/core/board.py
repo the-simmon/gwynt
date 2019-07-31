@@ -1,43 +1,16 @@
 from collections import defaultdict
-from typing import DefaultDict, List, Tuple
+from typing import DefaultDict, List
 
-from .one_hot_enum import OneHotEnum
 from .card import CombatRow, Card, Ability
 from .cardcollection import CardCollection
 from .player import Player
-
-
-class Weather(OneHotEnum):
-    CLEAR = 0
-    FROST = 1
-    FOG = 2
-    RAIN = 3
-
-    @classmethod
-    def ability_is_weather(cls, ability: Ability):
-        if ability is Ability.CLEAR_WEATHER or ability is Ability.FROST or ability is Ability.RAIN or \
-                ability is Ability.FOG:
-            return True
-        return False
-
-    @classmethod
-    def ability_to_weather(cls, ability: Ability) -> OneHotEnum:
-        if ability is Ability.CLEAR_WEATHER:
-            return Weather.CLEAR
-        elif ability is Ability.FROST:
-            return Weather.FROST
-        elif ability is Ability.FOG:
-            return Weather.FOG
-        elif ability is Ability.RAIN:
-            return Weather.RAIN
-
-        raise ValueError
+from .weather import Weather
 
 
 class Board:
 
     def __init__(self, player1: Player, player2: Player):
-        self.cards: DefaultDict[Player, CardCollection] = defaultdict(CardCollection)
+        self.cards: DefaultDict[Player, CardCollection] = defaultdict(lambda: CardCollection(max_cards=22, cards=[]))
         self.weather: Weather = Weather.CLEAR
         self.player1 = player1
         self.player2 = player2
@@ -48,16 +21,18 @@ class Board:
         return self.player1
 
     def add(self, player: Player, row: CombatRow, card: Card):
-        if card.ability is Ability.SPY:
-            enemy = self._get_enemy_player(player)
-            self.cards[enemy].add(row, card)
-        else:
-            self.cards[player].add(row, card)
+        if row is not CombatRow.SPECIAL:
+            if card.ability is Ability.SPY:
+                enemy = self._get_enemy_player(player)
+                self.cards[enemy].add(row, card)
+            else:
+                self.cards[player].add(row, card)
 
         self._check_ability(player, card)
 
     def remove(self, player: Player, row: CombatRow, card: Card):
         self.cards[player].remove(row, card)
+        player.graveyard.add(row, card)
 
     def _check_ability(self, player: Player, card: Card):
         ability = card.ability
@@ -71,6 +46,7 @@ class Board:
         elif ability is Ability.MUSTER:
             self._check_muster(player, card)
         elif ability is Ability.SPY:
+            player.pick_random_from_deck()
             player.pick_random_from_deck()
         elif ability is Ability.SCORCH:
             self._check_scorch(card, player)
@@ -99,25 +75,20 @@ class Board:
         else:
             enemy_damage = self.cards[enemy].calculate_damage_for_row(card.combat_row, self.weather)
             if enemy_damage > 10:
-                self._scorch_highest_card(enemy, card.combat_row)
+                self._scorch_highest_cards(enemy, card.combat_row)
 
-    def _scorch_highest_card(self, player: Player, selected_row: CombatRow):
-        max_damage = 0
-        max_row = None
-        max_index = 0
-        for row in self.cards[player].cards.keys():
-            index, damage = _get_highest_index_and_damage(self.cards[player].get_damage_adjusted_cards(selected_row, self.weather))
-            if damage > max_damage:
-                max_damage = damage
-                max_row = row
-                max_index = index
-        self.cards[player].cards[max_row].pop(max_index)
+    def _scorch_highest_cards(self, player: Player, selected_row: CombatRow):
+        damage = _get_highest_index_and_damage(self.cards[player].get_damage_adjusted_cards(selected_row, self.weather))
+
+        for card in self.cards[player].cards[selected_row]:
+            if card.damage == damage:
+                self.remove(player, selected_row, card)
 
     def _scorch_special(self):
         max_damage = 0
         for player in [self.player1, self.player2]:
             for row in self.cards[player].cards.keys():
-                _, damage = _get_highest_index_and_damage(self.cards[player].get_damage_adjusted_cards(row, self.weather))
+                damage = _get_highest_index_and_damage(self.cards[player].get_damage_adjusted_cards(row, self.weather))
                 if damage > max_damage:
                     max_damage = damage
         self._scorch_by_damage(max_damage)
@@ -125,17 +96,15 @@ class Board:
     def _scorch_by_damage(self, scorch_damage):
         for player in [self.player1, self.player2]:
             for row in self.cards[player].cards.keys():
-                for index, card in enumerate(self.cards[player].get_damage_adjusted_cards(row, self.weather)):
-                    if card.damage is scorch_damage and card.ability is not Ability.HERO:
-                        self.cards[player].cards[row].pop(index)
+                    for index, card in enumerate(self.cards[player].get_damage_adjusted_cards(row, self.weather)):
+                        if card.damage is scorch_damage and not card.hero:
+                            card_to_remove = self.cards[player].cards[row][index]
+                            self.remove(player, row, card_to_remove)
 
 
-def _get_highest_index_and_damage(cards: List[Card]) -> Tuple[int, int]:
+def _get_highest_index_and_damage(cards: List[Card]) -> int:
     max_damage = 0
-    index = 0
-
     for i, card in enumerate(cards):
-        if card.damage > max_damage and card.ability is not Ability.HERO:
+        if card.damage > max_damage and not card.hero:
             max_damage = card.damage
-            index = i
-    return index, max_damage
+    return max_damage

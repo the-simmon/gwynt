@@ -1,10 +1,9 @@
 from collections import defaultdict
 from copy import deepcopy
-from typing import DefaultDict, List
+from typing import DefaultDict, List, Callable
 
-from core import Ability
-from core.board import Weather
-from .card import CombatRow, Card
+from .weather import Weather
+from .card import CombatRow, Card, Ability
 
 
 class CardCollection:
@@ -22,28 +21,32 @@ class CardCollection:
     def remove(self, row: CombatRow, card: Card):
         self.cards[row].remove(card)
 
-    def repr_list(self) -> List[int]:
+    def repr_list(self, exclude_card: Card = None) -> List[int]:
         result = []
-        for row, cards in self.cards.items():
-            result.extend(self._one_hot_from_row(row, cards))
+        for row in CombatRow:
+            result.extend(self._one_hot_from_row(self.cards[row], exclude_card))
         return result
 
-    def _one_hot_from_row(self, row: CombatRow, cards: List[Card]) -> List[int]:
+    def _one_hot_from_row(self, cards: List[Card], exclude_card: Card = None) -> List[int]:
         result = []
-        counter = 0
-        for i, card in enumerate(cards):
-            result.extend(card.repr_list())
-            counter = i
+        exclude_once = False
+        empty_cards = self.max_cards - len(cards)
 
-        if counter < self.max_cards:
-            for _ in range(self.max_cards - counter):
-                result.extend(Card.empty_card_repr(row))
+        for card in cards:
+            if card != exclude_card or exclude_once:
+                result.extend(card.repr_list())
+            else:
+                exclude_once = True
+                empty_cards += 1
+
+        for _ in range(empty_cards):
+            result.extend(Card.empty_card_repr())
 
         return result
 
     def calculate_damage(self, weather: Weather) -> int:
         result = 0
-        for row, cards in self.cards:
+        for row, cards in self.cards.items():
             result += self.calculate_damage_for_row(row, weather)
         return result
 
@@ -75,13 +78,13 @@ def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> List[Card]
             affected_row = CombatRow.SIEGE
 
         for card in cards:
-            if card.combat_row is affected_row:
+            if card.combat_row is affected_row and card.damage > 0 and not card.hero:
                 card.damage = 1
         return cards
 
     def check_tight_bond(cards: List[Card]) -> List[Card]:
         bonds: DefaultDict[Card, int] = defaultdict(int)
-        for card in cards:
+        for card in deepcopy(cards):
             if card.ability is Ability.TIGHT_BOND:
                 current_damage = bonds[card]
                 bonds.update({card: current_damage + card.damage})
@@ -94,23 +97,27 @@ def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> List[Card]
         return cards
 
     def check_other_abilities(cards: List[Card]) -> List[Card]:
-        def morale_boost(card: Card) -> Card:
+        def morale_boost(card: Card):
             card.damage += 1
-            return card
 
-        def horn(card: Card) -> Card:
+        def horn(card: Card):
             card.damage *= 2
-            return card
 
-        updated_cards = deepcopy(cards)
+        def apply_function(f: Callable[[Card], None], cards: List[Card], current_card: Card):
+            for card in cards:
+                if card != current_card:
+                    f(card)
+
+        horn_applied = False
         for current_card in cards:
             if current_card.ability is Ability.MORALE_BOOST:
-                updated_cards = [morale_boost(card) for card in updated_cards if card != current_card]
+                apply_function(morale_boost, cards, current_card)
 
-            elif current_card.ability is Ability.COMMANDERS_HORN:
-                updated_cards = [horn(card) for card in updated_cards if card != current_card]
+            elif current_card.ability is Ability.COMMANDERS_HORN and not horn_applied:
+                apply_function(horn, cards, current_card)
+                horn_applied = True
 
-        return updated_cards
+        return cards
 
     cards = deepcopy(cards)
     cards = check_weather(cards, weather)
