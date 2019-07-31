@@ -57,12 +57,6 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
     def get_damage_adjusted_cards(self, row: CombatRow, weather: Weather) -> List[Card]:
         return _calculate_damage_for_row(self[row], weather)
 
-    def __len__(self):
-        length = 0
-        for cards in self.values():
-            length += len(cards)
-        return length
-
 
 def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> List[Card]:
 

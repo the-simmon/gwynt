@@ -25,9 +25,21 @@ class Ability(OneHotEnum):
     RAIN = 12
 
 
+class Muster(OneHotEnum):
+    NONE = 0
+    ARACHAS = 1
+    CRONE = 2
+    DWARVEN_SKIRMISHER = 3
+    ELVEN_SKIRMISHER = 4
+    GHOUL = 5
+    HAVEKAR_SMUGGLER = 6
+    NEKKER = 7
+    VAMPIRE = 8
+
+
 class Card:
 
-    def __init__(self, combat_row: CombatRow, damage: int, ability: Ability, hero: bool = False, muster: str = None):
+    def __init__(self, combat_row: CombatRow, damage: int, ability: Ability, hero: bool = False, muster: Muster = Muster.NONE):
         self.combat_row = combat_row
         self.damage = damage
         self.ability = ability
@@ -43,7 +55,7 @@ class Card:
 
     def __eq__(self, other):
         return other is not None and self.combat_row is other.combat_row and self.damage == other.damage and self.ability is other.ability \
-               and self.muster == other.muster and self.hero == other.hero
+               and self.muster is other.muster and self.hero is other.hero
 
     def __hash__(self):
         return self.combat_row.value + self.damage + self.ability.value + hash(self.muster)

@@ -59,7 +59,7 @@ class Board:
                 for current_card in cards:
                     if current_card.muster is muster_card.muster:
                         result.append(current_card)
-                        card_collection.remove(current_card)
+                        card_collection.remove(card.combat_row, current_card)
             return result
 
         cards_to_add = search_and_remove(card, player.active_cards)
