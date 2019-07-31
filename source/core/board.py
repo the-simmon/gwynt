@@ -55,7 +55,7 @@ class Board:
 
         def search_and_remove(muster_card: Card, card_collection: CardCollection) -> List[Card]:
             result = []
-            for cards in card_collection.cards.values():
+            for cards in card_collection.values():
                 for current_card in cards:
                     if current_card.muster is muster_card.muster:
                         result.append(current_card)
@@ -80,14 +80,14 @@ class Board:
     def _scorch_highest_cards(self, player: Player, selected_row: CombatRow):
         damage = _get_highest_index_and_damage(self.cards[player].get_damage_adjusted_cards(selected_row, self.weather))
 
-        for card in self.cards[player].cards[selected_row]:
+        for card in self.cards[player][selected_row]:
             if card.damage == damage:
                 self.remove(player, selected_row, card)
 
     def _scorch_special(self):
         max_damage = 0
         for player in [self.player1, self.player2]:
-            for row in self.cards[player].cards.keys():
+            for row in self.cards[player].keys():
                 damage = _get_highest_index_and_damage(self.cards[player].get_damage_adjusted_cards(row, self.weather))
                 if damage > max_damage:
                     max_damage = damage
@@ -95,10 +95,10 @@ class Board:
 
     def _scorch_by_damage(self, scorch_damage):
         for player in [self.player1, self.player2]:
-            for row in self.cards[player].cards.keys():
+            for row in self.cards[player].keys():
                     for index, card in enumerate(self.cards[player].get_damage_adjusted_cards(row, self.weather)):
                         if card.damage is scorch_damage and not card.hero:
-                            card_to_remove = self.cards[player].cards[row][index]
+                            card_to_remove = self.cards[player][row][index]
                             self.remove(player, row, card_to_remove)
 
 

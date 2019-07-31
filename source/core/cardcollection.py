@@ -6,25 +6,25 @@ from .weather import Weather
 from .card import CombatRow, Card, Ability
 
 
-class CardCollection:
+class CardCollection(DefaultDict[CombatRow, List[Card]]):
 
     def __init__(self, max_cards: int, cards: List[Card]):
+        super().__init__(list)
         self.max_cards = max_cards
-        self.cards: DefaultDict[CombatRow, List[Card]] = defaultdict(list)
 
         for card in cards:
-            self.cards[card.combat_row].append(card)
+            self[card.combat_row].append(card)
 
     def add(self, row: CombatRow, card: Card):
-        self.cards[row].append(card)
+        self[row].append(card)
 
     def remove(self, row: CombatRow, card: Card):
-        self.cards[row].remove(card)
+        self[row].remove(card)
 
     def repr_list(self, exclude_card: Card = None) -> List[int]:
         result = []
         for row in CombatRow:
-            result.extend(self._one_hot_from_row(self.cards[row], exclude_card))
+            result.extend(self._one_hot_from_row(self[row], exclude_card))
         return result
 
     def _one_hot_from_row(self, cards: List[Card], exclude_card: Card = None) -> List[int]:
@@ -46,20 +46,20 @@ class CardCollection:
 
     def calculate_damage(self, weather: Weather) -> int:
         result = 0
-        for row, cards in self.cards.items():
+        for row, cards in self.items():
             result += self.calculate_damage_for_row(row, weather)
         return result
 
     def calculate_damage_for_row(self, row: CombatRow, weather: Weather) -> int:
-        cards = _calculate_damage_for_row(self.cards[row], weather)
+        cards = _calculate_damage_for_row(self[row], weather)
         return sum([card.damage for card in cards])
 
     def get_damage_adjusted_cards(self, row: CombatRow, weather: Weather) -> List[Card]:
-        return _calculate_damage_for_row(self.cards[row], weather)
+        return _calculate_damage_for_row(self[row], weather)
 
     def __len__(self):
         length = 0
-        for cards in self.cards.values():
+        for cards in self.values():
             length += len(cards)
         return length
 

@@ -26,7 +26,7 @@ class Player:
     def pick_random_from_deck(self):
         cards = []
         for row in CombatRow:
-            cards.extend(self.deck.cards[row])
+            cards.extend(self.deck[row])
 
         card = random.choice(cards)
         self.deck.remove(card.combat_row, card)
