@@ -27,7 +27,7 @@ class CardCollectionTest(unittest.TestCase):
         for _ in range(self.max_cards - len(self.range_cards)):
             expected.extend(Card.empty_card_repr())
 
-        for _ in range(2):
+        for _ in range(3):
             for _ in range(self.max_cards):
                 expected.extend(Card.empty_card_repr())
         self.assertEqual(expected, self.card_collection.repr_list())
@@ -46,7 +46,7 @@ class CardCollectionTest(unittest.TestCase):
         for _ in range(self.max_cards - len(self.range_cards)):
             expected.extend(Card.empty_card_repr())
 
-        for _ in range(2):
+        for _ in range(3):
             for _ in range(self.max_cards):
                 expected.extend(Card.empty_card_repr())
 

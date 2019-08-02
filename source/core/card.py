@@ -7,6 +7,7 @@ class CombatRow(OneHotEnum):
     RANGE = 1
     SIEGE = 2
     SPECIAL = 3
+    AGILE = 4
 
 
 class Ability(OneHotEnum):
@@ -39,7 +40,7 @@ class Muster(OneHotEnum):
 
 class Card:
 
-    def __init__(self, combat_row: CombatRow, damage: int, ability: Ability, hero: bool = False, muster: Muster = Muster.NONE):
+    def __init__(self, combat_row: CombatRow, damage: int, ability: Ability = Ability.NONE, hero: bool = False, muster: Muster = Muster.NONE):
         self.combat_row = combat_row
         self.damage = damage
         self.ability = ability
@@ -47,7 +48,7 @@ class Card:
         self.muster = muster
 
     def repr_list(self) -> List[int]:
-        return [self.damage] + self.ability.one_hot() + [int(self.hero)]
+        return [self.damage] + self.ability.one_hot() + [int(self.hero)] + self.muster.one_hot()
 
     @classmethod
     def empty_card_repr(cls) -> List[int]:
@@ -58,4 +59,7 @@ class Card:
                and self.muster is other.muster and self.hero is other.hero
 
     def __hash__(self):
-        return self.combat_row.value + self.damage + self.ability.value + hash(self.muster)
+        return hash(self.combat_row) + self.damage + hash(self.ability) + hash(self.muster)
+
+    def __mul__(self, count: int):
+        return [self for _ in range(count)]
