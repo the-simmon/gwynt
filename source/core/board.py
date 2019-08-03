@@ -34,6 +34,20 @@ class Board:
         self.cards[player].remove(row, card)
         player.graveyard.add(row, card)
 
+    def calculate_damage(self, player: Player) -> int:
+        return self.cards[player].calculate_damage(self.weather)
+
+    def all_cards_to_graveyard(self):
+        for player, cardcollection in self.cards.items():
+            for row, cards in cards.items():
+                for card in cards:
+                    self.remove(player, row, card)
+
+    def repr_list(self, player: Player, excluded_card: Card):
+        enemy = self._get_enemy_player(player)
+        return enemy.repr_list() + player.repr_list(include_deck_and_active=True, exclude_card=excluded_card) + \
+            self.cards[enemy].repr_list() + self.cards[player].repr_list() + self.weather.one_hot()
+
     def _check_ability(self, player: Player, card: Card):
         ability = card.ability
 

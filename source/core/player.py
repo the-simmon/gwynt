@@ -22,6 +22,7 @@ class Player:
         self.deck = CardCollection(max_cards=22, cards=cards)
         self.graveyard = CardCollection(max_cards=22, cards=[])
         self.active_cards = CardCollection(max_cards=22, cards=[])
+        self.rounds_won = 0
 
     def pick_random_from_deck(self):
         cards = []
