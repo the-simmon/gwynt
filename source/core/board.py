@@ -1,4 +1,5 @@
 from collections import defaultdict
+from copy import deepcopy
 from typing import DefaultDict, List
 
 from .card import CombatRow, Card, Ability
@@ -32,21 +33,22 @@ class Board:
 
     def remove(self, player: Player, row: CombatRow, card: Card):
         self.cards[player].remove(row, card)
-        player.graveyard.add(row, card)
+        player.graveyard.add(card.combat_row, card)
 
     def calculate_damage(self, player: Player) -> int:
         return self.cards[player].calculate_damage(self.weather)
 
     def all_cards_to_graveyard(self):
         for player, cardcollection in self.cards.items():
-            for row, cards in cards.items():
-                for card in cards:
+            for row, cards in cardcollection.items():
+                for card in deepcopy(cards):
                     self.remove(player, row, card)
 
     def repr_list(self, player: Player, excluded_card: Card):
         enemy = self._get_enemy_player(player)
-        return enemy.repr_list() + player.repr_list(include_deck_and_active=True, exclude_card=excluded_card) + \
-            self.cards[enemy].repr_list() + self.cards[player].repr_list() + self.weather.one_hot()
+        return [len(enemy.active_cards)] + enemy.repr_list() + player.repr_list(include_deck_and_active=True,
+                                                                                exclude_card=excluded_card) + \
+               self.cards[enemy].repr_list() + self.cards[player].repr_list() + self.weather.one_hot()
 
     def _check_ability(self, player: Player, card: Card):
         ability = card.ability
@@ -110,10 +112,10 @@ class Board:
     def _scorch_by_damage(self, scorch_damage):
         for player in [self.player1, self.player2]:
             for row in self.cards[player].keys():
-                    for index, card in enumerate(self.cards[player].get_damage_adjusted_cards(row, self.weather)):
-                        if card.damage is scorch_damage and not card.hero:
-                            card_to_remove = self.cards[player][row][index]
-                            self.remove(player, row, card_to_remove)
+                for index, card in enumerate(self.cards[player].get_damage_adjusted_cards(row, self.weather)):
+                    if card.damage is scorch_damage and not card.hero:
+                        card_to_remove = self.cards[player][row][index]
+                        self.remove(player, row, card_to_remove)
 
 
 def _get_highest_index_and_damage(cards: List[Card]) -> int:

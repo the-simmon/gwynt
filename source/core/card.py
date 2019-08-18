@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List
 from .one_hot_enum import OneHotEnum
 
@@ -62,4 +63,4 @@ class Card:
         return hash(self.combat_row) + self.damage + hash(self.ability) + hash(self.muster)
 
     def __mul__(self, count: int):
-        return [self for _ in range(count)]
+        return [deepcopy(self) for _ in range(count)]

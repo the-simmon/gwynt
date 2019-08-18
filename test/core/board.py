@@ -2,6 +2,7 @@ import unittest
 
 from source.core.board import Board
 from source.core.card import Card, CombatRow, Ability, Muster
+from source.core.cardcollection import CardCollection
 from source.core.player import Faction, Player
 from source.core.weather import Weather
 
@@ -11,12 +12,22 @@ class BoardTest(unittest.TestCase):
     def setUp(self):
         self.player1_deck_cards = [Card(CombatRow.CLOSE, 4, Ability.NONE), Card(CombatRow.CLOSE, 5, Ability.NONE)]
         self.player1 = Player(0, Faction.NILFGAARD, self.player1_deck_cards)
+        self.player1_active_card = Card(CombatRow.RANGE, 9)
+        self.player1.active_cards.add(self.player1_active_card.combat_row, self.player1_active_card)
 
-        self.player2_muster_cards = [Card(CombatRow.CLOSE, 8, Ability.MUSTER, muster=Muster.NEKKER)] * 3
+        self.player2_muster_cards = Card(CombatRow.CLOSE, 8, Ability.MUSTER, muster=Muster.NEKKER) * 3
         self.player2_deck_cards = [Card(CombatRow.CLOSE, 3, Ability.NONE)] + self.player2_muster_cards
         self.player2 = Player(1, Faction.NOTHERN_REALMS, self.player2_deck_cards)
+        self.player2.active_cards.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 0))
 
         self.board = Board(self.player1, self.player2)
+
+    def test_repr_list(self):
+        empty_card_collection = CardCollection(22, [])
+        expected = [1] + self.player2.repr_list() + self.player1.repr_list(include_deck_and_active=True,
+                                                                           exclude_card=self.player1_active_card) + \
+                   empty_card_collection.repr_list() + empty_card_collection.repr_list() + Weather.CLEAR.one_hot()
+        self.assertCountEqual(expected, self.board.repr_list(self.player1, excluded_card=self.player1_active_card))
 
     def test_weather_card(self):
         self.board.add(self.player1, CombatRow.SPECIAL, Card(CombatRow.SPECIAL, 0, Ability.FOG))
@@ -77,4 +88,12 @@ class BoardTest(unittest.TestCase):
     def test_muster(self):
         muster_card = Card(CombatRow.CLOSE, 4, Ability.MUSTER, muster=Muster.NEKKER)
         self.board.add(self.player2, muster_card.combat_row, muster_card)
-        self.assertCountEqual(self.player2_muster_cards + [muster_card], self.board.cards[self.player2][CombatRow.CLOSE])
+        self.assertCountEqual(self.player2_muster_cards + [muster_card],
+                              self.board.cards[self.player2][CombatRow.CLOSE])
+
+    def test_all_cards_to_graveyard(self):
+        for card in self.player1_deck_cards:
+            self.board.add(self.player1, card.combat_row, card)
+
+        self.board.all_cards_to_graveyard()
+        self.assertCountEqual(self.player1_deck_cards, self.player1.graveyard.get_all_cards())

@@ -63,3 +63,7 @@ class CardCollectionTest(unittest.TestCase):
     def test_calculate_damage_hero_weather(self):
         expected = 40
         self.assertEqual(expected, self.card_collection.calculate_damage(Weather.FOG))
+
+    def test_get_all_cards(self):
+        expected = self.close_cards + self.range_cards
+        self.assertCountEqual(expected, self.card_collection.get_all_cards())

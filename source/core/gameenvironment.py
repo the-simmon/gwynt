@@ -1,6 +1,6 @@
 import random
 from collections import defaultdict
-from typing import Tuple, DefaultDict, List
+from typing import Tuple, List, Dict
 
 from .card import Card, CombatRow
 from .board import Board
@@ -14,37 +14,43 @@ class GameEnvironment:
         self.player2 = player2
         self.board = Board(player1, player2)
         self.current_round = 0
-        self.passed: DefaultDict[Player, bool] = defaultdict(lambda: False)
+        self.passed: Dict[Player, bool] = {player1: False, player2: False}
 
-        self.chose_active_cards()
+        self._chose_active_cards()
 
-    def chose_active_cards(self):
+    def _chose_active_cards(self):
         for player in [self.player1, self.player2]:
             chosen_cards = random.choices(player.deck.get_all_cards(), k=10)
 
             for card in chosen_cards:
-                player.deck.remove(card)
-                player.active_cards.add(card)
+                player.deck.remove(card.combat_row, card)
+                player.active_cards.add(card.combat_row, card)
 
-    def step(self, player: Player, row: CombatRow, card: Card, pass_=False) -> Tuple[int, bool]:
+    def step(self, player: Player, row: CombatRow = None, card: Card = None, pass_: bool = False) -> bool:
         if not pass_:
             self.board.add(player, row, card)
+            player.active_cards.remove(card.combat_row, card)
         else:
             self.passed[player] = True
 
-        reward = 0
-        if all(self.passed.values()):
-            reward = self._end_of_round()
+        return all(self.passed.values()) or self._players_have_no_cards()
 
-        done = False
-        if self.player1.rounds_won > 2 or self.player2.rounds_won > 2:
-            done = True
-            reward += 100
-        return reward, done
+    def get_round_reward(self) -> Tuple[int, int, bool]:
+        game_finished = self.player1.rounds_won > 2 or self.player2.rounds_won > 2 or self._players_have_no_cards()
+        reward1, reward2 = self._end_of_round(self.player1), self._end_of_round(self.player2)
+        return reward1, reward2, game_finished
+
+    def get_game_reward(self) -> Tuple[int, int]:
+        reward1 = 100 if self.player1.rounds_won == 2 else -100
+        reward2 = 100 if self.player2.rounds_won == 2 else -100
+        return reward1, reward2
+
+    def _players_have_no_cards(self):
+        return len(self.player1.active_cards) is 0 or len(self.player2.active_cards) is 0
 
     def repr_list(self, current_player: Player, excluded_card: Card) -> List[int]:
         current_round = [0] * 3
-        current_player[self.current_round] = 1
+        current_round[self.current_round] = 1
         return self.board.repr_list(current_player, excluded_card) + current_round
 
     def _end_of_round(self, player: Player) -> int:
@@ -67,7 +73,8 @@ class GameEnvironment:
         self.board.all_cards_to_graveyard()
         self.passed = defaultdict(lambda: False)
 
-        reward = 0
         if player is winner:
             reward = 10
+        else:
+            reward = -10
         return reward
