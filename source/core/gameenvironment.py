@@ -43,10 +43,11 @@ class GameEnvironment:
         else:
             self.passed[player] = True
 
-        return all(self.passed.values()) or self._players_have_no_cards(player)
+        return all(self.passed.values()) or self._players_have_no_cards(
+            player) or self._player_won() or self.current_round is 2
 
     def get_round_reward(self, player: Player) -> Tuple[int, bool]:
-        game_finished = self.player1.rounds_won > 2 or self.player2.rounds_won > 2 or self._players_have_no_cards(player)
+        game_finished = self._player_won() or self._players_have_no_cards(player) or self.current_round is 2
         reward = self._end_of_round(player)
         return reward, game_finished
 
@@ -56,6 +57,9 @@ class GameEnvironment:
 
     def _players_have_no_cards(self, player):
         return len(player.active_cards.get_all_cards()) is 0
+
+    def _player_won(self):
+        return self.player1.rounds_won >= 2 or self.player2.rounds_won >= 2
 
     def repr_list(self, current_player: Player, excluded_card: Card) -> List[int]:
         current_round = [0] * 3
@@ -87,4 +91,3 @@ class GameEnvironment:
         else:
             reward = -10
         return reward
-

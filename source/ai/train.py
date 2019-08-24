@@ -18,13 +18,20 @@ def train_ai():
         rewards2 = []
         finished = False
         while not finished:
-            finished1, reward1 = ai.step(environment, player1)
-            finished2, reward2 = ai.step(environment, player2)
+            reward1, reward2 = 0, 0
+            finished1, finished2 = False, False
+
+            if not environment.passed[player1]:
+                finished1, reward1 = ai.step(environment, player1)
+
+            if not environment.passed[player2] and not finished1:
+                finished2, reward2 = ai.step(environment, player2)
             finished = finished1 or finished2
 
             rewards1.append(reward1)
             rewards2.append(reward2)
-        print("current reward", rewards1[-1])
+
+        print("current reward", rewards1[-1], rewards2[-1])
 
 
 def _get_players() -> Tuple[Player, Player]:

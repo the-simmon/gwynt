@@ -29,13 +29,13 @@ class RandomForest(AbstractAI):
             reward, game_finished = environment.get_round_reward(player)
 
             if game_finished:
-                self.random_factor *= 0.99
+                self.random_factor *= 0.999
                 reward += environment.get_game_reward(player)
 
-        if not game_finished and not ignore_reward:
-            reward += self._get_future_reward(environment, player)
+        if not ignore_reward:
+            if not game_finished:
+                reward += self._get_future_reward(environment, player)
 
-        if game_finished and not ignore_reward:
             self.rf.fit(self.repr_list(environment, player, card, row), [reward])
 
         return game_finished, reward
@@ -60,10 +60,12 @@ class RandomForest(AbstractAI):
         environment = deepcopy(environment)
 
         reward = 0
+        game_finished = False
         if not environment.passed[player]:
             if not environment.passed[enemy]:
-                self.step(environment, enemy, ignore_reward=True)
-            _, reward = self.step(environment, player)
+                game_finished, _ = self.step(environment, enemy, ignore_reward=True)
+            if not game_finished:
+                _, reward = self.step(environment, player)
         return reward
 
     def _get_best_card(self, environment: GameEnvironment, player: Player) -> Tuple[Card, CombatRow]:
