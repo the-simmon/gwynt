@@ -9,5 +9,5 @@ def flatten(cards: List[any]) -> List[Card]:
         if type(item) is Card:
             result.append(item)
         else:
-            result.append(flatten(item))
+            result.extend(flatten(item))
     return result

@@ -23,7 +23,7 @@ cards = [
     Card(CombatRow.AGILE, 2, Ability.NONE),
     Card(CombatRow.SIEGE, 5),
     Card(CombatRow.CLOSE, 10, hero=True),
-    Card(CombatRow.AGILE, 8, Ability.AGILE, hero=True),
+    Card(CombatRow.AGILE, 8, hero=True),
     Card(CombatRow.RANGE, 10, hero=True),
     Card(CombatRow.CLOSE, 2, Ability.MUSTER, muster=Muster.NEKKER) * 3,
     Card(CombatRow.CLOSE, 5),

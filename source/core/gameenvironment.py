@@ -20,7 +20,11 @@ class GameEnvironment:
 
     def _chose_active_cards(self):
         for player in [self.player1, self.player2]:
-            chosen_cards = random.choices(player.deck.get_all_cards(), k=10)
+
+            #  random.choices not applicable, because it can return the same object multiple times
+            deck_cards = player.deck.get_all_cards()
+            random.shuffle(deck_cards)
+            chosen_cards = deck_cards[:10]
 
             for card in chosen_cards:
                 player.deck.remove(card.combat_row, card)
