@@ -1,18 +1,24 @@
+from __future__ import annotations
 import random
 from collections import defaultdict
-from typing import Tuple, List, Dict
+from copy import deepcopy
+from typing import Tuple, List, Dict, TYPE_CHECKING
 
 from .card import Card, CombatRow
 from .board import Board
 from .player import Player
 
+if TYPE_CHECKING:
+    from ..ai.abstract_ai import AbstractAI
+
 
 class GameEnvironment:
 
-    def __init__(self, player1: Player, player2: Player):
+    def __init__(self, player1: Player, player2: Player, ai: AbstractAI):
         self.player1 = player1
         self.player2 = player2
-        self.board = Board(player1, player2)
+        self.ai = ai
+        self.board = Board(player1, player2, ai, self)
         self.current_round = 0
         self.passed: Dict[Player, bool] = {player1: False, player2: False}
 
@@ -32,25 +38,24 @@ class GameEnvironment:
 
     def step(self, player: Player, row: CombatRow = None, card: Card = None, pass_: bool = False) -> bool:
         if not pass_:
-            self.board.add(player, row, card)
             player.active_cards.remove(card.combat_row, card)
+            self.board.add(player, row, card)
         else:
             self.passed[player] = True
 
-        return all(self.passed.values()) or self._players_have_no_cards()
+        return all(self.passed.values()) or self._players_have_no_cards(player)
 
-    def get_round_reward(self) -> Tuple[int, int, bool]:
-        game_finished = self.player1.rounds_won > 2 or self.player2.rounds_won > 2 or self._players_have_no_cards()
-        reward1, reward2 = self._end_of_round(self.player1), self._end_of_round(self.player2)
-        return reward1, reward2, game_finished
+    def get_round_reward(self, player: Player) -> Tuple[int, bool]:
+        game_finished = self.player1.rounds_won > 2 or self.player2.rounds_won > 2 or self._players_have_no_cards(player)
+        reward = self._end_of_round(player)
+        return reward, game_finished
 
-    def get_game_reward(self) -> Tuple[int, int]:
-        reward1 = 100 if self.player1.rounds_won == 2 else -100
-        reward2 = 100 if self.player2.rounds_won == 2 else -100
-        return reward1, reward2
+    def get_game_reward(self, player: Player) -> int:
+        reward = 100 if player.rounds_won == 2 else -100
+        return reward
 
-    def _players_have_no_cards(self):
-        return len(self.player1.active_cards) is 0 or len(self.player2.active_cards) is 0
+    def _players_have_no_cards(self, player):
+        return len(player.active_cards.get_all_cards()) is 0
 
     def repr_list(self, current_player: Player, excluded_card: Card) -> List[int]:
         current_round = [0] * 3
@@ -74,7 +79,7 @@ class GameEnvironment:
             self.player1.rounds_won += 1
             self.player2.rounds_won += 1
 
-        self.board.all_cards_to_graveyard()
+        self.board.all_cards_to_graveyard(player)
         self.passed = defaultdict(lambda: False)
 
         if player is winner:
@@ -82,3 +87,4 @@ class GameEnvironment:
         else:
             reward = -10
         return reward
+

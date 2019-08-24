@@ -1,22 +1,29 @@
+from __future__ import annotations
 from collections import defaultdict
 from copy import deepcopy
-from typing import DefaultDict, List
+from typing import DefaultDict, List, TYPE_CHECKING
 
 from .card import CombatRow, Card, Ability
 from .cardcollection import CardCollection
 from .player import Player
 from .weather import Weather
 
+if TYPE_CHECKING:
+    from ..ai.abstract_ai import AbstractAI
+    from .gameenvironment import GameEnvironment
+
 
 class Board:
 
-    def __init__(self, player1: Player, player2: Player):
+    def __init__(self, player1: Player, player2: Player, ai: AbstractAI, environment: GameEnvironment):
         self.cards: DefaultDict[Player, CardCollection] = defaultdict(lambda: CardCollection(max_cards=22, cards=[]))
         self.weather: Weather = Weather.CLEAR
         self.player1 = player1
         self.player2 = player2
+        self.ai = ai
+        self.environment = environment
 
-    def _get_enemy_player(self, player: Player) -> Player:
+    def get_enemy_player(self, player: Player) -> Player:
         if player.id is self.player1.id:
             return self.player2
         return self.player1
@@ -24,7 +31,7 @@ class Board:
     def add(self, player: Player, row: CombatRow, card: Card):
         if row is not CombatRow.SPECIAL:
             if card.ability is Ability.SPY:
-                enemy = self._get_enemy_player(player)
+                enemy = self.get_enemy_player(player)
                 self.cards[enemy].add(row, card)
             else:
                 self.cards[player].add(row, card)
@@ -38,14 +45,13 @@ class Board:
     def calculate_damage(self, player: Player) -> int:
         return self.cards[player].calculate_damage(self.weather)
 
-    def all_cards_to_graveyard(self):
-        for player, cardcollection in self.cards.items():
-            for row, cards in cardcollection.items():
+    def all_cards_to_graveyard(self, player: Player):
+            for row, cards in self.cards[player].items():
                 for card in deepcopy(cards):
                     self.remove(player, row, card)
 
     def repr_list(self, player: Player, excluded_card: Card):
-        enemy = self._get_enemy_player(player)
+        enemy = self.get_enemy_player(player)
         return [len(enemy.active_cards)] + enemy.repr_list() + player.repr_list(include_deck_and_active=True,
                                                                                 exclude_card=excluded_card) + \
                self.cards[enemy].repr_list() + self.cards[player].repr_list() + self.weather.one_hot()
@@ -58,7 +64,8 @@ class Board:
         elif Weather.ability_is_weather(ability):
             self.weather = Weather.ability_to_weather(ability)
         elif ability is Ability.MEDIC:
-            raise NotImplementedError
+            card, row = self.ai.chose_revive(self.environment, player)
+            self.add(player, row, card)
         elif ability is Ability.MUSTER:
             self._check_muster(player, card)
         elif ability is Ability.SPY:
@@ -71,11 +78,10 @@ class Board:
 
         def search_and_remove(muster_card: Card, card_collection: CardCollection) -> List[Card]:
             result = []
-            for cards in card_collection.values():
-                for current_card in cards:
-                    if current_card.muster is muster_card.muster:
-                        result.append(current_card)
-                        card_collection.remove(card.combat_row, current_card)
+            for current_card in card_collection.get_all_cards():
+                if current_card.muster is muster_card.muster:
+                    result.append(current_card)
+                    card_collection.remove(current_card.combat_row, current_card)
             return result
 
         cards_to_add = search_and_remove(card, player.active_cards)
@@ -85,7 +91,7 @@ class Board:
             self.add(player, card.combat_row, card)
 
     def _check_scorch(self, card: Card, player: Player):
-        enemy = self._get_enemy_player(player)
+        enemy = self.get_enemy_player(player)
         if card.combat_row is CombatRow.SPECIAL:
             self._scorch_special()
         else:
@@ -112,10 +118,13 @@ class Board:
     def _scorch_by_damage(self, scorch_damage):
         for player in [self.player1, self.player2]:
             for row in self.cards[player].keys():
+                cards_to_remove = []
                 for index, card in enumerate(self.cards[player].get_damage_adjusted_cards(row, self.weather)):
                     if card.damage is scorch_damage and not card.hero:
                         card_to_remove = self.cards[player][row][index]
-                        self.remove(player, row, card_to_remove)
+                        cards_to_remove.append(card_to_remove)
+                for card_to_remove in cards_to_remove:
+                    self.remove(player, row, card_to_remove)
 
 
 def _get_highest_index_and_damage(cards: List[Card]) -> int:

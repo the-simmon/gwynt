@@ -1,8 +1,10 @@
 import unittest
 
+from source.ai.random_forest.randomforest import RandomForest
 from source.core.board import Board
 from source.core.card import Card, CombatRow, Ability, Muster
 from source.core.cardcollection import CardCollection
+from source.core.gameenvironment import GameEnvironment
 from source.core.player import Faction, Player
 from source.core.weather import Weather
 
@@ -20,7 +22,8 @@ class BoardTest(unittest.TestCase):
         self.player2 = Player(1, Faction.NOTHERN_REALMS, self.player2_deck_cards)
         self.player2.active_cards.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 0))
 
-        self.board = Board(self.player1, self.player2)
+        dummy_player = Player(0, Faction.NILFGAARD, [])
+        self.board = Board(self.player1, self.player2, RandomForest(), GameEnvironment(dummy_player, dummy_player, RandomForest()))
 
     def test_repr_list(self):
         empty_card_collection = CardCollection(22, [])
@@ -75,8 +78,8 @@ class BoardTest(unittest.TestCase):
         self.assertEqual(surviving_cards2, self.board.cards[self.player2][CombatRow.CLOSE])
 
     def test_medic_card(self):
-        args = self.player1, CombatRow.CLOSE, Card(CombatRow.CLOSE, 3, Ability.MEDIC)
-        self.assertRaises(NotImplementedError, self.board.add, *args)
+        self.board.add(self.player1, CombatRow.CLOSE, Card(CombatRow.CLOSE, 3, Ability.MEDIC))
+        self.assertEqual(2, len(self.board.cards[self.player1].get_all_cards()))
 
     def test_spy_card(self):
         spy = Card(CombatRow.CLOSE, 5, Ability.SPY)
@@ -95,5 +98,5 @@ class BoardTest(unittest.TestCase):
         for card in self.player1_deck_cards:
             self.board.add(self.player1, card.combat_row, card)
 
-        self.board.all_cards_to_graveyard()
+        self.board.all_cards_to_graveyard(self.player1)
         self.assertCountEqual(self.player1_deck_cards, self.player1.graveyard.get_all_cards())

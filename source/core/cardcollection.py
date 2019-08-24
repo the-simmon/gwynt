@@ -63,6 +63,13 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
             result.extend(cards)
         return result
 
+    def __deepcopy__(self, memodict={}):
+        copy = CardCollection(self.max_cards, [])
+        for row, cards in self.items():
+            copy[row] = deepcopy(cards)
+        copy.max_cards = self.max_cards
+        return copy
+
 
 def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> List[Card]:
 
@@ -125,3 +132,4 @@ def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> List[Card]
     cards = check_other_abilities(cards)
 
     return cards
+

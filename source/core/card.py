@@ -1,3 +1,4 @@
+from __future__ import annotations
 from copy import deepcopy
 from typing import List
 from .one_hot_enum import OneHotEnum
@@ -9,6 +10,18 @@ class CombatRow(OneHotEnum):
     SIEGE = 2
     SPECIAL = 3
     AGILE = 4
+
+    @staticmethod
+    def get_possible_rows(row: CombatRow) -> List[CombatRow]:
+        result = []
+        if row is CombatRow.AGILE or row is CombatRow.SPECIAL:
+            result.append(CombatRow.CLOSE)
+            result.append(CombatRow.RANGE)
+            if row is CombatRow.SPECIAL:
+                result.append(CombatRow.SIEGE)
+        else:
+            result.append(row)
+        return result
 
 
 class Ability(OneHotEnum):
@@ -25,6 +38,7 @@ class Ability(OneHotEnum):
     FROST = 10
     FOG = 11
     RAIN = 12
+    PASS = 13
 
 
 class Muster(OneHotEnum):

@@ -1,7 +1,8 @@
 import random
+from copy import deepcopy
 from typing import List
 
-from source.core.card import CombatRow
+from source.core.card import CombatRow, Ability
 from .cardcollection import CardCollection
 from .card import Card
 from .one_hot_enum import OneHotEnum
@@ -25,10 +26,7 @@ class Player:
         self.rounds_won = 0
 
     def pick_random_from_deck(self):
-        cards = []
-        for row in CombatRow:
-            cards.extend(self.deck[row])
-
+        cards = self.deck.get_all_cards()
         card = random.choice(cards)
         self.deck.remove(card.combat_row, card)
         self.active_cards.add(card.combat_row, card)
@@ -39,3 +37,9 @@ class Player:
             result.extend(self.deck.repr_list())
             result.extend(self.active_cards.repr_list(exclude_card))
         return result
+
+    def __eq__(self, other):
+        return other is not None and self.id is other.id
+
+    def __hash__(self):
+        return hash(self.id) + hash(self.faction) + hash(self.rounds_won)
