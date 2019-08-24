@@ -1,3 +1,4 @@
+from ._flatten import flatten
 from ..card import Card, CombatRow, Ability
 
 cards = [
@@ -18,3 +19,5 @@ cards = [
     Card(CombatRow.RANGE, 7, Ability.MEDIC, hero=True),
     Card(CombatRow.CLOSE, 5),
 ]
+
+cards = flatten(cards)
