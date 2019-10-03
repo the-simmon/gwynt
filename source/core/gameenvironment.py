@@ -91,3 +91,11 @@ class GameEnvironment:
         else:
             reward = -10
         return reward
+
+    def __str__(self):
+        result = ''
+        result += str(self.player1.deck)
+        result += '\n\n-----------------\n\n'
+        result += str(self.board)
+        result += '\n\n-----------------\n\n'
+        result += str(self.player2.deck)

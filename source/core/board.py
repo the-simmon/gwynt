@@ -46,9 +46,9 @@ class Board:
         return self.cards[player].calculate_damage(self.weather)
 
     def all_cards_to_graveyard(self, player: Player):
-            for row, cards in self.cards[player].items():
-                for card in deepcopy(cards):
-                    self.remove(player, row, card)
+        for row, cards in self.cards[player].items():
+            for card in deepcopy(cards):
+                self.remove(player, row, card)
 
     def repr_list(self, player: Player, excluded_card: Card):
         enemy = self.get_enemy_player(player)
@@ -125,6 +125,22 @@ class Board:
                         cards_to_remove.append(card_to_remove)
                 for card_to_remove in cards_to_remove:
                     self.remove(player, row, card_to_remove)
+
+    def __str__(self):
+        result = ''
+        for player in self.cards.keys():
+            result += self._str_for_player(player)
+            result += '\n\n=====================\n\n'
+        return result
+
+    def _str_for_player(self, player: Player):
+        result = ''
+        for row, cards in self.cards[player].items():
+            result += '{} {}: '.format(row.name, self.cards[player].calculate_damage_for_row(row))
+            for card in cards:
+                result += '({}) '.format(str(card))
+            result += '\n'
+        return result
 
 
 def _get_highest_index_and_damage(cards: List[Card]) -> int:

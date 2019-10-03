@@ -55,7 +55,8 @@ class Muster(OneHotEnum):
 
 class Card:
 
-    def __init__(self, combat_row: CombatRow, damage: int, ability: Ability = Ability.NONE, hero: bool = False, muster: Muster = Muster.NONE):
+    def __init__(self, combat_row: CombatRow, damage: int, ability: Ability = Ability.NONE, hero: bool = False,
+                 muster: Muster = Muster.NONE):
         self.combat_row = combat_row
         self.damage = damage
         self.ability = ability
@@ -78,3 +79,6 @@ class Card:
 
     def __mul__(self, count: int):
         return [deepcopy(self) for _ in range(count)]
+
+    def __str__(self):
+        return '{}, {}, {}, {}'.format(self.damage, self.ability.name, self.hero, self.muster.name)
