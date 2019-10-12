@@ -1,5 +1,4 @@
 import abc
-from typing import Tuple
 
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
