@@ -1,10 +1,8 @@
 import random
-from copy import deepcopy
 from typing import List
 
-from source.core.card import CombatRow, Ability
-from .cardcollection import CardCollection
 from .card import Card
+from .cardcollection import CardCollection
 from .one_hot_enum import OneHotEnum
 
 

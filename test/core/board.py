@@ -1,6 +1,7 @@
 import unittest
 
 from source.ai.random_forest.randomforest import RandomForest
+
 from source.core.board import Board
 from source.core.card import Card, CombatRow, Ability, Muster
 from source.core.cardcollection import CardCollection

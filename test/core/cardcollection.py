@@ -1,5 +1,4 @@
 import unittest
-from copy import deepcopy
 
 from source.core.card import CombatRow, Ability, Card
 from source.core.cardcollection import CardCollection

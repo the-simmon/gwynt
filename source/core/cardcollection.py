@@ -2,8 +2,8 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import DefaultDict, List, Callable
 
-from .weather import Weather
 from .card import CombatRow, Card, Ability
+from .weather import Weather
 
 
 class CardCollection(DefaultDict[CombatRow, List[Card]]):

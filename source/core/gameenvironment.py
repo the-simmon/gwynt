@@ -1,11 +1,11 @@
 from __future__ import annotations
+
 import random
 from collections import defaultdict
-from copy import deepcopy
 from typing import Tuple, List, Dict, TYPE_CHECKING
 
-from .card import Card, CombatRow
 from .board import Board
+from .card import Card, CombatRow
 from .player import Player
 
 if TYPE_CHECKING:
