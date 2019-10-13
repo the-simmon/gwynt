@@ -8,7 +8,7 @@ from enum import Enum
 from math import sqrt
 from typing import List
 
-from source.core.card import Card, Ability
+from source.core.card import Card, Ability, CombatRow
 from source.core.cards.util import get_cards
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
@@ -16,20 +16,23 @@ from source.core.player import Player
 
 class PlayerType(Enum):
     SELF = 0
-    OPPONENT = 0
+    ENEMEY = 0
 
     def invert(self):
-        return PlayerType.SELF if self.value is PlayerType.OPPONENT else PlayerType.OPPONENT
+        return PlayerType.SELF if self.value is PlayerType.ENEMEY else PlayerType.ENEMEY
 
 
 class Node:
 
-    def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, player: Player):
+    def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, player: Player, card: Card,
+                 row: CombatRow):
         self.environment = environment
         self.board = environment.board
         self.parent = parent
         self.player_type = player_type
         self.player = player
+        self.card = card
+        self.row = row
         self.leafs: List[Node] = []
         self.simulations = 0
         self.wins = 0
@@ -65,7 +68,7 @@ class Node:
                 environment_copy = deepcopy(self.environment)
                 environment_copy.board.add(self.player, row, card)
 
-                node = Node(environment_copy, self, self.player_type.invert(), enemy)
+                node = Node(environment_copy, self, self.player_type.invert(), enemy, card, row)
                 if card.ability is Ability.MEDIC:
                     self._expand_medic(node)
                 self.leafs.append(node)
@@ -90,11 +93,9 @@ class Node:
                 environment_copy = deepcopy(self.environment)
                 environment_copy.board.add(self.player, row, card)
                 node.leafs.append(
-                    Node(environment_copy, node, self.player_type, self.board.get_enemy_player(self.player)))
+                    Node(environment_copy, node, self.player_type, self.board.get_enemy_player(self.player), card, row))
 
     def simulate(self):
-        self.simulations += 1
-
         environment_copy = deepcopy(self.environment)
         current_player = self.player
         current_player_type = self.player_type
@@ -113,6 +114,7 @@ class Node:
         self.backpropagate(current_player_type)
 
     def backpropagate(self, winner: PlayerType):
+        self.simulations += 1
         if winner is self.player_type:
             self.wins += 1
         if self.parent:
