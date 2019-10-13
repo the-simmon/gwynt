@@ -101,11 +101,12 @@ class Node:
         current_player_type = self.player_type
 
         print("simulate")
-        while environment_copy.current_round < 2:
+        game_over = False
+        while not game_over:
             enemy = environment_copy.board.get_enemy_player(self.player)
             random_card = random.choice(self._get_potential_cards(enemy))
             row = random.choice(CombatRow.get_possible_rows(random_card.combat_row))
-            environment_copy.board.add(current_player, row, random_card)
+            _, game_over = environment_copy.step(current_player, row, random_card)
 
             current_player = enemy
             current_player_type = current_player_type.invert()

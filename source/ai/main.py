@@ -28,9 +28,10 @@ def revive(environment: GameEnvironment, player: Player) -> Tuple[Card, CombatRo
 environment = GameEnvironment(player0, player1, revive)
 
 current_player = player0
-while environment.current_round < 2:
+game_over = False
+while not game_over:
     mcts = MCTS(environment, current_player)
     card, row = mcts.run()
-    environment.step(current_player, row, card)
+    _, game_over = environment.step(current_player, row, card)
 
     current_player = environment.board.get_enemy_player(current_player)
