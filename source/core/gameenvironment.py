@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import random
 from collections import defaultdict
-from typing import Tuple, List, Dict, TYPE_CHECKING
+from typing import Tuple, List, Dict, TYPE_CHECKING, Callable
 
 from .board import Board
 from .card import Card, CombatRow
@@ -14,11 +14,12 @@ if TYPE_CHECKING:
 
 class GameEnvironment:
 
-    def __init__(self, player1: Player, player2: Player, ai: AbstractAI):
+    def __init__(self, player1: Player, player2: Player,
+                 revive_func: Callable[[GameEnvironment, Player], Tuple[Card, CombatRow]]):
         self.player1 = player1
         self.player2 = player2
-        self.ai = ai
-        self.board = Board(player1, player2, ai, self)
+        self.revive_func = revive_func
+        self.board = Board(player1, player2, revive_func, self)
         self.current_round = 0
         self.passed: Dict[Player, bool] = {player1: False, player2: False}
 

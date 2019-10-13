@@ -89,7 +89,7 @@ class Node:
 
     def _expand_medic(self, node: Node):
         for card in self.player.graveyard.get_all_cards():
-            for row in card.combat_row.get_possible_rows():
+            for row in CombatRow.get_possible_rows(card.combat_row):
                 environment_copy = deepcopy(self.environment)
                 environment_copy.board.add(self.player, row, card)
                 node.leafs.append(
@@ -103,7 +103,7 @@ class Node:
         while environment_copy.current_round is not 2:
             enemy = environment_copy.board.get_enemy_player(self.player)
             random_card = random.choice(self._get_potential_cards(enemy))
-            row = random.choice(random_card.combat_row.get_possible_rows())
+            row = random.choice(CombatRow.get_possible_rows(random_card.combat_row))
             environment_copy.board.add(current_player, row, random_card)
 
             current_player = enemy

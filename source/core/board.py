@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from copy import deepcopy
-from typing import DefaultDict, List, TYPE_CHECKING
+from typing import DefaultDict, List, TYPE_CHECKING, Callable, Tuple
 
 from .card import CombatRow, Card, Ability
 from .cardcollection import CardCollection
@@ -16,12 +16,14 @@ if TYPE_CHECKING:
 
 class Board:
 
-    def __init__(self, player1: Player, player2: Player, ai: AbstractAI, environment: GameEnvironment):
+    def __init__(self, player1: Player, player2: Player,
+                 revive_func: Callable[[GameEnvironment, Player], Tuple[Card, CombatRow]],
+                 environment: GameEnvironment):
         self.cards: DefaultDict[Player, CardCollection] = defaultdict(lambda: CardCollection(max_cards=22, cards=[]))
         self.weather: Weather = Weather.CLEAR
         self.player1 = player1
         self.player2 = player2
-        self.ai = ai
+        self.revive_func = revive_func
         self.environment = environment
 
     def get_enemy_player(self, player: Player) -> Player:
@@ -65,7 +67,7 @@ class Board:
         elif Weather.ability_is_weather(ability):
             self.weather = Weather.ability_to_weather(ability)
         elif ability is Ability.MEDIC:
-            card, row = self.ai.choose_revive(self.environment, player)
+            card, row = self.revive_func(self.environment, player)
             self.add(player, row, card)
         elif ability is Ability.MUSTER:
             self._check_muster(player, card)

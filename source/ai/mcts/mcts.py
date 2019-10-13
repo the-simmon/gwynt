@@ -1,14 +1,13 @@
 import random
 import time
 
-from source.ai import AbstractAI
 from source.ai.mcts.node import Node, PlayerType
 from source.core.card import Card
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
 
 
-class MCTS(AbstractAI):
+class MCTS:
 
     def __init__(self, environment: GameEnvironment, player: Player, max_time=5):
         self.environment = environment
@@ -30,6 +29,3 @@ class MCTS(AbstractAI):
                 best_card = node.card
 
         return best_card
-
-    def choose_revive(self, environment: GameEnvironment, player: Player):
-        return random.choice(player.graveyard.get_all_cards())
