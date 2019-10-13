@@ -100,7 +100,8 @@ class Node:
         current_player = self.player
         current_player_type = self.player_type
 
-        while environment_copy.current_round is not 2:
+        print("simulate")
+        while environment_copy.current_round < 2:
             enemy = environment_copy.board.get_enemy_player(self.player)
             random_card = random.choice(self._get_potential_cards(enemy))
             row = random.choice(CombatRow.get_possible_rows(random_card.combat_row))
@@ -109,6 +110,7 @@ class Node:
             current_player = enemy
             current_player_type = current_player_type.invert()
 
+        print("stop simulating")
         if current_player.rounds_won is not 2:
             current_player_type = current_player_type.invert()
         self.backpropagate(current_player_type)

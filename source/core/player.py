@@ -25,9 +25,10 @@ class Player:
 
     def pick_random_from_deck(self):
         cards = self.deck.get_all_cards()
-        card = random.choice(cards)
-        self.deck.remove(card.combat_row, card)
-        self.active_cards.add(card.combat_row, card)
+        if cards:
+            card = random.choice(cards)
+            self.deck.remove(card.combat_row, card)
+            self.active_cards.add(card.combat_row, card)
 
     def repr_list(self, include_deck_and_active=False, exclude_card: Card = None) -> List[int]:
         result = self.faction.one_hot() + self.graveyard.repr_list()

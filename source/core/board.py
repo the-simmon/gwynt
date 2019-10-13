@@ -68,7 +68,8 @@ class Board:
             self.weather = Weather.ability_to_weather(ability)
         elif ability is Ability.MEDIC:
             card, row = self.revive_func(self.environment, player)
-            self.add(player, row, card)
+            if card:
+                self.add(player, row, card)
         elif ability is Ability.MUSTER:
             self._check_muster(player, card)
         elif ability is Ability.SPY:

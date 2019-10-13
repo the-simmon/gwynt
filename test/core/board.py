@@ -1,6 +1,6 @@
+import random
 import unittest
-
-from source.ai.random_forest.randomforest import RandomForest
+from typing import Tuple
 
 from source.core.board import Board
 from source.core.card import Card, CombatRow, Ability, Muster
@@ -8,6 +8,15 @@ from source.core.cardcollection import CardCollection
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Faction, Player
 from source.core.weather import Weather
+
+
+def revive(environment: GameEnvironment, player: Player) -> Tuple[Card, CombatRow]:
+    if player.graveyard.get_all_cards():
+        card = random.choice(player.graveyard.get_all_cards())
+        row = random.choice(CombatRow.get_possible_rows(card.combat_row))
+    else:
+        card, row = None, None
+    return card, row
 
 
 class BoardTest(unittest.TestCase):
@@ -24,7 +33,8 @@ class BoardTest(unittest.TestCase):
         self.player2.active_cards.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 0))
 
         dummy_player = Player(0, Faction.NILFGAARD, [])
-        self.board = Board(self.player1, self.player2, RandomForest(), GameEnvironment(dummy_player, dummy_player, RandomForest()))
+        self.board = Board(self.player1, self.player2, revive,
+                           GameEnvironment(dummy_player, dummy_player, revive))
 
     def test_repr_list(self):
         empty_card_collection = CardCollection(22, [])
@@ -79,6 +89,7 @@ class BoardTest(unittest.TestCase):
         self.assertEqual(surviving_cards2, self.board.cards[self.player2][CombatRow.CLOSE])
 
     def test_medic_card(self):
+        self.player1.graveyard.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 3))
         self.board.add(self.player1, CombatRow.CLOSE, Card(CombatRow.CLOSE, 3, Ability.MEDIC))
         self.assertEqual(2, len(self.board.cards[self.player1].get_all_cards()))
 

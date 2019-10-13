@@ -17,8 +17,12 @@ player1 = Player(1, Faction.NILFGAARD, player1_cards[:22])
 
 
 def revive(environment: GameEnvironment, player: Player) -> Tuple[Card, CombatRow]:
-    card = random.choice(player.graveyard.get_all_cards())
-    return card, random.choice(CombatRow.get_possible_rows(card.combat_row))
+    if player.graveyard.get_all_cards():
+        card = random.choice(player.graveyard.get_all_cards())
+        row = random.choice(CombatRow.get_possible_rows(card.combat_row))
+    else:
+        card, row = None, None
+    return card, row
 
 
 environment = GameEnvironment(player0, player1, revive)
