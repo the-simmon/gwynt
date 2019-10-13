@@ -31,5 +31,4 @@ class MCTS:
                 best_card = node.card
                 row = node.row
 
-        print("picking card: " + str(best_card))
         return best_card, row

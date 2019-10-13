@@ -91,7 +91,6 @@ class Node:
     def simulate(self):
         environment_copy = deepcopy(self.environment)
         current_player = deepcopy(self.player)
-        current_player_type = deepcopy(self.player_type)
 
         game_over = False
         while not game_over:
@@ -106,11 +105,15 @@ class Node:
             game_over, _ = environment_copy.step(current_player, row, random_card, pass_)
 
             current_player = environment_copy.board.get_enemy_player(current_player)
-            current_player_type = current_player_type.invert()
 
-        if current_player.rounds_won is not 2:
-            current_player_type = current_player_type.invert()
-        self.backpropagate(current_player_type)
+        board = environment_copy.board
+        winner = board.player1 if board.player1.rounds_won is 2 else board.player2
+
+        winning_type = PlayerType.SELF
+        if winner.id is not self.player.id:
+            winning_type = PlayerType.ENEMEY
+
+        self.backpropagate(winning_type)
 
     def backpropagate(self, winner: PlayerType):
         self.simulations += 1
