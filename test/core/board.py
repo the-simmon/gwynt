@@ -112,3 +112,7 @@ class BoardTest(unittest.TestCase):
 
         self.board.all_cards_to_graveyard(self.player1)
         self.assertCountEqual(self.player1_deck_cards, self.player1.graveyard.get_all_cards())
+
+    def test_get_enemy(self):
+        actual = self.board.get_enemy_player(self.player1)
+        self.assertEqual(self.player2, actual)

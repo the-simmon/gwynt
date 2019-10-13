@@ -10,7 +10,6 @@ from .player import Player
 from .weather import Weather
 
 if TYPE_CHECKING:
-    from ..ai.abstract_ai import AbstractAI
     from .gameenvironment import GameEnvironment
 
 

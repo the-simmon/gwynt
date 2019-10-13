@@ -19,7 +19,9 @@ class PlayerType(Enum):
     ENEMEY = 0
 
     def invert(self):
-        return PlayerType.SELF if self.value is PlayerType.ENEMEY else PlayerType.ENEMEY
+        if self.value is PlayerType.SELF:
+            return PlayerType.ENEMEY
+        return PlayerType.SELF
 
 
 class Node:
@@ -56,36 +58,25 @@ class Node:
                 self.select()
 
     def get_ucb1(self):
-        simulations = self.simulations or sys.float_info.epislon
+        simulations = self.simulations or sys.float_info.epsilon * 10
         return self.wins / simulations + sqrt(math.log(self.parent.simulations) / simulations)
 
     def expand(self):
-        enemy = self.board.get_enemy_player(self.player)
-        potential_cards = self._get_potential_cards(enemy)
+        potential_cards = self._get_potential_cards(self.player)
 
         for card in potential_cards:
-            for row in card.combat_row.get_possible_rows():
+            for row in card.combat_row.get_possible_rows(card.combat_row):
                 environment_copy = deepcopy(self.environment)
                 environment_copy.board.add(self.player, row, card)
 
-                node = Node(environment_copy, self, self.player_type.invert(), enemy, card, row)
+                enemy = environment_copy.board.get_enemy_player(self.player)
+                node = Node(environment_copy, self, deepcopy(self.player_type.invert()), enemy, card, row)
                 if card.ability is Ability.MEDIC:
                     self._expand_medic(node)
                 self.leafs.append(node)
 
-    def _get_potential_cards(self, enemy: Player) -> List[Card]:
-        if self.player_type is PlayerType.SELF:
-            potential_cards = self.player.active_cards.get_all_cards()
-        else:
-            potential_cards = get_cards(enemy.faction)
-
-            played_cards = self.board.cards[enemy].get_all_cards()
-            played_cards.extend(enemy.graveyard.get_all_cards())
-
-            for played_card in played_cards:
-                potential_cards.remove(played_card)
-
-        return potential_cards
+    def _get_potential_cards(self, player: Player) -> List[Card]:
+        return player.active_cards.get_all_cards()
 
     def _expand_medic(self, node: Node):
         for card in self.player.graveyard.get_all_cards():
@@ -93,25 +84,30 @@ class Node:
                 environment_copy = deepcopy(self.environment)
                 environment_copy.board.add(self.player, row, card)
                 node.leafs.append(
-                    Node(environment_copy, node, self.player_type, self.board.get_enemy_player(self.player), card, row))
+                    Node(environment_copy, node, deepcopy(self.player_type),
+                         environment_copy.board.get_enemy_player(self.player),
+                         card, row))
 
     def simulate(self):
         environment_copy = deepcopy(self.environment)
-        current_player = self.player
-        current_player_type = self.player_type
+        current_player = deepcopy(self.player)
+        current_player_type = deepcopy(self.player_type)
 
-        print("simulate")
         game_over = False
         while not game_over:
-            enemy = environment_copy.board.get_enemy_player(self.player)
-            random_card = random.choice(self._get_potential_cards(enemy))
-            row = random.choice(CombatRow.get_possible_rows(random_card.combat_row))
-            _, game_over = environment_copy.step(current_player, row, random_card)
+            pass_ = False
+            potential_cards = self._get_potential_cards(current_player)
+            if potential_cards:
+                random_card = random.choice(self._get_potential_cards(current_player))
+                row = random.choice(CombatRow.get_possible_rows(random_card.combat_row))
+            else:
+                random_card, row = None, None
+                pass_ = True
+            game_over, _ = environment_copy.step(current_player, row, random_card, pass_)
 
-            current_player = enemy
+            current_player = environment_copy.board.get_enemy_player(current_player)
             current_player_type = current_player_type.invert()
 
-        print("stop simulating")
         if current_player.rounds_won is not 2:
             current_player_type = current_player_type.invert()
         self.backpropagate(current_player_type)

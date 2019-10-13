@@ -1,8 +1,9 @@
 import random
 import time
+from typing import Tuple
 
 from source.ai.mcts.node import Node, PlayerType
-from source.core.card import Card
+from source.core.card import Card, CombatRow
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
 
@@ -16,16 +17,19 @@ class MCTS:
         self.start_time = None
         self.node = Node(environment, None, PlayerType.ENEMEY, player, None, None)
 
-    def run(self) -> Card:
+    def run(self) -> Tuple[Card, CombatRow]:
         self.start_time = time.time()
         while time.time() - self.start_time < self.max_time:
             self.node.select()
 
         max_simulations = 0
         best_card: Card = None
+        row: CombatRow = None
         for node in self.node.leafs:
             if node.simulations > max_simulations:
                 max_simulations = node.simulations
                 best_card = node.card
+                row = node.row
 
-        return best_card
+        print("picking card: " + str(best_card))
+        return best_card, row
