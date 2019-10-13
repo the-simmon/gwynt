@@ -16,7 +16,7 @@ class CombatRow(OneHotEnum):
     @staticmethod
     def get_possible_rows(row: CombatRow) -> List[CombatRow]:
         result = []
-        if row is CombatRow.AGILE or row is CombatRow.SPECIAL:
+        if row is CombatRow.AGILE:
             result.append(CombatRow.CLOSE)
             result.append(CombatRow.RANGE)
             if row is CombatRow.SPECIAL:

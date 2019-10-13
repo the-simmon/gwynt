@@ -9,6 +9,7 @@ from math import sqrt
 from typing import List
 
 from source.core.card import Card, Ability, CombatRow
+from source.core.cardcollection import CardCollection
 from source.core.cards.util import get_cards
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
@@ -90,7 +91,8 @@ class Node:
 
     def simulate(self):
         environment_copy = deepcopy(self.environment)
-        current_player = deepcopy(self.player)
+        current_player = environment_copy.board.get_player(self.player)
+        self._add_random_cards_to_enemy(environment_copy)
 
         game_over = False
         while not game_over:
@@ -114,6 +116,22 @@ class Node:
             winning_type = PlayerType.ENEMEY
 
         self.backpropagate(winning_type)
+
+    def _add_random_cards_to_enemy(self, environment: GameEnvironment):
+        player_to_add_cards = self.player
+        if self.player_type is PlayerType.ENEMEY:
+            player_to_add_cards = environment.board.get_enemy_player(self.player)
+
+        all_cards = get_cards(player_to_add_cards.faction)
+        played_cards = environment.board.cards[player_to_add_cards].get_all_cards()
+        played_cards.extend(player_to_add_cards.graveyard.get_all_cards())
+        for card in played_cards:
+            if card in all_cards:
+                all_cards.remove(card)
+        random.shuffle(all_cards)
+
+        number_of_played_cards = len(environment.board.cards[player_to_add_cards].get_all_cards())
+        player_to_add_cards.active_cards = CardCollection(22, all_cards[:22 - number_of_played_cards])
 
     def backpropagate(self, winner: PlayerType):
         self.simulations += 1

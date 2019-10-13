@@ -25,6 +25,11 @@ class Board:
         self.revive_func = revive_func
         self.environment = environment
 
+    def get_player(self, player: Player) -> Player:
+        if player.id is self.player1.id:
+            return self.player1
+        return self.player2
+
     def get_enemy_player(self, player: Player) -> Player:
         if player.id is self.player1.id:
             return self.player2
@@ -68,6 +73,7 @@ class Board:
         elif ability is Ability.MEDIC:
             card, row = self.revive_func(self.environment, player)
             if card:
+                player.graveyard[card.combat_row].remove(card)
                 self.add(player, row, card)
         elif ability is Ability.MUSTER:
             self._check_muster(player, card)
