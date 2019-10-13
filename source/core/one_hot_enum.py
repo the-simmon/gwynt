@@ -8,4 +8,3 @@ class OneHotEnum(Enum):
         one_hot = [0] * len(self.__class__)
         one_hot[self.value] = 1
         return one_hot
-

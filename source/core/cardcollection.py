@@ -72,7 +72,7 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
 
     def __str__(self):
         result = ''
-        for row, cards in self.cards.items():
+        for row, cards in self.items():
             result += '{}: '.format(row.name)
             for card in cards:
                 result += '({}) '.format(str(card))

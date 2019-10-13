@@ -89,3 +89,4 @@ class GameEnvironment:
         result += str(self.board)
         result += '\n\n-----------------\n\n'
         result += str(self.player2.deck)
+        return result

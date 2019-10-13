@@ -10,7 +10,8 @@ class CardCollectionTest(unittest.TestCase):
     def setUp(self):
         self.max_cards = 5
         self.close_cards = [Card(CombatRow.CLOSE, 5, Ability.NONE), Card(CombatRow.CLOSE, 3, Ability.TIGHT_BOND),
-                            Card(CombatRow.CLOSE, 3, Ability.TIGHT_BOND), Card(CombatRow.CLOSE, 0, Ability.COMMANDERS_HORN)]
+                            Card(CombatRow.CLOSE, 3, Ability.TIGHT_BOND),
+                            Card(CombatRow.CLOSE, 0, Ability.COMMANDERS_HORN)]
         self.range_cards = [Card(CombatRow.RANGE, 6, Ability.NONE, hero=True)]
         self.card_collection = CardCollection(max_cards=self.max_cards, cards=self.close_cards + self.range_cards)
 

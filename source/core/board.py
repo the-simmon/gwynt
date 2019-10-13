@@ -145,7 +145,7 @@ class Board:
     def _str_for_player(self, player: Player):
         result = ''
         for row, cards in self.cards[player].items():
-            result += '{} {}: '.format(row.name, self.cards[player].calculate_damage_for_row(row))
+            result += '{} {}: '.format(row.name, self.cards[player].calculate_damage_for_row(row, self.weather))
             for card in cards:
                 result += '({}) '.format(str(card))
             result += '\n'

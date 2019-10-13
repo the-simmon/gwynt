@@ -28,5 +28,3 @@ class PlayerTest(unittest.TestCase):
                    + CardCollection(max_cards=22, cards=self.deck_cards).repr_list() + \
                    CardCollection(max_cards=22, cards=self.active_cards).repr_list()
         self.assertEqual(expected, self.player.repr_list(include_deck_and_active=True))
-
-
