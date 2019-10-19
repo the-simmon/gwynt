@@ -77,6 +77,9 @@ class Node:
                     self._expand_medic(node)
                 self.leafs.append(node)
 
+    def _get_potential_cards(self, player: Player) -> List[Card]:
+        return player.active_cards.get_all_cards()
+
     def _expand_medic(self, node: Node):
         for card in self.player.graveyard.get_all_cards():
             for row in CombatRow.get_possible_rows(card.combat_row):
