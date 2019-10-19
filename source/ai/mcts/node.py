@@ -8,6 +8,7 @@ from enum import Enum
 from math import sqrt
 from typing import List
 
+from source.ai.random_simulator import simulate_random_game
 from source.core.card import Card, Ability, CombatRow
 from source.core.cardcollection import CardCollection
 from source.core.cards.util import get_cards
@@ -76,9 +77,6 @@ class Node:
                     self._expand_medic(node)
                 self.leafs.append(node)
 
-    def _get_potential_cards(self, player: Player) -> List[Card]:
-        return player.active_cards.get_all_cards()
-
     def _expand_medic(self, node: Node):
         for card in self.player.graveyard.get_all_cards():
             for row in CombatRow.get_possible_rows(card.combat_row):
@@ -94,22 +92,7 @@ class Node:
         current_player = environment_copy.board.get_player(self.player)
         self._add_random_cards_to_enemy(environment_copy)
 
-        game_over = False
-        while not game_over:
-            pass_ = False
-            potential_cards = self._get_potential_cards(current_player)
-            if potential_cards:
-                random_card = random.choice(self._get_potential_cards(current_player))
-                row = random.choice(CombatRow.get_possible_rows(random_card.combat_row))
-            else:
-                random_card, row = None, None
-                pass_ = True
-            game_over, _ = environment_copy.step(current_player, row, random_card, pass_)
-
-            current_player = environment_copy.board.get_enemy_player(current_player)
-
-        board = environment_copy.board
-        winner = board.player1 if board.player1.rounds_won is 2 else board.player2
+        winner = simulate_random_game(environment_copy, current_player)
 
         winning_type = PlayerType.SELF
         if winner.id is not self.player.id:
@@ -131,7 +114,8 @@ class Node:
         random.shuffle(all_cards)
 
         number_of_played_cards = len(environment.board.cards[player_to_add_cards].get_all_cards())
-        player_to_add_cards.active_cards = CardCollection(22, all_cards[:22 - number_of_played_cards])
+        player_to_add_cards.active_cards = CardCollection(22, all_cards[:10 - number_of_played_cards])
+        player_to_add_cards.deck = CardCollection(22, all_cards[11:])
 
     def backpropagate(self, winner: PlayerType):
         self.simulations += 1

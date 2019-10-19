@@ -45,10 +45,10 @@ class GameEnvironmentTest(unittest.TestCase):
         card = self.player1.active_cards[CombatRow.CLOSE][0]
         self.environment.step(self.player1, card.combat_row, card)
 
-        actual = self.environment.step(self.player1, pass_=True)
+        actual = self.environment.pass_(self.player1)
         self.assertEqual((False, False), actual)
 
-        actual = self.environment.step(self.player2, pass_=True)
+        actual = self.environment.pass_(self.player2)
         self.assertEqual((True, False), actual)
 
     def test_no_cards_left(self):

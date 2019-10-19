@@ -34,15 +34,21 @@ class GameEnvironment:
                 player.deck.remove(card.combat_row, card)
                 player.active_cards.add(card.combat_row, card)
 
-    def step(self, player: Player, row: CombatRow = None, card: Card = None, pass_: bool = False) -> Tuple[bool, bool]:
-        if not pass_:
-            player.active_cards.remove(card.combat_row, card)
-            self.board.add(player, row, card)
-        else:
-            self.passed[player] = True
+    def step(self, player: Player, row: CombatRow, card: Card) -> Tuple[bool, bool]:
+        player.active_cards.remove(card.combat_row, card)
+        self.board.add(player, row, card)
 
         if len(player.active_cards.get_all_cards()) is 0:
             self.passed[player] = True
+
+        round_over = self.round_over()
+        if round_over:
+            self._end_of_round()
+
+        return round_over, self.game_over()
+
+    def pass_(self, player: Player) -> Tuple[bool, bool]:
+        self.passed[player] = True
 
         round_over = self.round_over()
         if round_over:
