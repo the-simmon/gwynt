@@ -18,11 +18,11 @@ from source.core.player import Player
 
 class PlayerType(Enum):
     SELF = 0
-    ENEMEY = 0
+    ENEMY = 1
 
     def invert(self):
         if self.value is PlayerType.SELF:
-            return PlayerType.ENEMEY
+            return PlayerType.ENEMY
         return PlayerType.SELF
 
 
@@ -99,13 +99,13 @@ class Node:
 
         winning_type = PlayerType.SELF
         if winner.id is not self.player.id:
-            winning_type = PlayerType.ENEMEY
+            winning_type = PlayerType.ENEMY
 
         self.backpropagate(winning_type)
 
     def _add_random_cards_to_enemy(self, environment: GameEnvironment):
         player_to_add_cards = self.player
-        if self.player_type is PlayerType.ENEMEY:
+        if self.player_type is PlayerType.SELF:
             player_to_add_cards = environment.board.get_enemy_player(self.player)
 
         all_cards = get_cards(player_to_add_cards.faction)
