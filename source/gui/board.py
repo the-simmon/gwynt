@@ -5,6 +5,7 @@ from source.core.board import Board as CoreBoard
 from source.core.card import CombatRow
 from source.core.player import Player
 from source.gui.card import Card
+from source.core.card import Card as CoreCard
 
 
 class Board(tk.Frame):
@@ -42,8 +43,9 @@ class Board(tk.Frame):
         for card in self.card_list:
             card.destroy()
 
-    def _draw_row(self, card_list: List[Card], master: tk.Widget):
+    def _draw_row(self, card_list: List[CoreCard], master: tk.Widget):
         frame = tk.Frame()
         frame.pack(in_=master)
         for card in card_list:
+            card = Card(card)  # convert core card to gui card
             card.pack(in_=frame, side=tk.RIGHT, padx=Card.WIDTH * 0.1, pady=Card.HEIGHT * 0.1)
