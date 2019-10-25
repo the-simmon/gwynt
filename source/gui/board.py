@@ -21,8 +21,11 @@ class Board(tk.Frame):
         frames = self._get_frames_per_player()
 
         enemy = self.board.get_enemy_player(self.player)
-        frames[enemy].pack(in_=self)
-        frames[self.player].pack(in_=self)
+        if frames[enemy]:
+            frames[enemy].pack(in_=self)
+
+        if frames[self.player]:
+            frames[self.player].pack(in_=self)
 
     def _get_frames_per_player(self) -> Dict[Player, tk.Frame]:
 
