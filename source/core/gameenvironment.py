@@ -87,12 +87,3 @@ class GameEnvironment:
         self.board.all_cards_to_graveyard(self.player1)
         self.board.all_cards_to_graveyard(self.player2)
         self.passed = defaultdict(lambda: False)
-
-    def __str__(self):
-        result = ''
-        result += str(self.player1.deck)
-        result += '\n\n-----------------\n\n'
-        result += str(self.board)
-        result += '\n\n-----------------\n\n'
-        result += str(self.player2.deck)
-        return result

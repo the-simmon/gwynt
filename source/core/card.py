@@ -81,6 +81,3 @@ class Card:
 
     def __mul__(self, count: int):
         return [deepcopy(self) for _ in range(count)]
-
-    def __str__(self):
-        return '{}, {}, {}, {}'.format(self.damage, self.ability.name, self.hero, self.muster.name)

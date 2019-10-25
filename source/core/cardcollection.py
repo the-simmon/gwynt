@@ -70,15 +70,6 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
         copy.max_cards = self.max_cards
         return copy
 
-    def __str__(self):
-        result = ''
-        for row, cards in self.items():
-            result += '{}: '.format(row.name)
-            for card in cards:
-                result += '({}) '.format(str(card))
-            result += '\n'
-        return result
-
 
 def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> List[Card]:
     def check_weather(cards: List[Card], weather: Weather) -> List[Card]:
