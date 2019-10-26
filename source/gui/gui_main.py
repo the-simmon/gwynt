@@ -1,7 +1,7 @@
 import tkinter as tk
 
-from source.gui.card import Card
 from source.core.card import Card as CoreCard, CombatRow, Ability
+from source.gui.card import Card
 
 
 def main():

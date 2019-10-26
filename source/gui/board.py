@@ -2,10 +2,10 @@ import tkinter as tk
 from typing import List, Dict
 
 from source.core.board import Board as CoreBoard
+from source.core.card import Card as CoreCard
 from source.core.card import CombatRow
 from source.core.player import Player
 from source.gui.card import Card
-from source.core.card import Card as CoreCard
 
 
 class Board(tk.Frame):

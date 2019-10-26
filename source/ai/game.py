@@ -3,9 +3,8 @@ from typing import Tuple
 
 from source.ai.mcts.mcts import MCTS
 from source.core.card import CombatRow, Card
-from source.core.cards.util import get_cards
 from source.core.gameenvironment import GameEnvironment
-from source.core.player import Player, Faction
+from source.core.player import Player
 
 
 class Game:
