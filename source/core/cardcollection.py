@@ -21,29 +21,6 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
     def remove(self, row: CombatRow, card: Card):
         self[row].remove(card)
 
-    def repr_list(self, exclude_card: Card = None) -> List[int]:
-        result = []
-        for row in CombatRow:
-            result.extend(self._one_hot_from_row(self[row], exclude_card))
-        return result
-
-    def _one_hot_from_row(self, cards: List[Card], exclude_card: Card = None) -> List[int]:
-        result = []
-        exclude_once = False
-        empty_cards = self.max_cards - len(cards)
-
-        for card in cards:
-            if card != exclude_card or exclude_once:
-                result.extend(card.repr_list())
-            else:
-                exclude_once = True
-                empty_cards += 1
-
-        for _ in range(empty_cards):
-            result.extend(Card.empty_card_repr())
-
-        return result
-
     def calculate_damage(self, weather: Weather) -> int:
         result = 0
         for row, cards in self.items():

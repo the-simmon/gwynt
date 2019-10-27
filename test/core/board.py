@@ -4,7 +4,6 @@ from typing import Tuple
 
 from source.core.board import Board
 from source.core.card import Card, CombatRow, Ability, Muster
-from source.core.cardcollection import CardCollection
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Faction, Player
 from source.core.weather import Weather
@@ -35,13 +34,6 @@ class BoardTest(unittest.TestCase):
         dummy_player = Player(0, Faction.NILFGAARD, [])
         self.board = Board(self.player1, self.player2, revive,
                            GameEnvironment(dummy_player, dummy_player, revive))
-
-    def test_repr_list(self):
-        empty_card_collection = CardCollection(22, [])
-        expected = [1] + self.player2.repr_list() + self.player1.repr_list(include_deck_and_active=True,
-                                                                           exclude_card=self.player1_active_card) + \
-                   empty_card_collection.repr_list() + empty_card_collection.repr_list() + Weather.CLEAR.one_hot()
-        self.assertCountEqual(expected, self.board.repr_list(self.player1, excluded_card=self.player1_active_card))
 
     def test_weather_card(self):
         self.board.add(self.player1, CombatRow.SPECIAL, Card(CombatRow.SPECIAL, 0, Ability.FOG))

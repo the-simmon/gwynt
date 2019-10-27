@@ -66,13 +66,6 @@ class Card:
         self.hero = hero
         self.muster = muster
 
-    def repr_list(self) -> List[int]:
-        return [self.damage] + self.ability.one_hot() + [int(self.hero)] + self.muster.one_hot()
-
-    @classmethod
-    def empty_card_repr(cls) -> List[int]:
-        return Card(CombatRow.CLOSE, 0, Ability.EMPTY_PLACEHOLDER).repr_list()
-
     def __eq__(self, other):
         return other is not None and self.combat_row is other.combat_row and self.damage == other.damage and \
                self.ability is other.ability and self.muster is other.muster and self.hero is other.hero

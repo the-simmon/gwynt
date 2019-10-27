@@ -24,13 +24,6 @@ class GameEnvironmentTest(unittest.TestCase):
         self.player2 = Player(2, Faction.NILFGAARD, Card(CombatRow.RANGE, 10) * 22)
         self.environment = GameEnvironment(self.player1, self.player2, revive)
 
-    def test_repr_list(self):
-        expected = self.environment.board.repr_list(self.player1, self.player1.active_cards[CombatRow.CLOSE][0]) + [1,
-                                                                                                                    0,
-                                                                                                                    0]
-        self.assertEqual(expected,
-                         self.environment.repr_list(self.player1, self.player1.active_cards[CombatRow.CLOSE][0]))
-
     def test_active_card_choice(self):
         self.assertEqual(10, len(self.player1.active_cards.get_all_cards()))
         self.assertEqual(10, len(self.player2.active_cards.get_all_cards()))

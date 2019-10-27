@@ -66,12 +66,6 @@ class Board:
                     break
         return row_possible
 
-    def repr_list(self, player: Player, excluded_card: Card):
-        enemy = self.get_enemy_player(player)
-        return [len(enemy.active_cards)] + enemy.repr_list() + player.repr_list(include_deck_and_active=True,
-                                                                                exclude_card=excluded_card) + \
-               self.cards[enemy].repr_list() + self.cards[player].repr_list() + self.weather.one_hot()
-
     def _check_ability(self, player: Player, card: Card):
         ability = card.ability
 

@@ -30,13 +30,6 @@ class Player:
             self.deck.remove(card.combat_row, card)
             self.active_cards.add(card.combat_row, card)
 
-    def repr_list(self, include_deck_and_active=False, exclude_card: Card = None) -> List[int]:
-        result = self.faction.one_hot() + self.graveyard.repr_list()
-        if include_deck_and_active:
-            result.extend(self.deck.repr_list())
-            result.extend(self.active_cards.repr_list(exclude_card))
-        return result
-
     def __eq__(self, other):
         return other is not None and self.id is other.id
 

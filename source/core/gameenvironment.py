@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import random
 from collections import defaultdict
-from typing import Tuple, List, Dict, Callable
+from typing import Tuple, Dict, Callable
 
 from .board import Board
 from .card import Card, CombatRow
@@ -64,11 +64,6 @@ class GameEnvironment:
 
     def _player_won(self):
         return self.player1.rounds_won >= 2 or self.player2.rounds_won >= 2
-
-    def repr_list(self, current_player: Player, excluded_card: Card) -> List[int]:
-        current_round = [0] * 3
-        current_round[self.current_round] = 1
-        return self.board.repr_list(current_player, excluded_card) + current_round
 
     def _end_of_round(self):
         self.current_round += 1
