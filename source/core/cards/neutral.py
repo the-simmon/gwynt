@@ -5,7 +5,7 @@ cards = [
     Card(CombatRow.SPECIAL, 0, Ability.FROST) * 3,
     Card(CombatRow.CLOSE, 15, hero=True),
     Card(CombatRow.SPECIAL, 0, Ability.CLEAR_WEATHER) * 2,
-    Card(CombatRow.SPECIAL, 0, Ability.COMMANDERS_HORN) * 4,
+    Card(CombatRow.SPECIAL, 0, Ability.SPECIAL_COMMANDERS_HORN) * 4,
     Card(CombatRow.CLOSE, 2, Ability.COMMANDERS_HORN),
     Card(CombatRow.CLOSE, 5),
     Card(CombatRow.CLOSE, 15, hero=True),

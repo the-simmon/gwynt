@@ -114,7 +114,9 @@ def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> List[Card]
                 if card != current_card:
                     f(card)
 
+        # there are tow types of commanders horn, dandelion and the generic horn
         horn_applied = False
+        special_horn_applied = False
         for current_card in cards:
             if current_card.ability is Ability.MORALE_BOOST:
                 apply_function(morale_boost, cards, current_card)
@@ -122,6 +124,10 @@ def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> List[Card]
             elif current_card.ability is Ability.COMMANDERS_HORN and not horn_applied:
                 apply_function(horn, cards, current_card)
                 horn_applied = True
+
+            elif current_card.ability is Ability.SPECIAL_COMMANDERS_HORN and not special_horn_applied:
+                apply_function(horn, cards, current_card)
+                special_horn_applied = True
 
         return cards
 

@@ -16,7 +16,7 @@ class CombatRow(OneHotEnum):
     @staticmethod
     def get_possible_rows(row: CombatRow) -> List[CombatRow]:
         result = []
-        if row is CombatRow.AGILE:
+        if row is CombatRow.AGILE or row is CombatRow.SPECIAL:
             result.append(CombatRow.CLOSE)
             result.append(CombatRow.RANGE)
             if row is CombatRow.SPECIAL:
@@ -36,11 +36,12 @@ class Ability(OneHotEnum):
     TIGHT_BOND = 6
     SCORCH = 7
     COMMANDERS_HORN = 8
-    CLEAR_WEATHER = 9
-    FROST = 10
-    FOG = 11
-    RAIN = 12
-    PASS = 13
+    SPECIAL_COMMANDERS_HORN = 9
+    CLEAR_WEATHER = 10
+    FROST = 11
+    FOG = 12
+    RAIN = 13
+    PASS = 14
 
 
 class Muster(OneHotEnum):

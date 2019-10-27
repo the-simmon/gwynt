@@ -57,6 +57,15 @@ class Board:
             for card in deepcopy(cards):
                 self.remove(player, row, card)
 
+    def check_commanders_horn(self, player: Player, horn_card: Card, row: CombatRow) -> bool:
+        row_possible = True
+        if horn_card.ability is Ability.SPECIAL_COMMANDERS_HORN or horn_card.ability is Ability.COMMANDERS_HORN:
+            for card in self.cards[player][row]:
+                if card.ability is horn_card.ability:
+                    row_possible = False
+                    break
+        return row_possible
+
     def repr_list(self, player: Player, excluded_card: Card):
         enemy = self.get_enemy_player(player)
         return [len(enemy.active_cards)] + enemy.repr_list() + player.repr_list(include_deck_and_active=True,

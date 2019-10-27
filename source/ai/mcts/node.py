@@ -68,14 +68,16 @@ class Node:
 
         for card in potential_cards:
             for row in card.combat_row.get_possible_rows(card.combat_row):
-                environment_copy = deepcopy(self.environment)
-                environment_copy.board.add(self.player, row, card)
+                # only one commanders horn per row is possible
+                if self.environment.board.check_commanders_horn(self.player, card, row):
+                    environment_copy = deepcopy(self.environment)
+                    environment_copy.board.add(self.player, row, card)
 
-                enemy = environment_copy.board.get_enemy_player(self.player)
-                node = Node(environment_copy, self, deepcopy(self.player_type.invert()), enemy, card, row)
-                if card.ability is Ability.MEDIC:
-                    self._expand_medic(node)
-                self.leafs.append(node)
+                    enemy = environment_copy.board.get_enemy_player(self.player)
+                    node = Node(environment_copy, self, deepcopy(self.player_type.invert()), enemy, card, row)
+                    if card.ability is Ability.MEDIC:
+                        self._expand_medic(node)
+                    self.leafs.append(node)
 
     def _get_potential_cards(self, player: Player) -> List[Card]:
         return player.active_cards.get_all_cards()
