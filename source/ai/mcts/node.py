@@ -113,13 +113,17 @@ class Node:
         all_cards = get_cards(player_to_add_cards.faction)
         played_cards = environment.board.cards[player_to_add_cards].get_all_cards()
         played_cards.extend(player_to_add_cards.graveyard.get_all_cards())
+
+        total_active_cards = 10
         for card in played_cards:
             if card in all_cards:
                 all_cards.remove(card)
+            if card.ability is Ability.SPY:
+                total_active_cards += 2
         random.shuffle(all_cards)
 
         number_of_played_cards = len(environment.board.cards[player_to_add_cards].get_all_cards())
-        player_to_add_cards.active_cards = CardCollection(22, all_cards[:10 - number_of_played_cards])
+        player_to_add_cards.active_cards = CardCollection(22, all_cards[:total_active_cards - number_of_played_cards])
         player_to_add_cards.deck = CardCollection(22, all_cards[11:])
 
     def backpropagate(self, winner: PlayerType):
