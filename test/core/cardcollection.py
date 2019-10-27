@@ -13,7 +13,7 @@ class CardCollectionTest(unittest.TestCase):
                             Card(CombatRow.CLOSE, 3, Ability.TIGHT_BOND),
                             Card(CombatRow.CLOSE, 0, Ability.COMMANDERS_HORN)]
         self.range_cards = [Card(CombatRow.RANGE, 6, Ability.NONE, hero=True)]
-        self.card_collection = CardCollection(max_cards=self.max_cards, cards=self.close_cards + self.range_cards)
+        self.card_collection = CardCollection(self.close_cards + self.range_cards)
 
     def test_calculate_damage_clear_weather(self):
         expected = 40

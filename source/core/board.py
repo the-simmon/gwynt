@@ -18,7 +18,7 @@ class Board:
     def __init__(self, player1: Player, player2: Player,
                  revive_func: Callable[[GameEnvironment, Player], Tuple[Card, CombatRow]],
                  environment: GameEnvironment):
-        self.cards: DefaultDict[Player, CardCollection] = defaultdict(lambda: CardCollection(max_cards=22, cards=[]))
+        self.cards: DefaultDict[Player, CardCollection] = defaultdict(lambda: CardCollection(cards=[]))
         self.weather: Weather = Weather.CLEAR
         self.player1 = player1
         self.player2 = player2

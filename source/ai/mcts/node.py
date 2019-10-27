@@ -123,8 +123,8 @@ class Node:
         random.shuffle(all_cards)
 
         number_of_played_cards = len(environment.board.cards[player_to_add_cards].get_all_cards())
-        player_to_add_cards.active_cards = CardCollection(22, all_cards[:total_active_cards - number_of_played_cards])
-        player_to_add_cards.deck = CardCollection(22, all_cards[11:])
+        player_to_add_cards.active_cards = CardCollection(all_cards[:total_active_cards - number_of_played_cards])
+        player_to_add_cards.deck = CardCollection(all_cards[11:])
 
     def backpropagate(self, winner: PlayerType):
         self.simulations += 1

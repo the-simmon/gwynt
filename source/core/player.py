@@ -18,9 +18,9 @@ class Player:
     def __init__(self, id: int, faction: Faction, cards: List[Card]):
         self.id = id
         self.faction = faction
-        self.deck = CardCollection(max_cards=22, cards=cards)
-        self.graveyard = CardCollection(max_cards=22, cards=[])
-        self.active_cards = CardCollection(max_cards=22, cards=[])
+        self.deck = CardCollection(cards)
+        self.graveyard = CardCollection([])
+        self.active_cards = CardCollection([])
         self.rounds_won = 0
 
     def pick_random_from_deck(self):

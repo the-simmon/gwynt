@@ -46,8 +46,8 @@ class GameEnvironmentTest(unittest.TestCase):
 
     def test_no_cards_left(self):
         card = Card(CombatRow.CLOSE, 3)
-        self.player1.active_cards = CardCollection(max_cards=22, cards=[card])
-        self.player2.active_cards = CardCollection(max_cards=22, cards=[card])
+        self.player1.active_cards = CardCollection([card])
+        self.player2.active_cards = CardCollection([card])
 
         actual = self.environment.step(self.player1, card.combat_row, card)
         self.assertEqual((False, False), actual)
@@ -59,8 +59,8 @@ class GameEnvironmentTest(unittest.TestCase):
         card = Card(CombatRow.CLOSE, 3)
         self.environment.current_round = 1
 
-        self.player1.active_cards = CardCollection(max_cards=22, cards=[card])
-        self.player2.active_cards = CardCollection(max_cards=22, cards=[card])
+        self.player1.active_cards = CardCollection([card])
+        self.player2.active_cards = CardCollection([card])
 
         actual = self.environment.step(self.player1, card.combat_row, card)
         self.assertEqual((False, False), actual)

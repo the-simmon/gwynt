@@ -8,9 +8,8 @@ from .weather import Weather
 
 class CardCollection(DefaultDict[CombatRow, List[Card]]):
 
-    def __init__(self, max_cards: int, cards: List[Card]):
+    def __init__(self, cards: List[Card]):
         super().__init__(list)
-        self.max_cards = max_cards
 
         for card in cards:
             self[card.combat_row].append(card)
@@ -41,10 +40,9 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
         return result
 
     def __deepcopy__(self, memodict={}):
-        copy = CardCollection(self.max_cards, [])
+        copy = CardCollection([])
         for row, cards in self.items():
             copy[row] = deepcopy(cards)
-        copy.max_cards = self.max_cards
         return copy
 
 
