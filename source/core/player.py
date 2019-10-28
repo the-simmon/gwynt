@@ -1,12 +1,12 @@
+import enum
 import random
 from typing import List
 
 from .card import Card
 from .cardcollection import CardCollection
-from .one_hot_enum import OneHotEnum
 
 
-class Faction(OneHotEnum):
+class Faction(enum.Enum):
     MONSTER = 0
     NILFGAARD = 1
     NOTHERN_REALMS = 2

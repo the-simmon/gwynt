@@ -1,8 +1,11 @@
+from __future__ import annotations
+
+import enum
+
 from .card import Ability
-from .one_hot_enum import OneHotEnum
 
 
-class Weather(OneHotEnum):
+class Weather(enum.Enum):
     CLEAR = 0
     FROST = 1
     FOG = 2
@@ -16,7 +19,7 @@ class Weather(OneHotEnum):
         return False
 
     @classmethod
-    def ability_to_weather(cls, ability: Ability) -> OneHotEnum:
+    def ability_to_weather(cls, ability: Ability) -> Weather:
         if ability is Ability.CLEAR_WEATHER:
             return Weather.CLEAR
         elif ability is Ability.FROST:

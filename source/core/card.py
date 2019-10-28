@@ -1,12 +1,11 @@
 from __future__ import annotations
 
+import enum
 from copy import deepcopy
 from typing import List
 
-from .one_hot_enum import OneHotEnum
 
-
-class CombatRow(OneHotEnum):
+class CombatRow(enum.Enum):
     CLOSE = 0
     RANGE = 1
     SIEGE = 2
@@ -26,7 +25,7 @@ class CombatRow(OneHotEnum):
         return result
 
 
-class Ability(OneHotEnum):
+class Ability(enum.Enum):
     NONE = 0
     EMPTY_PLACEHOLDER = 1
     MEDIC = 2
@@ -44,7 +43,7 @@ class Ability(OneHotEnum):
     PASS = 14
 
 
-class Muster(OneHotEnum):
+class Muster(enum.Enum):
     NONE = 0
     ARACHAS = 1
     CRONE = 2
