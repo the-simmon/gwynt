@@ -56,15 +56,6 @@ class GameEnvironment:
 
         return self.game_over(), self.current_player, card_source
 
-    def pass_(self, player: Player) -> Tuple[bool, bool]:
-        self.passed[player] = True
-
-        round_over = self.round_over()
-        if round_over:
-            self._end_of_round()
-
-        return round_over, self.game_over()
-
     def round_over(self):
         return all(self.passed.values())
 
@@ -80,7 +71,7 @@ class GameEnvironment:
         player1_damage = self.board.calculate_damage(self.player1)
         player2_damage = self.board.calculate_damage(self.player2)
 
-        current_player, card_source = None, None
+        current_player, card_source = self.current_player, None
         if player1_damage > player2_damage:
             self.player1.rounds_won += 1
             current_player = self.player1
@@ -100,7 +91,7 @@ class GameEnvironment:
 
     def _determine_current_player(self, played_card: Card, player: Player) -> Tuple[Player, CardSource]:
         result = None
-        if played_card.ability is Ability.MEDIC and len(player.graveyard.get_all_cards()):
+        if played_card and played_card.ability is Ability.MEDIC and len(player.graveyard.get_all_cards()):
             result = self.current_player, CardSource.GRAVEYARD
         else:
             enemy = self.board.get_enemy_player(self.current_player)

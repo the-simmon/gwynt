@@ -70,11 +70,6 @@ class BoardTest(unittest.TestCase):
         self.assertEqual(cards_to_scorch2, self.player2.graveyard[CombatRow.RANGE])
         self.assertEqual(surviving_cards2, self.board.cards[self.player2][CombatRow.CLOSE])
 
-    def test_medic_card(self):
-        self.player1.graveyard.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 3))
-        self.board.add(self.player1, CombatRow.CLOSE, Card(CombatRow.CLOSE, 3, Ability.MEDIC))
-        self.assertEqual(2, len(self.board.cards[self.player1].get_all_cards()))
-
     def test_spy_card(self):
         spy = Card(CombatRow.CLOSE, 5, Ability.SPY)
         self.board.add(self.player1, spy.combat_row, spy)
