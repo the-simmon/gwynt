@@ -75,8 +75,11 @@ class Node:
                     player_copy = deepcopy(self.player)
                     _, next_player, card_source = environment_copy.step(player_copy, row, card)
 
-                    node = Node(environment_copy, self, deepcopy(self.player_type.invert()), next_player, card, row,
-                                card_source)
+                    player_type = deepcopy(self.player_type)
+                    if next_player.id is not self.player.id:
+                        player_type = deepcopy(self.player_type.invert())
+
+                    node = Node(environment_copy, self, player_type, deepcopy(next_player), card, row, card_source)
                     self.leafs.append(node)
 
     def _get_potential_cards(self, player: Player) -> List[Card]:
