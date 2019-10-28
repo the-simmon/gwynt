@@ -19,12 +19,8 @@ class Game:
     def calculate_step(self) -> Tuple[Card, CombatRow]:
         mcts = MCTS(self.environment, self.current_player)
         card, row = mcts.run()
-        _, self.game_over = self.environment.step(self.current_player, row, card)
-        self.current_player = self.get_current_player()
+        self.game_over, self.current_player, card_source = self.environment.step(self.current_player, row, card)
         return card, row
-
-    def get_current_player(self) -> Player:
-        return self.environment.board.get_enemy_player(self.current_player)
 
 
 def _revive(environment: GameEnvironment, player: Player) -> Tuple[Card, CombatRow]:

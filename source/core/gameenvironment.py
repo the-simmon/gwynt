@@ -1,12 +1,19 @@
 from __future__ import annotations
 
+import enum
 import random
 from collections import defaultdict
 from typing import Tuple, Dict, Callable
 
+from source.core.card import Ability
 from .board import Board
 from .card import Card, CombatRow
 from .player import Player
+
+
+class CardSource(enum.Enum):
+    HAND = 0
+    GRAVEYARD = 1
 
 
 class GameEnvironment:
@@ -15,6 +22,7 @@ class GameEnvironment:
                  revive_func: Callable[[GameEnvironment, Player], Tuple[Card, CombatRow]]):
         self.player1 = player1
         self.player2 = player2
+        self.current_player = random.choice([player1, player2])
         self.revive_func = revive_func
         self.board = Board(player1, player2, revive_func, self)
         self.current_round = 0
@@ -34,18 +42,21 @@ class GameEnvironment:
                 player.deck.remove(card.combat_row, card)
                 player.active_cards.add(card.combat_row, card)
 
-    def step(self, player: Player, row: CombatRow, card: Card) -> Tuple[bool, bool]:
-        player.active_cards.remove(card.combat_row, card)
-        self.board.add(player, row, card)
+    def step(self, player: Player, row: CombatRow, card: Card) -> Tuple[bool, Player, CardSource]:
+        # card == None => player passes
+        if card:
+            player.active_cards.remove(card.combat_row, card)
+            self.board.add(player, row, card)
 
-        if len(player.active_cards.get_all_cards()) is 0:
+        if len(player.active_cards.get_all_cards()) is 0 or not card:
             self.passed[player] = True
 
-        round_over = self.round_over()
-        if round_over:
-            self._end_of_round()
+        self.current_player, card_source = self._determine_current_player(card, player)
 
-        return round_over, self.game_over()
+        if self.round_over():
+            self.current_player, card_source = self._end_of_round()
+
+        return self.game_over(), self.current_player, card_source
 
     def pass_(self, player: Player) -> Tuple[bool, bool]:
         self.passed[player] = True
@@ -65,20 +76,39 @@ class GameEnvironment:
     def _player_won(self):
         return self.player1.rounds_won >= 2 or self.player2.rounds_won >= 2
 
-    def _end_of_round(self):
+    def _end_of_round(self) -> Tuple[Player, CardSource]:
         self.current_round += 1
 
         player1_damage = self.board.calculate_damage(self.player1)
         player2_damage = self.board.calculate_damage(self.player2)
 
+        current_player, card_source = None, None
         if player1_damage > player2_damage:
             self.player1.rounds_won += 1
+            current_player = self.player1
         elif player1_damage < player2_damage:
             self.player2.rounds_won += 1
+            current_player = self.player2
         else:
             self.player1.rounds_won += 1
             self.player2.rounds_won += 1
+        card_source = CardSource.HAND
 
         self.board.all_cards_to_graveyard(self.player1)
         self.board.all_cards_to_graveyard(self.player2)
         self.passed = defaultdict(lambda: False)
+
+        return current_player, card_source
+
+    def _determine_current_player(self, played_card: Card, player: Player) -> Tuple[Player, CardSource]:
+        result = None
+        if played_card.ability is Ability.MEDIC and len(player.graveyard.get_all_cards()):
+            result = self.current_player, CardSource.GRAVEYARD
+        else:
+            enemy = self.board.get_enemy_player(self.current_player)
+            if self.passed[enemy]:
+                result = self.current_player, CardSource.HAND
+            else:
+                result = enemy, CardSource.HAND
+
+        return result

@@ -12,7 +12,7 @@ from source.ai.random_simulator import simulate_random_game
 from source.core.card import Card, Ability, CombatRow
 from source.core.cardcollection import CardCollection
 from source.core.cards.util import get_cards
-from source.core.gameenvironment import GameEnvironment
+from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 
 
@@ -29,7 +29,7 @@ class PlayerType(Enum):
 class Node:
 
     def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, player: Player, card: Card,
-                 row: CombatRow):
+                 row: CombatRow, card_source: CardSource):
         self.environment = environment
         self.board = environment.board
         self.parent = parent
@@ -37,6 +37,7 @@ class Node:
         self.player = player
         self.card = card
         self.row = row
+        self.next_card_source = card_source
         self.leafs: List[Node] = []
         self.simulations = 0
         self.wins = 0
@@ -71,26 +72,17 @@ class Node:
                 # only one commanders horn per row is possible
                 if self.environment.board.check_commanders_horn(self.player, card, row):
                     environment_copy = deepcopy(self.environment)
-                    environment_copy.board.add(self.player, row, card)
+                    player_copy = deepcopy(self.player)
+                    _, next_player, card_source = environment_copy.step(player_copy, row, card)
 
-                    enemy = environment_copy.board.get_enemy_player(self.player)
-                    node = Node(environment_copy, self, deepcopy(self.player_type.invert()), enemy, card, row)
-                    if card.ability is Ability.MEDIC:
-                        self._expand_medic(node)
+                    node = Node(environment_copy, self, deepcopy(self.player_type.invert()), next_player, card, row,
+                                card_source)
                     self.leafs.append(node)
 
     def _get_potential_cards(self, player: Player) -> List[Card]:
-        return player.active_cards.get_all_cards()
-
-    def _expand_medic(self, node: Node):
-        for card in self.player.graveyard.get_all_cards():
-            for row in CombatRow.get_possible_rows(card.combat_row):
-                environment_copy = deepcopy(self.environment)
-                environment_copy.board.add(self.player, row, card)
-                node.leafs.append(
-                    Node(environment_copy, node, deepcopy(self.player_type),
-                         environment_copy.board.get_enemy_player(self.player),
-                         card, row))
+        if self.next_card_source is CardSource.HAND:
+            return player.active_cards.get_all_cards()
+        return player.graveyard.get_all_cards()
 
     def simulate(self):
         environment_copy = deepcopy(self.environment)
