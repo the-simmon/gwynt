@@ -57,6 +57,12 @@ class Board:
             for card in deepcopy(cards):
                 self.remove(player, row, card)
 
+        # remove cards that cannot be revived
+        for cards in player.graveyard.values():
+            for card in cards:
+                if card.hero or card.combat_row is CombatRow.SPECIAL:
+                    cards.remove(card)
+
     def check_commanders_horn(self, player: Player, horn_card: Card, row: CombatRow) -> bool:
         row_possible = True
         if horn_card.ability is Ability.SPECIAL_COMMANDERS_HORN or horn_card.ability is Ability.COMMANDERS_HORN:
