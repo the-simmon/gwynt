@@ -9,15 +9,6 @@ from source.core.player import Faction, Player
 from source.core.weather import Weather
 
 
-def revive(environment: GameEnvironment, player: Player) -> Tuple[Card, CombatRow]:
-    if player.graveyard.get_all_cards():
-        card = random.choice(player.graveyard.get_all_cards())
-        row = random.choice(CombatRow.get_possible_rows(card.combat_row))
-    else:
-        card, row = None, None
-    return card, row
-
-
 class BoardTest(unittest.TestCase):
 
     def setUp(self):
@@ -32,8 +23,7 @@ class BoardTest(unittest.TestCase):
         self.player2.active_cards.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 0))
 
         dummy_player = Player(0, Faction.NILFGAARD, [])
-        self.board = Board(self.player1, self.player2, revive,
-                           GameEnvironment(dummy_player, dummy_player, revive))
+        self.board = Board(self.player1, self.player2, GameEnvironment(dummy_player, dummy_player))
 
     def test_weather_card(self):
         self.board.add(self.player1, CombatRow.SPECIAL, Card(CombatRow.SPECIAL, 0, Ability.FOG))

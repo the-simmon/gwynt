@@ -15,14 +15,11 @@ if TYPE_CHECKING:
 
 class Board:
 
-    def __init__(self, player1: Player, player2: Player,
-                 revive_func: Callable[[GameEnvironment, Player], Tuple[Card, CombatRow]],
-                 environment: GameEnvironment):
+    def __init__(self, player1: Player, player2: Player, environment: GameEnvironment):
         self.cards: DefaultDict[Player, CardCollection] = defaultdict(lambda: CardCollection(cards=[]))
         self.weather: Weather = Weather.CLEAR
         self.player1 = player1
         self.player2 = player2
-        self.revive_func = revive_func
         self.environment = environment
 
     def get_player(self, player: Player) -> Player:
@@ -80,10 +77,7 @@ class Board:
         elif Weather.ability_is_weather(ability):
             self.weather = Weather.ability_to_weather(ability)
         elif ability is Ability.MEDIC:
-            card, row = self.revive_func(self.environment, player)
-            if card:
-                player.graveyard[card.combat_row].remove(card)
-                self.add(player, row, card)
+            pass  # reviving is handled on environment level
         elif ability is Ability.MUSTER:
             self._check_muster(player, card)
         elif ability is Ability.SPY:

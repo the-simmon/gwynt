@@ -18,13 +18,11 @@ class CardSource(enum.Enum):
 
 class GameEnvironment:
 
-    def __init__(self, player1: Player, player2: Player,
-                 revive_func: Callable[[GameEnvironment, Player], Tuple[Card, CombatRow]]):
+    def __init__(self, player1: Player, player2: Player):
         self.player1 = player1
         self.player2 = player2
         self.current_player = random.choice([player1, player2])
-        self.revive_func = revive_func
-        self.board = Board(player1, player2, revive_func, self)
+        self.board = Board(player1, player2, self)
         self.current_round = 0
         self.passed: Dict[Player, bool] = {player1: False, player2: False}
 

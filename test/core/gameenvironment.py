@@ -8,21 +8,12 @@ from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player, Faction
 
 
-def revive(environment: GameEnvironment, player: Player) -> Tuple[Card, CombatRow]:
-    if player.graveyard.get_all_cards():
-        card = random.choice(player.graveyard.get_all_cards())
-        row = random.choice(CombatRow.get_possible_rows(card.combat_row))
-    else:
-        card, row = None, None
-    return card, row
-
-
 class GameEnvironmentTest(unittest.TestCase):
 
     def setUp(self):
         self.player1 = Player(1, Faction.NOTHERN_REALMS, Card(CombatRow.CLOSE, 6) * 22)
         self.player2 = Player(2, Faction.NILFGAARD, Card(CombatRow.RANGE, 10) * 22)
-        self.environment = GameEnvironment(self.player1, self.player2, revive)
+        self.environment = GameEnvironment(self.player1, self.player2)
 
     def test_active_card_choice(self):
         self.assertEqual(10, len(self.player1.active_cards.get_all_cards()))
