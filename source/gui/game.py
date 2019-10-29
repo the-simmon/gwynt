@@ -17,8 +17,8 @@ class Game(tk.Frame):
         self.player = player
         self.board = Board(environment.board, player)
 
-        self.win_frame = tk.Frame()
-        self.win_frame.grid(in_=self, column=0, row=0, padx=5)
+        self.info_frame = tk.Frame()
+        self.info_frame.grid(in_=self, column=0, row=0, padx=5)
 
         self.damage_frame = tk.Frame()
         self.damage_frame.grid(in_=self, column=1, row=0)
@@ -27,7 +27,7 @@ class Game(tk.Frame):
 
     def redraw(self):
         self._clear_frame()
-        self._draw_win_frame()
+        self._draw_info_frame()
         self._draw_damage_frame()
         self.board.redraw()
 
@@ -35,14 +35,17 @@ class Game(tk.Frame):
         for widget in self.damage_frame.children:
             widget.destroy()
 
-        for widget in self.win_frame.children:
+        for widget in self.info_frame.children:
             widget.destroy()
 
-    def _draw_win_frame(self):
+    def _draw_info_frame(self):
+        tk.Label(text=f'Weather: {self.environment.board.weather.name}').pack(in_=self.info_frame, anchor=tk.N)
+        tk.Frame(height=Card.HEIGHT).pack(in_=self.info_frame)
+
         enemy = self.environment.board.get_enemy_player(self.player)
-        tk.Label(text=f'Enemy: {enemy.rounds_won}').pack(in_=self.win_frame)
-        tk.Frame(height=Card.HEIGHT * 3).pack(in_=self.win_frame)
-        tk.Label(text=f'Self: {self.player.rounds_won}').pack(in_=self.win_frame)
+        tk.Label(text=f'Enemy: {enemy.rounds_won}').pack(in_=self.info_frame)
+        tk.Frame(height=Card.HEIGHT * 3).pack(in_=self.info_frame)
+        tk.Label(text=f'Self: {self.player.rounds_won}').pack(in_=self.info_frame)
 
     def _draw_damage_frame(self):
         combat_row_sorting = [CombatRow.SIEGE, CombatRow.RANGE, CombatRow.CLOSE]
