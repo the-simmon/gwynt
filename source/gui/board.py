@@ -39,7 +39,9 @@ class Board(tk.Frame):
             card_collection = self.board.cards[player]
             frame = tk.Frame()
             frame_dict[player] = frame
-            for card_list in [card_collection[row] for row in combat_row_sorting]:
+
+            cards = [card_collection.get_damage_adjusted_cards(row, self.board.weather) for row in combat_row_sorting]
+            for card_list in cards:
                 self._draw_row(card_list, player).pack(in_=frame)
 
             if player.id is self.player.id:
