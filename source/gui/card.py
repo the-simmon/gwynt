@@ -7,7 +7,7 @@ class Card(tk.Canvas):
     HEIGHT = 100
     WIDTH = 56
 
-    def __init__(self, card: CoreCard):
+    def __init__(self, card: CoreCard, enable_highlighting: bool):
         super().__init__(height=Card.HEIGHT, width=Card.WIDTH, background='white')
         self.card = card
         self.create_rectangle(1, 1, Card.WIDTH, Card.HEIGHT)
@@ -15,8 +15,9 @@ class Card(tk.Canvas):
         self.create_text(Card.WIDTH * 0.7, Card.HEIGHT * 0.9, text=self.card.ability.name, font="Times 10")
         self.create_text(Card.WIDTH * 0.5, Card.HEIGHT * 0.5, text=self.card.combat_row.name, font="Times 10")
 
-        self.bind('<Enter>', self._highlight)
-        self.bind('<Leave>', self._stop_highlight)
+        if enable_highlighting:
+            self.bind('<Enter>', self._highlight)
+            self.bind('<Leave>', self._stop_highlight)
 
     def _highlight(self, _):
         self.config(background='red')

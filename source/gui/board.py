@@ -40,10 +40,10 @@ class Board(tk.Frame):
             frame = tk.Frame()
             frame_dict[player] = frame
             for row, card_list in enumerate([card_collection[row] for row in combat_row_sorting]):
-                self._draw_row(card_list).pack(in_=frame)
+                self._draw_row(card_list, player).pack(in_=frame)
 
             if player.id is self.player.id:
-                self._draw_row(player.active_cards.get_all_cards()).pack(in_=frame)
+                self._draw_row(player.active_cards.get_all_cards(), player).pack(in_=frame)
             combat_row_sorting.reverse()
 
         return frame_dict
@@ -52,9 +52,9 @@ class Board(tk.Frame):
         for widget in self.children:
             widget.destroy()
 
-    def _draw_row(self, card_list: List[CoreCard]):
+    def _draw_row(self, card_list: List[CoreCard], player: Player) -> tk.Frame:
         frame = tk.Frame(height=Card.HEIGHT * 1.1)
         for card in card_list:
-            card = Card(card)  # convert core card to gui card
+            card = Card(card, player.id is self.player.id)  # convert core card to gui card
             card.pack(in_=frame, side=tk.RIGHT, padx=Card.WIDTH * 0.1)
         return frame
