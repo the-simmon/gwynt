@@ -8,9 +8,18 @@ class Card(tk.Canvas):
     WIDTH = 56
 
     def __init__(self, card: CoreCard):
-        super().__init__(height=Card.HEIGHT, width=Card.WIDTH)
+        super().__init__(height=Card.HEIGHT, width=Card.WIDTH, background='white')
         self.card = card
-        self.create_rectangle(1, 1, Card.WIDTH, Card.HEIGHT, activeoutline="red")
-        self.create_text(10, 10, text=str(self.card.damage), font="Times 20")
+        self.create_rectangle(1, 1, Card.WIDTH, Card.HEIGHT)
+        self.create_text(15, 15, text=str(self.card.damage), font="Times 20")
         self.create_text(Card.WIDTH * 0.7, Card.HEIGHT * 0.9, text=self.card.ability.name, font="Times 10")
         self.create_text(Card.WIDTH * 0.5, Card.HEIGHT * 0.5, text=self.card.combat_row.name, font="Times 10")
+
+        self.bind('<Enter>', self._highlight)
+        self.bind('<Leave>', self._stop_highlight)
+
+    def _highlight(self, _):
+        self.config(background='red')
+
+    def _stop_highlight(self, _):
+        self.config(background='white')
