@@ -4,8 +4,8 @@ from source.core.card import Card as CoreCard
 
 
 class Card(tk.Canvas):
-    HEIGHT = 160
-    WIDTH = 90
+    HEIGHT = 100
+    WIDTH = 56
 
     def __init__(self, card: CoreCard):
         super().__init__(height=Card.HEIGHT, width=Card.WIDTH)

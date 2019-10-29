@@ -1,14 +1,31 @@
 import tkinter as tk
 
 from source.core.card import Card as CoreCard, CombatRow, Ability
+from source.core.cards.util import get_cards
+from source.core.gameenvironment import GameEnvironment
+from source.core.player import Player, Faction
+from source.gui.board import Board
 from source.gui.card import Card
+from source.core.board import Board as CoreBoard
 
 
 def main():
     master = tk.Tk()
-    card = Card(CoreCard(CombatRow.CLOSE, 5, Ability.MEDIC))
-    card.pack(in_=master)
+    player1 = Player(0, Faction.NILFGAARD, get_cards(Faction.NILFGAARD))
+    player2 = Player(1, Faction.NOTHERN_REALMS, get_cards(Faction.NOTHERN_REALMS))
+    environment = GameEnvironment(player1, player2)
+    environment.current_player = player1
+    card = player1.active_cards.get_all_cards()[0]
+    environment.step(player1, card.combat_row, card)
 
+    card = player2.active_cards.get_all_cards()[0]
+    environment.step(player2, card.combat_row, card)
+
+    card = player1.active_cards.get_all_cards()[0]
+    environment.step(player1, card.combat_row, card)
+    board = Board(environment.board, player1)
+    board.pack(in_=master)
+    master.after(1, board.redraw)
     master.mainloop()
 
 

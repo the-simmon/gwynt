@@ -9,46 +9,52 @@ from source.gui.card import Card
 
 
 class Board(tk.Frame):
+    WIDTH = 1920
+    HEIGHT = 1080
 
     def __init__(self, board: CoreBoard, player: Player):
-        super().__init__(width=1920, height=1080 / 2)
+        super().__init__(width=Board.WIDTH, height=Board.HEIGHT)
         self.board = board
         self.player = player
-        self.card_list: List[Card] = []
 
     def redraw(self):
         self.clear_cards()
         frames = self._get_frames_per_player()
 
         enemy = self.board.get_enemy_player(self.player)
-        if frames[enemy]:
-            frames[enemy].pack(in_=self)
+        frames[enemy].pack(in_=self)
 
-        if frames[self.player]:
-            frames[self.player].pack(in_=self)
+        canvas = tk.Canvas(width=Board.WIDTH, height=5)
+        canvas.create_rectangle(0, 0, Board.WIDTH, 5, fill='black')
+        canvas.pack(in_=self)
+
+        frames[self.player].pack(in_=self)
 
     def _get_frames_per_player(self) -> Dict[Player, tk.Frame]:
 
         frame_dict: Dict[Player, tk.Frame] = {}
 
         combat_row_sorting = [CombatRow.CLOSE, CombatRow.RANGE, CombatRow.SIEGE]
-        for player, card_collection in self.board.cards:
+        for player in [self.player, self.board.get_enemy_player(self.player)]:
+            card_collection = self.board.cards[player]
             frame = tk.Frame()
             frame_dict[player] = frame
-            for card_list in [card_collection[row] for row in combat_row_sorting]:
-                self._draw_row(card_list, frame)
+            for row, card_list in enumerate([card_collection[row] for row in combat_row_sorting]):
+                self._draw_row(card_list).pack(in_=frame)
 
-            self._draw_row(player.active_cards.get_all_cards(), frame)
+            if player.id is self.player.id:
+                self._draw_row(player.active_cards.get_all_cards()).pack(in_=frame)
+            combat_row_sorting.reverse()
 
         return frame_dict
 
     def clear_cards(self):
-        for card in self.card_list:
-            card.destroy()
+        for widget in self.children:
+            widget.destroy()
 
-    def _draw_row(self, card_list: List[CoreCard], master: tk.Widget):
-        frame = tk.Frame()
-        frame.pack(in_=master)
+    def _draw_row(self, card_list: List[CoreCard]):
+        frame = tk.Frame(height=Card.HEIGHT * 1.1)
         for card in card_list:
             card = Card(card)  # convert core card to gui card
-            card.pack(in_=frame, side=tk.RIGHT, padx=Card.WIDTH * 0.1, pady=Card.HEIGHT * 0.1)
+            card.pack(in_=frame, side=tk.RIGHT, padx=Card.WIDTH * 0.1)
+        return frame
