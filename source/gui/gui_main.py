@@ -7,6 +7,7 @@ from source.core.player import Player, Faction
 from source.gui.board import Board
 from source.gui.card import Card
 from source.core.board import Board as CoreBoard
+from source.gui.game import Game
 
 
 def main():
@@ -23,9 +24,9 @@ def main():
 
     card = player1.active_cards.get_all_cards()[0]
     environment.step(player1, card.combat_row, card)
-    board = Board(environment.board, player1)
-    board.pack(in_=master)
-    master.after(1, board.redraw)
+    game = Game(environment, player1)
+    game.pack(in_=master)
+    master.after(1, game.redraw)
     master.mainloop()
 
 

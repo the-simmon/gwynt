@@ -39,7 +39,7 @@ class Board(tk.Frame):
             card_collection = self.board.cards[player]
             frame = tk.Frame()
             frame_dict[player] = frame
-            for row, card_list in enumerate([card_collection[row] for row in combat_row_sorting]):
+            for card_list in [card_collection[row] for row in combat_row_sorting]:
                 self._draw_row(card_list, player).pack(in_=frame)
 
             if player.id is self.player.id:
