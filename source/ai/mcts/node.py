@@ -75,17 +75,32 @@ class Node:
                     player_copy = deepcopy(self.player)
                     _, next_player, card_source = environment_copy.step(player_copy, row, card)
 
-                    player_type = deepcopy(self.player_type)
-                    if next_player.id is not self.player.id:
-                        player_type = deepcopy(self.player_type.invert())
-
-                    node = Node(environment_copy, self, player_type, deepcopy(next_player), card, row, card_source)
+                    player_type = self._get_next_player_type(next_player)
+                    node = Node(environment_copy, self, player_type, deepcopy(next_player), card, row,
+                                deepcopy(card_source))
                     self.leafs.append(node)
+        self._add_pass_node()
 
     def _get_potential_cards(self, player: Player) -> List[Card]:
         if self.next_card_source is CardSource.HAND:
             return player.active_cards.get_all_cards()
         return player.graveyard.get_all_cards()
+
+    def _get_next_player_type(self, next_player: Player) -> PlayerType:
+        player_type = deepcopy(self.player_type)
+        if next_player.id is not self.player.id:
+            player_type = deepcopy(self.player_type.invert())
+        return player_type
+
+    def _add_pass_node(self):
+        if not self.environment.passed[self.player] and self.next_card_source is CardSource.HAND:
+            environment_copy = deepcopy(self.environment)
+            player_copy = deepcopy(self.player)
+            _, next_player, card_source = environment_copy.step(player_copy, None, None)
+
+            player_type = self._get_next_player_type(next_player)
+            node = Node(environment_copy, self, player_type, player_copy, None, None, deepcopy(card_source))
+            self.leafs.append(node)
 
     def simulate(self):
         environment_copy = deepcopy(self.environment)
