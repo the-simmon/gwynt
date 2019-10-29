@@ -16,25 +16,42 @@ class Game(tk.Frame):
         self.environment = environment
         self.player = player
         self.board = Board(environment.board, player)
-        self.frame = tk.Frame()
-        self.frame.grid(in_=self)
-        self.board.grid(in_=self, column=1, row=0)
+
+        self.win_frame = tk.Frame()
+        self.win_frame.grid(in_=self, column=0, row=0, padx=5)
+
+        self.damage_frame = tk.Frame()
+        self.damage_frame.grid(in_=self, column=1, row=0)
+
+        self.board.grid(in_=self, column=2, row=0)
 
     def redraw(self):
         self._clear_frame()
+        self._draw_win_frame()
+        self._draw_damage_frame()
         self.board.redraw()
 
+    def _clear_frame(self):
+        for widget in self.damage_frame.children:
+            widget.destroy()
+
+        for widget in self.win_frame.children:
+            widget.destroy()
+
+    def _draw_win_frame(self):
+        enemy = self.environment.board.get_enemy_player(self.player)
+        tk.Label(text=f'Enemy: {enemy.rounds_won}').pack(in_=self.win_frame)
+        tk.Frame(height=Card.HEIGHT * 3).pack(in_=self.win_frame)
+        tk.Label(text=f'Self: {self.player.rounds_won}').pack(in_=self.win_frame)
+
+    def _draw_damage_frame(self):
         combat_row_sorting = [CombatRow.SIEGE, CombatRow.RANGE, CombatRow.CLOSE]
         core_board = self.environment.board
 
         for player in [core_board.get_enemy_player(self.player), self.player]:
             for row in combat_row_sorting:
                 damage = core_board.cards[player].calculate_damage_for_row(row, core_board.weather)
-                text = tk.Label(text=str(damage))
-                text.pack(in_=self.frame)
-                tk.Frame(height=Card.HEIGHT * 1.1).pack(in_=self.frame)
+                text = tk.Label(text=F'{row.name}: {damage}')
+                text.pack(in_=self.damage_frame)
+                tk.Frame(height=Card.HEIGHT).pack(in_=self.damage_frame)
             combat_row_sorting.reverse()
-
-    def _clear_frame(self):
-        for widget in self.frame.children:
-            widget.destroy()
