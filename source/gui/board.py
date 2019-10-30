@@ -1,4 +1,5 @@
 import tkinter as tk
+from operator import attrgetter
 from typing import List, Dict
 
 from source.core.board import Board as CoreBoard
@@ -56,7 +57,7 @@ class Board(tk.Frame):
 
     def _draw_row(self, card_list: List[CoreCard], player: Player) -> tk.Frame:
         frame = tk.Frame(height=Card.HEIGHT * 1.1)
-        for card in card_list:
+        for card in sorted(card_list, key=attrgetter('damage', 'ability')):
             card = Card(card, player.id is self.player.id)  # convert core card to gui card
             card.pack(in_=frame, side=tk.RIGHT, padx=Card.WIDTH * 0.1)
         return frame

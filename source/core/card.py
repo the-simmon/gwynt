@@ -42,6 +42,9 @@ class Ability(enum.Enum):
     RAIN = 13
     PASS = 14
 
+    def __lt__(self, other):
+        return self.value < other.value
+
 
 class Muster(enum.Enum):
     NONE = 0
