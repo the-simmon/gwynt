@@ -35,7 +35,7 @@ class Main:
 
         self.gui.redraw()
         if not game_over:
-            self.master.after(0, self._run_mcts, current_player, card_source)
+            self.master.after(500, self._run_mcts, current_player, card_source)
 
 
 if __name__ == '__main__':

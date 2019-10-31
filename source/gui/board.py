@@ -10,7 +10,7 @@ from source.gui.card import Card
 
 
 class Board(tk.Frame):
-    WIDTH = 1920
+    WIDTH = 1920 / 2
     HEIGHT = 1080
 
     def __init__(self, board: CoreBoard, player: Player):

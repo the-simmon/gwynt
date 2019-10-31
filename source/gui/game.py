@@ -8,7 +8,7 @@ from source.gui.card import Card
 
 
 class Game(tk.Frame):
-    WIDTH = 1920
+    WIDTH = 1920/2
     HEIGHT = 1080
 
     def __init__(self, environment: GameEnvironment, player: Player):
