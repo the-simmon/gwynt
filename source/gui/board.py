@@ -23,13 +23,13 @@ class Board(tk.Frame):
         frames = self._get_frames_per_player()
 
         enemy = self.board.get_enemy_player(self.player)
-        frames[enemy].pack(in_=self)
+        frames[enemy].pack()
 
-        canvas = tk.Canvas(width=Board.WIDTH, height=5)
+        canvas = tk.Canvas(self, width=Board.WIDTH, height=5)
         canvas.create_rectangle(0, 0, Board.WIDTH, 5, fill='black')
-        canvas.pack(in_=self)
+        canvas.pack()
 
-        frames[self.player].pack(in_=self)
+        frames[self.player].pack()
 
     def _get_frames_per_player(self) -> Dict[Player, tk.Frame]:
 
@@ -38,7 +38,7 @@ class Board(tk.Frame):
         combat_row_sorting = [CombatRow.CLOSE, CombatRow.RANGE, CombatRow.SIEGE]
         for player in [self.player, self.board.get_enemy_player(self.player)]:
             card_collection = self.board.cards[player]
-            frame = tk.Frame()
+            frame = tk.Frame(self)
             frame_dict[player] = frame
 
             cards = [card_collection.get_damage_adjusted_cards(row, self.board.weather) for row in combat_row_sorting]
@@ -52,7 +52,7 @@ class Board(tk.Frame):
         return frame_dict
 
     def clear_cards(self):
-        for widget in self.children:
+        for widget in self.winfo_children():
             widget.destroy()
 
     def _draw_row(self, card_list: List[CoreCard], player: Player) -> tk.Frame:

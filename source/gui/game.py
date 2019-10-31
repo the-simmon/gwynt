@@ -17,11 +17,11 @@ class Game(tk.Frame):
         self.player = player
         self.board = Board(environment.board, player)
 
-        self.info_frame = tk.Frame()
-        self.info_frame.grid(in_=self, column=0, row=0, padx=5)
+        self.info_frame = tk.Frame(self)
+        self.info_frame.grid(column=0, row=0, padx=5)
 
-        self.damage_frame = tk.Frame()
-        self.damage_frame.grid(in_=self, column=1, row=0)
+        self.damage_frame = tk.Frame(self)
+        self.damage_frame.grid(column=1, row=0)
 
         self.board.grid(in_=self, column=2, row=0)
 
@@ -32,21 +32,21 @@ class Game(tk.Frame):
         self.board.redraw()
 
     def _clear_frame(self):
-        for widget in self.damage_frame.children:
+        for widget in self.damage_frame.winfo_children():
             widget.destroy()
 
-        for widget in self.info_frame.children:
+        for widget in self.info_frame.winfo_children():
             widget.destroy()
 
     def _draw_info_frame(self):
-        tk.Label(text=f'Weather: {self.environment.board.weather.name}').pack(in_=self.info_frame, anchor=tk.N)
+        tk.Label(self.info_frame, text=f'Weather: {self.environment.board.weather.name}').pack(anchor=tk.N)
 
         enemy = self.environment.board.get_enemy_player(self.player)
-        tk.Label(text=f'Enemy: {enemy.rounds_won}').pack(in_=self.info_frame)
-        tk.Label(text=f'Self: {self.player.rounds_won}').pack(in_=self.info_frame)
+        tk.Label(self.info_frame, text=f'Enemy: {enemy.rounds_won}').pack()
+        tk.Label(self.info_frame, text=f'Self: {self.player.rounds_won}').pack()
 
         current_player = 'Self' if self.environment.current_player.id == self.player.id else 'Enemy'
-        tk.Label(text=f'Current player: {current_player}').pack(in_=self.info_frame)
+        tk.Label(self.info_frame, text=f'Current player: {current_player}').pack()
 
     def _draw_damage_frame(self):
         combat_row_sorting = [CombatRow.SIEGE, CombatRow.RANGE, CombatRow.CLOSE]
@@ -55,7 +55,7 @@ class Game(tk.Frame):
         for player in [core_board.get_enemy_player(self.player), self.player]:
             for row in combat_row_sorting:
                 damage = core_board.cards[player].calculate_damage_for_row(row, core_board.weather)
-                text = tk.Label(text=F'{row.name}: {damage}')
-                text.pack(in_=self.damage_frame)
-                tk.Frame(height=Card.HEIGHT).pack(in_=self.damage_frame)
+                text = tk.Label(self.damage_frame, text=F'{row.name}: {damage}')
+                text.pack()
+                tk.Frame(self.damage_frame, height=Card.HEIGHT).pack()
             combat_row_sorting.reverse()
