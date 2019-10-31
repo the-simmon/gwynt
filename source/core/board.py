@@ -100,7 +100,7 @@ class Board:
         cards_to_add.extend(search_and_remove(card, player.deck))
 
         for card in cards_to_add:
-            self.add(player, card.combat_row, card)
+            self.cards[player][card.combat_row].append(card)
 
     def _check_scorch(self, card: Card, player: Player):
         enemy = self.get_enemy_player(player)
