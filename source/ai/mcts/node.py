@@ -72,11 +72,11 @@ class Node:
                 # only one commanders horn per row is possible
                 if self.environment.board.check_commanders_horn(self.player, card, row):
                     environment_copy = deepcopy(self.environment)
-                    player_copy = deepcopy(self.player)
+                    player_copy = environment_copy.board.get_player(self.player)
                     _, next_player, card_source = environment_copy.step(player_copy, row, card)
 
                     player_type = self._get_next_player_type(next_player)
-                    node = Node(environment_copy, self, player_type, deepcopy(next_player), card, row,
+                    node = Node(environment_copy, self, player_type, next_player, card, row,
                                 deepcopy(card_source))
                     self.leafs.append(node)
         if not self.environment.passed[self.player] and self.next_card_source is CardSource.HAND:
@@ -96,7 +96,7 @@ class Node:
     def _add_pass_node(self):
         if not self.environment.passed[self.player] and self.next_card_source is CardSource.HAND:
             environment_copy = deepcopy(self.environment)
-            player_copy = deepcopy(self.player)
+            player_copy = environment_copy.board.get_player(self.player)
             _, next_player, card_source = environment_copy.step(player_copy, None, None)
 
             player_type = self._get_next_player_type(next_player)
@@ -105,7 +105,7 @@ class Node:
 
     def simulate(self):
         environment_copy = deepcopy(self.environment)
-        current_player = environment_copy.board.get_player(self.player)
+        current_player = environment_copy.current_player
         self._add_random_cards_to_enemy(environment_copy)
 
         winner = simulate_random_game(environment_copy, current_player)
