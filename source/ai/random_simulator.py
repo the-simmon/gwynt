@@ -13,7 +13,10 @@ def simulate_random_game(environment: GameEnvironment, current_player: Player) -
         potential_cards.append(None)  # None == pass
 
         random_card = random.choice(potential_cards)
-        row = random.choice(CombatRow.get_possible_rows(random_card.combat_row))
+        if random_card:
+            row = random.choice(CombatRow.get_possible_rows(random_card.combat_row))
+        else:
+            row = None
         game_over, current_player, card_source = environment.step(current_player, row, random_card)
 
     board = environment.board

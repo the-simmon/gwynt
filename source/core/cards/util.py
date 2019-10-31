@@ -1,3 +1,5 @@
+import random
+
 from source.core.player import Faction
 from .monster import cards as monster_cards
 from .neutral import cards as neutral_cards
@@ -16,4 +18,6 @@ def get_cards(faction: Faction):
         result.extend(nothern_reamls_cards)
     elif faction is Faction.Scoiatael:
         result.extend(scoiatael_cards)
+
+    random.shuffle(result)
     return result
