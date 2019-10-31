@@ -40,12 +40,13 @@ class Game(tk.Frame):
 
     def _draw_info_frame(self):
         tk.Label(text=f'Weather: {self.environment.board.weather.name}').pack(in_=self.info_frame, anchor=tk.N)
-        tk.Frame(height=Card.HEIGHT).pack(in_=self.info_frame)
 
         enemy = self.environment.board.get_enemy_player(self.player)
         tk.Label(text=f'Enemy: {enemy.rounds_won}').pack(in_=self.info_frame)
-        tk.Frame(height=Card.HEIGHT * 3).pack(in_=self.info_frame)
         tk.Label(text=f'Self: {self.player.rounds_won}').pack(in_=self.info_frame)
+
+        current_player = 'Self' if self.environment.current_player.id == self.player.id else 'Enemy'
+        tk.Label(text=f'Current player: {current_player}').pack(in_=self.info_frame)
 
     def _draw_damage_frame(self):
         combat_row_sorting = [CombatRow.SIEGE, CombatRow.RANGE, CombatRow.CLOSE]
