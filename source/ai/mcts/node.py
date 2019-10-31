@@ -94,14 +94,13 @@ class Node:
         return player_type
 
     def _add_pass_node(self):
-        if not self.environment.passed[self.player] and self.next_card_source is CardSource.HAND:
-            environment_copy = deepcopy(self.environment)
-            player_copy = environment_copy.board.get_player(self.player)
-            _, next_player, card_source = environment_copy.step(player_copy, None, None)
+        environment_copy = deepcopy(self.environment)
+        player_copy = environment_copy.board.get_player(self.player)
+        _, next_player, card_source = environment_copy.step(player_copy, None, None)
 
-            player_type = self._get_next_player_type(next_player)
-            node = Node(environment_copy, self, player_type, player_copy, None, None, deepcopy(card_source))
-            self.leafs.append(node)
+        player_type = self._get_next_player_type(next_player)
+        node = Node(environment_copy, self, player_type, player_copy, None, None, deepcopy(card_source))
+        self.leafs.append(node)
 
     def simulate(self):
         environment_copy = deepcopy(self.environment)
