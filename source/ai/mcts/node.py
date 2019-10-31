@@ -99,7 +99,7 @@ class Node:
         _, next_player, card_source = environment_copy.step(player_copy, None, None)
 
         player_type = self._get_next_player_type(next_player)
-        node = Node(environment_copy, self, player_type, player_copy, None, None, deepcopy(card_source))
+        node = Node(environment_copy, self, player_type, next_player, None, None, deepcopy(card_source))
         self.leafs.append(node)
 
     def simulate(self):
