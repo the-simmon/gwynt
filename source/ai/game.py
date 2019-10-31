@@ -12,7 +12,7 @@ class Game:
     def __init__(self, player: Player, enemy: Player):
         self.player = player
         self.enemy = enemy
-        self.environment = GameEnvironment(player, enemy, _revive)
+        self.environment = GameEnvironment(player, enemy)
         self.game_over = False
         self.current_player = player
 
