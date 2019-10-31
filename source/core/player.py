@@ -34,4 +34,4 @@ class Player:
         return other is not None and self.id is other.id
 
     def __hash__(self):
-        return hash(self.id) + hash(self.faction) + hash(self.rounds_won)
+        return self.id
