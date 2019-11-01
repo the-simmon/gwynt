@@ -3,7 +3,7 @@ from typing import Tuple
 
 from source.ai.mcts.node import Node, PlayerType
 from source.core.card import Card, CombatRow
-from source.core.gameenvironment import GameEnvironment
+from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 
 
@@ -14,7 +14,8 @@ class MCTS:
         self.player = player
         self.max_time = max_time
         self.start_time = None
-        self.node = Node(environment, None, PlayerType.ENEMY, player, None, None, card_source)
+        playerType = PlayerType.ENEMY if card_source is CardSource.HAND else PlayerType.SELF
+        self.node = Node(environment, None, playerType, player, None, None, card_source)
 
     def run(self) -> Tuple[Card, CombatRow]:
         self.start_time = time.time()
