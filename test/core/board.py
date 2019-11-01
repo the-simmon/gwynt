@@ -29,6 +29,10 @@ class BoardTest(unittest.TestCase):
         self.board.add(self.player1, CombatRow.SPECIAL, Card(CombatRow.SPECIAL, 0, Ability.FOG))
         self.assertEqual(Weather.FOG, self.board.weather)
 
+        self.board.add(self.player1, self.player1_active_card.combat_row, self.player1_active_card)
+        actual = self.board.calculate_damage(self.player1)
+        self.assertEqual(1, actual)
+
     def test_none_ability_card(self):
         card = Card(CombatRow.CLOSE, 3, Ability.NONE)
         self.board.add(self.player1, card.combat_row, card)
