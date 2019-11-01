@@ -75,7 +75,7 @@ class GameEnvironment:
         player1_damage = self.board.calculate_damage(self.player1)
         player2_damage = self.board.calculate_damage(self.player2)
 
-        current_player, card_source = self.current_player, None
+        current_player = self.current_player
         if player1_damage > player2_damage:
             self.player1.rounds_won += 1
             current_player = self.player1
@@ -94,7 +94,6 @@ class GameEnvironment:
         return current_player, card_source
 
     def _determine_current_player(self, played_card: Card, player: Player) -> Tuple[Player, CardSource]:
-        result = None
         if played_card and played_card.ability is Ability.MEDIC and len(player.graveyard.get_all_cards()):
             result = self.current_player, CardSource.GRAVEYARD
         else:
