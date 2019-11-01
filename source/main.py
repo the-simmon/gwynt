@@ -44,7 +44,7 @@ class Main:
         game_over, current_player, card_source = self.environment.step(player, row, card)
 
         self._should_update_gui.set()
-        time.sleep(500)
+        time.sleep(1)
         if not game_over:
             self._run_mcts(current_player, card_source)
 
