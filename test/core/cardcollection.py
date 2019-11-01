@@ -17,15 +17,15 @@ class CardCollectionTest(unittest.TestCase):
 
     def test_calculate_damage_clear_weather(self):
         expected = 40
-        self.assertEqual(expected, self.card_collection.calculate_damage(Weather.CLEAR))
+        self.assertEqual(expected, self.card_collection.calculate_damage([Weather.CLEAR]))
 
     def test_calculate_damage_frost_weather(self):
         expected = 16
-        self.assertEqual(expected, self.card_collection.calculate_damage(Weather.FROST))
+        self.assertEqual(expected, self.card_collection.calculate_damage([Weather.FROST]))
 
     def test_calculate_damage_hero_weather(self):
         expected = 40
-        self.assertEqual(expected, self.card_collection.calculate_damage(Weather.FOG))
+        self.assertEqual(expected, self.card_collection.calculate_damage([Weather.FOG]))
 
     def test_get_all_cards(self):
         expected = self.close_cards + self.range_cards

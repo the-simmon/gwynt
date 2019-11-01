@@ -20,17 +20,17 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
     def remove(self, row: CombatRow, card: Card):
         self[row].remove(card)
 
-    def calculate_damage(self, weather: Weather) -> int:
+    def calculate_damage(self, weather: List[Weather]) -> int:
         result = 0
         for row, cards in self.items():
             result += self.calculate_damage_for_row(row, weather)
         return result
 
-    def calculate_damage_for_row(self, row: CombatRow, weather: Weather) -> int:
+    def calculate_damage_for_row(self, row: CombatRow, weather: List[Weather]) -> int:
         cards = _calculate_damage_for_row(self[row], weather)
         return sum([card.damage for card in cards])
 
-    def get_damage_adjusted_cards(self, row: CombatRow, weather: Weather) -> List[Card]:
+    def get_damage_adjusted_cards(self, row: CombatRow, weather: List[Weather]) -> List[Card]:
         return _calculate_damage_for_row(self[row], weather)
 
     def get_all_cards(self) -> List[Card]:
@@ -46,20 +46,18 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
         return copy
 
 
-def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> List[Card]:
-    def check_weather(cards: List[Card], weather: Weather) -> List[Card]:
-        affected_row = None
-        if weather is Weather.CLEAR:
-            pass
-        elif weather is Weather.FROST:
-            affected_row = CombatRow.CLOSE
-        elif weather is Weather.FOG:
-            affected_row = CombatRow.RANGE
-        elif weather is Weather.RAIN:
-            affected_row = CombatRow.SIEGE
+def _calculate_damage_for_row(cards: List[Card], weather: List[Weather]) -> List[Card]:
+    def check_weather(cards: List[Card], weather: List[Weather]) -> List[Card]:
+        affected_rows: List[CombatRow] = []
+        if Weather.FROST in weather:
+            affected_rows.append(CombatRow.CLOSE)
+        if Weather.FOG in weather:
+            affected_rows.append(CombatRow.RANGE)
+        if Weather.RAIN in weather:
+            affected_rows.append(CombatRow.SIEGE)
 
         for card in cards:
-            if card.combat_row is affected_row and card.damage > 0 and not card.hero:
+            if card.combat_row in affected_rows and card.damage > 0 and not card.hero:
                 card.damage = 1
         return cards
 

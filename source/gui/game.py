@@ -39,7 +39,11 @@ class Game(tk.Frame):
             widget.destroy()
 
     def _draw_info_frame(self):
-        tk.Label(self.info_frame, text=f'Weather: {self.environment.board.weather.name}').pack(anchor=tk.N)
+        weather_string = ''
+        for weather in self.environment.board.weather:
+            weather_string += f'{weather.name}, '
+
+        tk.Label(self.info_frame, text=f'Weather: {weather_string}').pack(anchor=tk.N)
 
         enemy = self.environment.board.get_enemy_player(self.player)
         tk.Label(self.info_frame, text=f'Enemy: {enemy.rounds_won}').pack()

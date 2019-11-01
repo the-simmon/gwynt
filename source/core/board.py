@@ -17,7 +17,7 @@ class Board:
 
     def __init__(self, player1: Player, player2: Player, environment: GameEnvironment):
         self.cards: DefaultDict[Player, CardCollection] = defaultdict(lambda: CardCollection(cards=[]))
-        self.weather: Weather = Weather.CLEAR
+        self.weather: List[Weather] = [Weather.CLEAR]
         self.player1 = player1
         self.player2 = player2
         self.environment = environment
@@ -75,7 +75,9 @@ class Board:
         if ability is Ability.NONE:
             pass
         elif Weather.ability_is_weather(ability):
-            self.weather = Weather.ability_to_weather(ability)
+            if Weather.CLEAR in self.weather:
+                self.weather.remove(Weather.CLEAR)
+            self.weather.append(Weather.ability_to_weather(ability))
         elif ability is Ability.MEDIC:
             pass  # reviving is handled on environment level
         elif ability is Ability.MUSTER:

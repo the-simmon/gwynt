@@ -93,7 +93,7 @@ class GameEnvironment:
         self.board.all_cards_to_graveyard(self.player2)
         self.passed = defaultdict(lambda: False)
 
-        self.board.weather = Weather.CLEAR
+        self.board.weather = [Weather.CLEAR]
 
         return current_player, card_source
 
