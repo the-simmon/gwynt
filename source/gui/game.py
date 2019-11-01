@@ -51,6 +51,7 @@ class Game(tk.Frame):
 
         current_player = 'Self' if self.environment.current_player.id == self.player.id else 'Enemy'
         tk.Label(self.info_frame, text=f'Current player: {current_player}').pack()
+        tk.Label(self.info_frame, text=f'Enemy cards: {len(enemy.active_cards.get_all_cards())}').pack()
 
         tk.Frame(self.info_frame, height=Card.HEIGHT).pack()
         core_board = self.environment.board
