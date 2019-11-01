@@ -3,6 +3,7 @@ from __future__ import annotations
 import enum
 import random
 from collections import defaultdict
+from copy import deepcopy
 from typing import Tuple, Dict, Callable
 
 from source.core.card import Ability
@@ -104,3 +105,19 @@ class GameEnvironment:
                 result = enemy, CardSource.HAND
 
         return result
+
+    def __deepcopy__(self, memodict={}):
+        copy = GameEnvironment(deepcopy(self.player1), deepcopy(self.player2))
+
+        board = copy.board
+        board.player1 = copy.player1
+        board.player2 = copy.player2
+        board.environment = copy
+        board.cards = deepcopy(self.board.cards)
+        board.weather = deepcopy(self.board.weather)
+
+        copy.current_player = copy.board.get_player(self.current_player)
+        copy.passed = deepcopy(self.passed)
+        copy.current_card_source = deepcopy(self.current_card_source)
+        copy.current_round = deepcopy(self.current_round)
+        return copy
