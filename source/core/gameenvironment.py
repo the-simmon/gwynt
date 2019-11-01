@@ -7,6 +7,7 @@ from copy import deepcopy
 from typing import Tuple, Dict, Callable
 
 from source.core.card import Ability
+from source.core.weather import Weather
 from .board import Board
 from .card import Card, CombatRow
 from .player import Player
@@ -91,6 +92,8 @@ class GameEnvironment:
         self.board.all_cards_to_graveyard(self.player1)
         self.board.all_cards_to_graveyard(self.player2)
         self.passed = defaultdict(lambda: False)
+
+        self.board.weather = Weather.CLEAR
 
         return current_player, card_source
 
