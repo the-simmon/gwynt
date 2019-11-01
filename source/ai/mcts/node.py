@@ -62,7 +62,7 @@ class Node:
 
     def get_ucb1(self):
         simulations = self.simulations or sys.float_info.epsilon * 10
-        return self.wins / simulations + sqrt(math.log(self.parent.simulations) / simulations)
+        return self.wins / simulations + 2 * sqrt(math.log(self.parent.simulations) / simulations)
 
     def expand(self):
         self.expanded = True
