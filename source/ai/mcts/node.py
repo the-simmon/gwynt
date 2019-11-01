@@ -31,7 +31,6 @@ class Node:
     def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, player: Player, card: Card,
                  row: CombatRow, card_source: CardSource):
         self.environment = environment
-        self.board = environment.board
         self.parent = parent
         self.player_type = player_type
         self.player = player

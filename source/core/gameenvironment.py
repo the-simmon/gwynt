@@ -53,13 +53,12 @@ class GameEnvironment:
         if len(player.active_cards.get_all_cards()) is 0 or not card:
             self.passed[player] = True
 
-        self.current_player, card_source = self._determine_current_player(card, player)
+        self.current_player, self.current_card_source = self._determine_current_player(card, player)
 
         if self.round_over():
-            self.current_player, card_source = self._end_of_round()
+            self.current_player, self.current_card_source = self._end_of_round()
 
-        self.current_card_source = card_source
-        return self.game_over(), self.current_player, card_source
+        return self.game_over(), self.current_player, self.current_card_source
 
     def round_over(self):
         return all(self.passed.values())
