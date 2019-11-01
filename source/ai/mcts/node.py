@@ -110,11 +110,7 @@ class Node:
 
         winner = simulate_random_game(environment_copy, current_player, environment_copy.current_card_source)
 
-        winning_type = PlayerType.SELF
-        if winner.id is not self.player.id:
-            winning_type = PlayerType.ENEMY
-
-        self.backpropagate(winning_type)
+        self.backpropagate(winner)
 
     def _add_random_cards_to_enemy(self, environment: GameEnvironment):
         player_to_add_cards = self.player
@@ -137,9 +133,9 @@ class Node:
         player_to_add_cards.active_cards = CardCollection(all_cards[:total_active_cards - number_of_played_cards])
         player_to_add_cards.deck = CardCollection(all_cards[11:])
 
-    def backpropagate(self, winner: PlayerType):
+    def backpropagate(self, winner: Player):
         self.simulations += 1
-        if winner is self.player_type:
+        if winner.id is self.player.id:
             self.wins += 1
         if self.parent:
             self.parent.backpropagate(winner)
