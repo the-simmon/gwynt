@@ -61,6 +61,10 @@ class Game(tk.Frame):
         tk.Label(self.info_frame, text=f'Enemy passed: {self.environment.passed[enemy]}').pack()
         tk.Label(self.info_frame, text=f'Self passed: {self.environment.passed[self.player]}').pack()
 
+        tk.Frame(self.info_frame, height=Card.HEIGHT).pack()
+        tk.Label(self.info_frame, text=f'Enemy: {core_board.get_enemy_player(self.player).faction.name}').pack()
+        tk.Label(self.info_frame, text=f'Self: {self.player.faction.name}').pack()
+
     def _draw_damage_frame(self):
         combat_row_sorting = [CombatRow.SIEGE, CombatRow.RANGE, CombatRow.CLOSE]
         core_board = self.environment.board
