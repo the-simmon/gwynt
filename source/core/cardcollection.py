@@ -86,7 +86,7 @@ def _calculate_damage_for_row(cards: List[Card], weather: Weather) -> List[Card]
 
         def apply_function(f: Callable[[Card], None], cards: List[Card], current_card: Card):
             for card in cards:
-                if card != current_card:
+                if card != current_card and not card.hero:
                     f(card)
 
         # there are tow types of commanders horn, dandelion and the generic horn
