@@ -1,4 +1,6 @@
 import random
+import threading
+import time
 import tkinter as tk
 
 from source.ai.mcts.mcts import MCTS
@@ -25,17 +27,26 @@ class Main:
 
         self.gui.pack(in_=self.master)
         self.master.after(1, self.gui.redraw)
-        self.master.after(100, self._run_mcts, self.environment.current_player)
+        self._should_update_gui = threading.Event()
+        threading.Thread(target=self._run_mcts, args=[self.environment.current_player]).start()
+        self.master.after(1000, self._update_gui)
         self.master.mainloop()
 
+    def _update_gui(self):
+        if self._should_update_gui.is_set():
+            self.gui.redraw()
+            self._should_update_gui.clear()
+        self.master.after(1000, self._update_gui)
+
     def _run_mcts(self, player: Player, card_source: CardSource = CardSource.HAND):
-        mcts = MCTS(self.environment, player, card_source, max_time=2)
+        mcts = MCTS(self.environment, player, card_source)
         card, row = mcts.run()
         game_over, current_player, card_source = self.environment.step(player, row, card)
 
-        self.gui.redraw()
+        self._should_update_gui.set()
+        time.sleep(500)
         if not game_over:
-            self.master.after(500, self._run_mcts, current_player, card_source)
+            self._run_mcts(current_player, card_source)
 
 
 if __name__ == '__main__':
