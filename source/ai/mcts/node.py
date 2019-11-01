@@ -113,7 +113,7 @@ class Node:
         self.backpropagate(winner)
 
     def _add_random_cards_to_enemy(self, environment: GameEnvironment):
-        player_to_add_cards = self.player
+        player_to_add_cards = environment.board.get_player(self.player)
         if self.player_type is PlayerType.SELF:
             player_to_add_cards = environment.board.get_enemy_player(self.player)
 
