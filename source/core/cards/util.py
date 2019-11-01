@@ -16,7 +16,7 @@ def get_cards(faction: Faction):
         result.extend(niflgaard_cards)
     elif faction is Faction.NOTHERN_REALMS:
         result.extend(nothern_reamls_cards)
-    elif faction is Faction.Scoiatael:
+    elif faction is Faction.SCOIATAEL:
         result.extend(scoiatael_cards)
 
     random.shuffle(result)

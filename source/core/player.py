@@ -10,7 +10,7 @@ class Faction(enum.Enum):
     MONSTER = 0
     NILFGAARD = 1
     NOTHERN_REALMS = 2
-    Scoiatael = 3
+    SCOIATAEL = 3
 
 
 class Player:
