@@ -135,7 +135,7 @@ class Node:
 
     def backpropagate(self, winner: Player):
         self.simulations += 1
-        if winner.id is self.player.id:
+        if winner and winner.id is self.player.id:
             self.wins += 1
         if self.parent:
             self.parent.backpropagate(winner)
