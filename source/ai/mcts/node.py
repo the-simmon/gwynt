@@ -107,7 +107,7 @@ class Node:
         current_player = environment_copy.current_player
         self._add_random_cards_to_enemy(environment_copy)
 
-        winner = simulate_random_game(environment_copy, current_player)
+        winner = simulate_random_game(environment_copy, current_player, environment_copy.current_card_source)
 
         winning_type = PlayerType.SELF
         if winner.id is not self.player.id:

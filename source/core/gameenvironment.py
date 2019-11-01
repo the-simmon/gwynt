@@ -22,6 +22,7 @@ class GameEnvironment:
         self.player1 = player1
         self.player2 = player2
         self.current_player = random.choice([player1, player2])
+        self.current_card_source = CardSource.HAND
         self.board = Board(player1, player2, self)
         self.current_round = 0
         self.passed: Dict[Player, bool] = {player1: False, player2: False}
@@ -43,7 +44,10 @@ class GameEnvironment:
     def step(self, player: Player, row: CombatRow, card: Card) -> Tuple[bool, Player, CardSource]:
         # card == None => player passes
         if card:
-            player.active_cards.remove(card.combat_row, card)
+            if self.current_card_source is CardSource.HAND:
+                player.active_cards.remove(card.combat_row, card)
+            else:
+                player.graveyard.remove(card.combat_row, card)
             self.board.add(player, row, card)
 
         if len(player.active_cards.get_all_cards()) is 0 or not card:
@@ -54,6 +58,7 @@ class GameEnvironment:
         if self.round_over():
             self.current_player, card_source = self._end_of_round()
 
+        self.current_card_source = card_source
         return self.game_over(), self.current_player, card_source
 
     def round_over(self):

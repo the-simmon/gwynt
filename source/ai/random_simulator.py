@@ -2,14 +2,14 @@ import random
 from typing import List
 
 from source.core.card import CombatRow, Card
-from source.core.gameenvironment import GameEnvironment
+from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 
 
-def simulate_random_game(environment: GameEnvironment, current_player: Player) -> Player:
+def simulate_random_game(environment: GameEnvironment, current_player: Player, card_source: CardSource) -> Player:
     game_over = False
     while not game_over:
-        potential_cards = _get_potential_cards(current_player)
+        potential_cards = _get_potential_cards(current_player, card_source)
         potential_cards.append(None)  # None == pass
 
         random_card = random.choice(potential_cards)
@@ -24,5 +24,7 @@ def simulate_random_game(environment: GameEnvironment, current_player: Player) -
     return winner
 
 
-def _get_potential_cards(player: Player) -> List[Card]:
-    return player.active_cards.get_all_cards()
+def _get_potential_cards(player: Player, next_card_source: CardSource) -> List[Card]:
+    if next_card_source is CardSource.HAND:
+        return player.active_cards.get_all_cards()
+    return player.graveyard.get_all_cards()

@@ -29,7 +29,7 @@ class Main:
         self.master.mainloop()
 
     def _run_mcts(self, player: Player, card_source: CardSource = CardSource.HAND):
-        mcts = MCTS(self.environment, player, card_source)
+        mcts = MCTS(self.environment, player, card_source, max_time=2)
         card, row = mcts.run()
         game_over, current_player, card_source = self.environment.step(player, row, card)
 
