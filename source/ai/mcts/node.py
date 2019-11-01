@@ -41,9 +41,10 @@ class Node:
         self.leafs: List[Node] = []
         self.simulations = 0
         self.wins = 0
+        self.expanded = False
 
     def select(self):
-        if self.leafs:
+        if self.expanded:
             max_index = 0
             max_value = 0
             for i, node in enumerate(self.leafs):
@@ -65,6 +66,7 @@ class Node:
         return self.wins / simulations + sqrt(math.log(self.parent.simulations) / simulations)
 
     def expand(self):
+        self.expanded = True
         potential_cards = self._get_potential_cards(self.player)
 
         for card in potential_cards:
