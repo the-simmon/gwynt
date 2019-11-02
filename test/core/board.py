@@ -1,6 +1,4 @@
-import random
 import unittest
-from typing import Tuple
 
 from source.core.board import Board
 from source.core.card import Card, Ability, Muster

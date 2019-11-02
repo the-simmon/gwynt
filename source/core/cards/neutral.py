@@ -1,6 +1,6 @@
+from source.core.comabt_row import CombatRow
 from ._flatten import flatten
 from ..card import Card, Ability
-from source.core.comabt_row import CombatRow
 
 cards = [
     Card(CombatRow.SPECIAL, 0, Ability.FROST) * 3,

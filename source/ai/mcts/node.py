@@ -10,9 +10,9 @@ from typing import List
 
 from source.ai.random_simulator import simulate_random_game
 from source.core.card import Card, Ability
-from source.core.comabt_row import CombatRow
 from source.core.cardcollection import CardCollection
 from source.core.cards.util import get_cards
+from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 

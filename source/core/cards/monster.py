@@ -1,6 +1,6 @@
+from source.core.comabt_row import CombatRow
 from ._flatten import flatten
 from ..card import Card, Ability, Muster
-from source.core.comabt_row import CombatRow
 
 cards = [
     Card(CombatRow.CLOSE, 4, Ability.MUSTER, muster=Muster.ARACHAS) * 3,

@@ -4,13 +4,13 @@ import enum
 import random
 from collections import defaultdict
 from copy import deepcopy
-from typing import Tuple, Dict, Callable
+from typing import Tuple, Dict
 
 from source.core.card import Ability
+from source.core.comabt_row import CombatRow
 from source.core.weather import Weather
 from .board import Board
 from .card import Card
-from source.core.comabt_row import CombatRow
 from .player import Player
 
 

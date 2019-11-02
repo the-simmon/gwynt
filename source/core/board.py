@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from collections import defaultdict
 from copy import deepcopy
-from typing import DefaultDict, List, TYPE_CHECKING, Callable, Tuple
+from typing import DefaultDict, List, TYPE_CHECKING
 
-from .card import Card, Ability
 from source.core.comabt_row import CombatRow
+from .card import Card, Ability
 from .cardcollection import CardCollection
 from .player import Player
 from .weather import Weather
