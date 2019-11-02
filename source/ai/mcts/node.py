@@ -75,12 +75,16 @@ class Node:
                 if self.environment.board.check_commanders_horn(self.player, card, row):
                     environment_copy = deepcopy(self.environment)
                     player_copy = environment_copy.board.get_player(self.player)
-                    _, next_player, card_source = environment_copy.step(player_copy, row, card)
+                    game_over, next_player, card_source = environment_copy.step(player_copy, row, card)
 
-                    player_type = self._get_next_player_type(next_player)
-                    node = Node(environment_copy, self, player_type, next_player, card, row,
-                                deepcopy(card_source))
-                    self.leafs.append(node)
+                    if game_over:
+                        winner = environment_copy.get_winner()
+                        self.backpropagate(winner)
+                    else:
+                        player_type = self._get_next_player_type(next_player)
+                        node = Node(environment_copy, self, player_type, next_player, card, row,
+                                    deepcopy(card_source))
+                        self.leafs.append(node)
         if not self.environment.passed[self.player] and self.next_card_source is CardSource.HAND:
             self._add_pass_node()
 
