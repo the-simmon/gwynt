@@ -38,15 +38,16 @@ class Main:
             self._should_update_gui.clear()
         self.master.after(1000, self._update_gui)
 
-    def _run_mcts(self, player: Player, card_source: CardSource = CardSource.HAND):
-        mcts = MCTS(self.environment, player, card_source)
-        card, row = mcts.run()
-        game_over, current_player, card_source = self.environment.step(player, row, card)
+    def _run_mcts(self, current_player: Player, card_source: CardSource = CardSource.HAND):
+        game_over = False
 
-        self._should_update_gui.set()
-        time.sleep(1)
-        if not game_over:
-            self._run_mcts(current_player, card_source)
+        while not game_over:
+            mcts = MCTS(self.environment, current_player, card_source)
+            card, row = mcts.run()
+            game_over, current_player, card_source = self.environment.step(current_player, row, card)
+
+            self._should_update_gui.set()
+            time.sleep(1)
 
 
 if __name__ == '__main__':
