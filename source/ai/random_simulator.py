@@ -20,13 +20,7 @@ def simulate_random_game(environment: GameEnvironment, current_player: Player, c
             row = None
         game_over, current_player, card_source = environment.step(current_player, row, random_card)
 
-    board = environment.board
-    winner = None
-    if environment.player1.rounds_won is 2 and environment.player2.rounds_won is not 2:
-        winner = environment.player1
-    elif environment.player2.rounds_won is 2 and environment.player1.rounds_won is not 2:
-        winner = environment.player2
-    return winner
+    return environment.get_winner()
 
 
 def _get_potential_cards(player: Player, next_card_source: CardSource) -> List[Card]:
