@@ -128,10 +128,15 @@ class Node:
 
         total_active_cards = 10
         for card in played_cards:
-            if card in all_cards:
+            if card in all_cards and card.ability is not Ability.SPY:
                 all_cards.remove(card)
                 total_active_cards -= 1
-            if card.ability is Ability.SPY:
+
+        # spy cards are placed on the enemy side
+        enemy = environment.board.get_enemy_player(player_to_add_cards)
+        enemy_cards = environment.board.cards[enemy].get_all_cards()
+        for card in enemy_cards:
+            if card in all_cards and card.ability is Ability.SPY:
                 total_active_cards += 2
         random.shuffle(all_cards)
 
