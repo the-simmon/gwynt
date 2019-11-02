@@ -15,7 +15,7 @@ def simulate_random_game(environment: GameEnvironment, current_player: Player, c
 
         random_card = random.choice(potential_cards)
         if random_card:
-            row = random.choice(CombatRow.get_possible_rows(random_card.combat_row))
+            row = random.choice(CombatRow.get_possible_rows(random_card))
         else:
             row = None
         game_over, current_player, card_source = environment.step(current_player, row, random_card)
