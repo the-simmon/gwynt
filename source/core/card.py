@@ -2,27 +2,10 @@ from __future__ import annotations
 
 import enum
 from copy import deepcopy
-from typing import List
+from typing import TYPE_CHECKING
 
-
-class CombatRow(enum.Enum):
-    CLOSE = 0
-    RANGE = 1
-    SIEGE = 2
-    SPECIAL = 3
-    AGILE = 4
-
-    @staticmethod
-    def get_possible_rows(row: CombatRow) -> List[CombatRow]:
-        result = []
-        if row is CombatRow.AGILE or row is CombatRow.SPECIAL:
-            result.append(CombatRow.CLOSE)
-            result.append(CombatRow.RANGE)
-            if row is CombatRow.SPECIAL:
-                result.append(CombatRow.SIEGE)
-        else:
-            result.append(row)
-        return result
+if TYPE_CHECKING:
+    from source.core.comabt_row import CombatRow
 
 
 class Ability(enum.Enum):

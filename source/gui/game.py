@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from source.core.card import CombatRow
+from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
 from source.gui.board import Board

@@ -1,5 +1,6 @@
 from ._flatten import flatten
-from ..card import Card, CombatRow, Ability
+from ..card import Card, Ability
+from source.core.comabt_row import CombatRow
 
 cards = [
     Card(CombatRow.RANGE, 2),

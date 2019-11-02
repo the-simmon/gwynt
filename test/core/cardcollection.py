@@ -1,6 +1,7 @@
 import unittest
 
-from source.core.card import CombatRow, Ability, Card
+from source.core.card import Ability, Card
+from source.core.comabt_row import CombatRow
 from source.core.cardcollection import CardCollection
 from source.core.weather import Weather
 

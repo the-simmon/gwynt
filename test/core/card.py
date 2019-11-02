@@ -1,16 +1,25 @@
 import unittest
 
-from source.core.card import CombatRow
+from source.core.card import Card, Ability
+from source.core.comabt_row import CombatRow
 
 
-class CardText(unittest.TestCase):
+class CardTest(unittest.TestCase):
 
     def test_get_possible_rows(self):
-        actual = CombatRow.get_possible_rows(CombatRow.AGILE)
+        card = Card(CombatRow.AGILE, 0)
+        actual = CombatRow.get_possible_rows(card)
         self.assertCountEqual(actual, [CombatRow.CLOSE, CombatRow.RANGE])
 
-        actual = CombatRow.get_possible_rows(CombatRow.SPECIAL)
+        card.combat_row = CombatRow.SPECIAL
+        actual = CombatRow.get_possible_rows(card)
         self.assertCountEqual(actual, [CombatRow.CLOSE, CombatRow.RANGE, CombatRow.SIEGE])
 
-        actual = CombatRow.get_possible_rows(CombatRow.CLOSE)
+        card.combat_row = CombatRow.CLOSE
+        actual = CombatRow.get_possible_rows(card)
         self.assertCountEqual(actual, [CombatRow.CLOSE])
+
+        card.combat_row = CombatRow.SPECIAL
+        card.ability = Ability.CLEAR_WEATHER
+        actual = CombatRow.get_possible_rows(card)
+        self.assertCountEqual(actual, [CombatRow.SPECIAL])

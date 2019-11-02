@@ -9,7 +9,8 @@ from math import sqrt
 from typing import List
 
 from source.ai.random_simulator import simulate_random_game
-from source.core.card import Card, Ability, CombatRow
+from source.core.card import Card, Ability
+from source.core.comabt_row import CombatRow
 from source.core.cardcollection import CardCollection
 from source.core.cards.util import get_cards
 from source.core.gameenvironment import GameEnvironment, CardSource
@@ -69,7 +70,7 @@ class Node:
         potential_cards = self._get_potential_cards(self.player)
 
         for card in potential_cards:
-            for row in card.combat_row.get_possible_rows(card.combat_row):
+            for row in card.combat_row.get_possible_rows(card):
                 # only one commanders horn per row is possible
                 if self.environment.board.check_commanders_horn(self.player, card, row):
                     environment_copy = deepcopy(self.environment)

@@ -9,7 +9,8 @@ from typing import Tuple, Dict, Callable
 from source.core.card import Ability
 from source.core.weather import Weather
 from .board import Board
-from .card import Card, CombatRow
+from .card import Card
+from source.core.comabt_row import CombatRow
 from .player import Player
 
 

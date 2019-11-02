@@ -4,7 +4,7 @@ from typing import List, Dict
 
 from source.core.board import Board as CoreBoard
 from source.core.card import Card as CoreCard
-from source.core.card import CombatRow
+from source.core.comabt_row import CombatRow
 from source.core.player import Player
 from source.gui.card import Card
 

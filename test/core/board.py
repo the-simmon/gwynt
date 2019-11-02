@@ -3,7 +3,8 @@ import unittest
 from typing import Tuple
 
 from source.core.board import Board
-from source.core.card import Card, CombatRow, Ability, Muster
+from source.core.card import Card, Ability, Muster
+from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Faction, Player
 from source.core.weather import Weather

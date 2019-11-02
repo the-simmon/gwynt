@@ -1,7 +1,8 @@
 import random
 from typing import List
 
-from source.core.card import CombatRow, Card
+from source.core.card import Card
+from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 

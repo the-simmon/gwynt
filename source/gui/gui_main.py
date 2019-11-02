@@ -1,6 +1,7 @@
 import tkinter as tk
 
-from source.core.card import Card as CoreCard, CombatRow, Ability
+from source.core.card import Card as CoreCard, Ability
+from source.core.comabt_row import CombatRow
 from source.core.cards.util import get_cards
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player, Faction
