@@ -78,6 +78,8 @@ class Board:
         elif Weather.ability_is_weather(ability):
             if Weather.CLEAR in self.weather:
                 self.weather.remove(Weather.CLEAR)
+            if ability is Ability.CLEAR_WEATHER:
+                self.weather.clear()
             self.weather.append(Weather.ability_to_weather(ability))
         elif ability is Ability.MEDIC:
             pass  # reviving is handled on environment level
