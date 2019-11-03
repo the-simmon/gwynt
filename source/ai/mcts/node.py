@@ -34,7 +34,7 @@ class Node:
         self.environment = environment
         self.parent = parent
         self.player_type = player_type
-        self.player = player
+        self.next_player = player
         self.card = card
         self.row = row
         self.next_card_source = card_source
@@ -67,14 +67,14 @@ class Node:
 
     def expand(self):
         self.expanded = True
-        potential_cards = self._get_potential_cards(self.player)
+        potential_cards = self._get_potential_cards(self.next_player)
 
         for card in potential_cards:
             for row in card.combat_row.get_possible_rows(card):
                 # only one commanders horn per row is possible
-                if self.environment.board.check_commanders_horn(self.player, card, row):
+                if self.environment.board.check_commanders_horn(self.next_player, card, row):
                     environment_copy = deepcopy(self.environment)
-                    player_copy = environment_copy.board.get_player(self.player)
+                    player_copy = environment_copy.board.get_player(self.next_player)
                     game_over, next_player, card_source = environment_copy.step(player_copy, row, card)
 
                     if game_over:
@@ -87,7 +87,7 @@ class Node:
                         self.leafs.append(node)
 
         game_over = self.environment.game_over()
-        if not game_over and not self.environment.passed[self.player.id] and self.next_card_source is CardSource.HAND:
+        if not game_over and not self.environment.passed[self.next_player.id] and self.next_card_source is CardSource.HAND:
             self._add_pass_node()
 
     def _get_potential_cards(self, player: Player) -> List[Card]:
@@ -97,13 +97,13 @@ class Node:
 
     def _get_next_player_type(self, next_player: Player) -> PlayerType:
         player_type = deepcopy(self.player_type)
-        if next_player.id is not self.player.id:
+        if next_player.id is not self.next_player.id:
             player_type = deepcopy(self.player_type.invert())
         return player_type
 
     def _add_pass_node(self):
         environment_copy = deepcopy(self.environment)
-        player_copy = environment_copy.board.get_player(self.player)
+        player_copy = environment_copy.board.get_player(self.next_player)
         game_over, next_player, card_source = environment_copy.step(player_copy, None, None)
 
         if game_over:
@@ -124,9 +124,9 @@ class Node:
         self.backpropagate(winner)
 
     def _add_random_cards_to_enemy(self, environment: GameEnvironment):
-        player_to_add_cards = environment.board.get_player(self.player)
+        player_to_add_cards = environment.board.get_player(self.next_player)
         if self.player_type is PlayerType.SELF:
-            player_to_add_cards = environment.board.get_enemy_player(self.player)
+            player_to_add_cards = environment.board.get_enemy_player(self.next_player)
 
         all_cards = get_cards(player_to_add_cards.faction)
         played_cards = environment.board.cards[player_to_add_cards].get_all_cards()
@@ -152,7 +152,13 @@ class Node:
 
     def backpropagate(self, winner: Player):
         self.simulations += 1
-        if winner and winner.id is self.player.id:
+
+        # self.card was not laid by self.next_player (as it is the next player to lay a card)
+        # if self.next_player wins, the enemy (relative to this node) won
+        # except the previous card was a medic (hence the CardSource.GRAVEYARD)
+        if winner and winner.id is not self.next_player.id and self.next_card_source is CardSource.HAND:
+            self.wins += 1
+        elif winner and winner.id is self.next_player.id and self.next_card_source is CardSource.GRAVEYARD:
             self.wins += 1
         if self.parent:
             self.parent.backpropagate(winner)
