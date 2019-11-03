@@ -15,8 +15,7 @@ class MCTS:
         self.player = player
         self.max_time = max_time
         self.start_time = None
-        player_type = PlayerType.ENEMY if card_source is CardSource.HAND else PlayerType.SELF
-        self.node = Node(environment, None, player_type, player, None, None, card_source)
+        self.node = Node(environment, None, PlayerType.SELF, player, None, None, card_source)
 
     def run(self) -> Tuple[Card, CombatRow]:
         self.start_time = time.time()
