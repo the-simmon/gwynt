@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class Board:
 
     def __init__(self, player1: Player, player2: Player, environment: GameEnvironment):
-        self.cards: DefaultDict[Player, CardCollection] = defaultdict(lambda: CardCollection(cards=[]))
+        self.cards: DefaultDict[int, CardCollection] = defaultdict(lambda: CardCollection(cards=[]))
         self.weather: List[Weather] = [Weather.CLEAR]
         self.player1 = player1
         self.player2 = player2
@@ -37,21 +37,21 @@ class Board:
         if row is not CombatRow.SPECIAL:
             if card.ability is Ability.SPY:
                 enemy = self.get_enemy_player(player)
-                self.cards[enemy].add(row, card)
+                self.cards[enemy.id].add(row, card)
             else:
-                self.cards[player].add(row, card)
+                self.cards[player.id].add(row, card)
 
         self._check_ability(player, card)
 
     def remove(self, player: Player, row: CombatRow, card: Card):
-        self.cards[player].remove(row, card)
+        self.cards[player.id].remove(row, card)
         player.graveyard.add(card.combat_row, card)
 
     def calculate_damage(self, player: Player) -> int:
-        return self.cards[player].calculate_damage(self.weather)
+        return self.cards[player.id].calculate_damage(self.weather)
 
     def all_cards_to_graveyard(self, player: Player):
-        for row, cards in self.cards[player].items():
+        for row, cards in self.cards[player.id].items():
             for card in deepcopy(cards):
                 self.remove(player, row, card)
 
@@ -64,7 +64,7 @@ class Board:
     def check_commanders_horn(self, player: Player, horn_card: Card, row: CombatRow) -> bool:
         row_possible = True
         if horn_card.ability is Ability.SPECIAL_COMMANDERS_HORN or horn_card.ability is Ability.COMMANDERS_HORN:
-            for card in self.cards[player][row]:
+            for card in self.cards[player.id][row]:
                 if card.ability is horn_card.ability:
                     row_possible = False
                     break
@@ -103,40 +103,42 @@ class Board:
         cards_to_add.extend(search_and_remove(card, player.deck))
 
         for card in cards_to_add:
-            self.cards[player][card.combat_row].append(card)
+            self.cards[player.id][card.combat_row].append(card)
 
     def _check_scorch(self, card: Card, player: Player):
         enemy = self.get_enemy_player(player)
         if card.combat_row is CombatRow.SPECIAL:
             self._scorch_special()
         else:
-            enemy_damage = self.cards[enemy].calculate_damage_for_row(card.combat_row, self.weather)
+            enemy_damage = self.cards[enemy.id].calculate_damage_for_row(card.combat_row, self.weather)
             if enemy_damage > 10:
                 self._scorch_highest_cards(enemy, card.combat_row)
 
     def _scorch_highest_cards(self, player: Player, selected_row: CombatRow):
-        damage = _get_highest_index_and_damage(self.cards[player].get_damage_adjusted_cards(selected_row, self.weather))
+        damage = _get_highest_index_and_damage(
+            self.cards[player.id].get_damage_adjusted_cards(selected_row, self.weather))
 
-        for card in self.cards[player][selected_row]:
+        for card in self.cards[player.id][selected_row]:
             if card.damage == damage:
                 self.remove(player, selected_row, card)
 
     def _scorch_special(self):
         max_damage = 0
         for player in [self.player1, self.player2]:
-            for row in self.cards[player].keys():
-                damage = _get_highest_index_and_damage(self.cards[player].get_damage_adjusted_cards(row, self.weather))
+            for row in self.cards[player.id].keys():
+                damage = _get_highest_index_and_damage(
+                    self.cards[player.id].get_damage_adjusted_cards(row, self.weather))
                 if damage > max_damage:
                     max_damage = damage
         self._scorch_by_damage(max_damage)
 
     def _scorch_by_damage(self, scorch_damage):
         for player in [self.player1, self.player2]:
-            for row in self.cards[player].keys():
+            for row in self.cards[player.id].keys():
                 cards_to_remove = []
-                for index, card in enumerate(self.cards[player].get_damage_adjusted_cards(row, self.weather)):
+                for index, card in enumerate(self.cards[player.id].get_damage_adjusted_cards(row, self.weather)):
                     if card.damage is scorch_damage and not card.hero:
-                        card_to_remove = self.cards[player][row][index]
+                        card_to_remove = self.cards[player.id][row][index]
                         cards_to_remove.append(card_to_remove)
                 for card_to_remove in cards_to_remove:
                     self.remove(player, row, card_to_remove)

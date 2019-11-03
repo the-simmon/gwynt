@@ -16,7 +16,7 @@ class Faction(enum.Enum):
 class Player:
 
     def __init__(self, id: int, faction: Faction, cards: List[Card]):
-        self.id = id
+        self.id: int = id
         self.faction = faction
         self.deck = CardCollection(cards)
         self.graveyard = CardCollection([])
@@ -29,9 +29,3 @@ class Player:
             card = random.choice(cards)
             self.deck.remove(card.combat_row, card)
             self.active_cards.add(card.combat_row, card)
-
-    def __eq__(self, other):
-        return other is not None and self.id is other.id
-
-    def __hash__(self):
-        return self.id

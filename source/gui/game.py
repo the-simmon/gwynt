@@ -63,8 +63,8 @@ class Game(tk.Frame):
         tk.Label(self.info_frame, text=f'Own damage: {damage}').pack()
 
         tk.Frame(self.info_frame, height=Card.HEIGHT).pack()
-        tk.Label(self.info_frame, text=f'Enemy passed: {self.environment.passed[enemy]}').pack()
-        tk.Label(self.info_frame, text=f'Self passed: {self.environment.passed[self.player]}').pack()
+        tk.Label(self.info_frame, text=f'Enemy passed: {self.environment.passed[enemy.id]}').pack()
+        tk.Label(self.info_frame, text=f'Self passed: {self.environment.passed[self.player.id]}').pack()
 
         tk.Frame(self.info_frame, height=Card.HEIGHT).pack()
         tk.Label(self.info_frame, text=f'Enemy: {core_board.get_enemy_player(self.player).faction.name}').pack()

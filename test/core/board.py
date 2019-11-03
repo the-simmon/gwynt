@@ -38,7 +38,7 @@ class BoardTest(unittest.TestCase):
     def test_none_ability_card(self):
         card = Card(CombatRow.CLOSE, 3, Ability.NONE)
         self.board.add(self.player1, card.combat_row, card)
-        self.assertEqual([card], self.board.cards[self.player1][card.combat_row])
+        self.assertEqual([card], self.board.cards[self.player1.id][card.combat_row])
 
     def test_remove_card(self):
         card = Card(CombatRow.CLOSE, 3, Ability.NONE)
@@ -51,7 +51,7 @@ class BoardTest(unittest.TestCase):
         self.board.add(self.player2, scorched_card.combat_row, scorched_card)
         self.board.add(self.player1, CombatRow.CLOSE, Card(CombatRow.CLOSE, 2, Ability.SCORCH))
         self.assertEqual([scorched_card], self.player2.graveyard[CombatRow.CLOSE])
-        self.assertTrue(scorched_card not in self.board.cards[self.player2][scorched_card.combat_row])
+        self.assertTrue(scorched_card not in self.board.cards[self.player2.id][scorched_card.combat_row])
 
     def test_special_scorch(self):
         cards_to_scorch1 = [Card(CombatRow.CLOSE, 6, Ability.NONE), Card(CombatRow.SIEGE, 6, Ability.MORALE_BOOST)]
@@ -70,24 +70,24 @@ class BoardTest(unittest.TestCase):
 
         self.assertEqual([cards_to_scorch1[0]], self.player1.graveyard[CombatRow.CLOSE])
         self.assertEqual([cards_to_scorch1[1]], self.player1.graveyard[CombatRow.SIEGE])
-        self.assertEqual([surviving_cards1[0]], self.board.cards[self.player1][CombatRow.CLOSE])
-        self.assertEqual([surviving_cards1[1]], self.board.cards[self.player1][CombatRow.RANGE])
+        self.assertEqual([surviving_cards1[0]], self.board.cards[self.player1.id][CombatRow.CLOSE])
+        self.assertEqual([surviving_cards1[1]], self.board.cards[self.player1.id][CombatRow.RANGE])
 
         self.assertEqual(cards_to_scorch2, self.player2.graveyard[CombatRow.RANGE])
-        self.assertEqual(surviving_cards2, self.board.cards[self.player2][CombatRow.CLOSE])
+        self.assertEqual(surviving_cards2, self.board.cards[self.player2.id][CombatRow.CLOSE])
 
     def test_spy_card(self):
         spy = Card(CombatRow.CLOSE, 5, Ability.SPY)
         self.board.add(self.player1, spy.combat_row, spy)
 
         self.assertCountEqual(self.player1_deck_cards, self.player1.active_cards[CombatRow.CLOSE])
-        self.assertEqual([spy], self.board.cards[self.player2][spy.combat_row])
+        self.assertEqual([spy], self.board.cards[self.player2.id][spy.combat_row])
 
     def test_muster(self):
         muster_card = Card(CombatRow.CLOSE, 4, Ability.MUSTER, muster=Muster.NEKKER)
         self.board.add(self.player2, muster_card.combat_row, muster_card)
         self.assertCountEqual(self.player2_muster_cards + [muster_card],
-                              self.board.cards[self.player2][CombatRow.CLOSE])
+                              self.board.cards[self.player2.id][CombatRow.CLOSE])
 
     def test_all_cards_to_graveyard(self):
         for card in self.player1_deck_cards:

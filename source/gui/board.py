@@ -37,7 +37,7 @@ class Board(tk.Frame):
 
         combat_row_sorting = [CombatRow.CLOSE, CombatRow.RANGE, CombatRow.SIEGE]
         for player in [self.player, self.board.get_enemy_player(self.player)]:
-            card_collection = self.board.cards[player]
+            card_collection = self.board.cards[player.id]
             frame = tk.Frame(self)
             frame_dict[player] = frame
 

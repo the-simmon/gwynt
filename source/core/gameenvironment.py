@@ -28,7 +28,7 @@ class GameEnvironment:
         self.current_card_source = CardSource.HAND
         self.board = Board(player1, player2, self)
         self.current_round = 0
-        self.passed: Dict[Player, bool] = {player1: False, player2: False}
+        self.passed: Dict[int, bool] = {player1.id: False, player2.id: False}
 
         self._chose_active_cards()
 
@@ -54,7 +54,7 @@ class GameEnvironment:
             self.board.add(player, row, card)
 
         if len(player.active_cards.get_all_cards()) is 0 or not card:
-            self.passed[player] = True
+            self.passed[player.id] = True
 
         self.current_player, self.current_card_source = self._determine_current_player(card, player)
 
@@ -111,7 +111,7 @@ class GameEnvironment:
             result = self.current_player, CardSource.GRAVEYARD
         else:
             enemy = self.board.get_enemy_player(self.current_player)
-            if self.passed[enemy]:
+            if self.passed[enemy.id]:
                 result = self.current_player, CardSource.HAND
             else:
                 result = enemy, CardSource.HAND

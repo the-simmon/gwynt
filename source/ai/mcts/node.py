@@ -87,7 +87,7 @@ class Node:
                         self.leafs.append(node)
 
         game_over = self.environment.game_over()
-        if not game_over and not self.environment.passed[self.player] and self.next_card_source is CardSource.HAND:
+        if not game_over and not self.environment.passed[self.player.id] and self.next_card_source is CardSource.HAND:
             self._add_pass_node()
 
     def _get_potential_cards(self, player: Player) -> List[Card]:
