@@ -67,7 +67,7 @@ class Node:
 
     def expand(self):
         self.expanded = True
-        potential_cards = self._get_potential_cards(self.next_player)
+        potential_cards = self._get_potential_cards()
 
         for card in potential_cards:
             for row in card.combat_row.get_possible_rows(card):
@@ -87,10 +87,17 @@ class Node:
                         self.leafs.append(node)
 
         game_over = self.environment.game_over()
-        if not game_over and not self.environment.passed[self.next_player.id] and self.next_card_source is CardSource.HAND:
+        if not game_over and not self.environment.passed[self.next_player.id] \
+                and self.next_card_source is CardSource.HAND:
             self._add_pass_node()
 
-    def _get_potential_cards(self, player: Player) -> List[Card]:
+    def _get_potential_cards(self) -> List[Card]:
+        if self.player_type is PlayerType.SELF:
+            player = self.next_player
+        else:
+            player = deepcopy(self.next_player)
+            self._add_random_cards_to_enemy(self.environment, player)
+
         if self.next_card_source is CardSource.HAND:
             return player.active_cards.get_all_cards()
         return player.graveyard.get_all_cards()
@@ -117,17 +124,18 @@ class Node:
     def simulate(self):
         environment_copy = deepcopy(self.environment)
         current_player = environment_copy.current_player
-        self._add_random_cards_to_enemy(environment_copy)
 
+        if self.player_type is PlayerType.SELF:
+            player_to_add_cards = environment_copy.board.get_enemy_player(self.next_player)
+        else:
+            player_to_add_cards = environment_copy.board.get_player(self.next_player)
+
+        self._add_random_cards_to_enemy(environment_copy, player_to_add_cards)
         winner = simulate_random_game(environment_copy, current_player, environment_copy.current_card_source)
 
         self.backpropagate(winner)
 
-    def _add_random_cards_to_enemy(self, environment: GameEnvironment):
-        player_to_add_cards = environment.board.get_player(self.next_player)
-        if self.player_type is PlayerType.SELF:
-            player_to_add_cards = environment.board.get_enemy_player(self.next_player)
-
+    def _add_random_cards_to_enemy(self, environment: GameEnvironment, player_to_add_cards: Player):
         all_cards = get_cards(player_to_add_cards.faction)
         played_cards = environment.board.cards[player_to_add_cards].get_all_cards()
         played_cards.extend(player_to_add_cards.graveyard.get_all_cards())
