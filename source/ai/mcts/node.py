@@ -58,7 +58,8 @@ class Node:
             if self.simulations is 0:
                 self.simulate()
             else:
-                self.expand()
+                if not self.environment.game_over():
+                    self.expand()
                 self.select()
 
     def get_ucb1(self):
@@ -82,10 +83,7 @@ class Node:
                                 deepcopy(card_source))
                     self.leafs.append(node)
 
-        game_over = self.environment.game_over()
-        if not game_over and not self.environment.passed[self.next_player.id] \
-                and self.next_card_source is CardSource.HAND:
-            self._add_pass_node()
+        self._add_pass_node()
 
     def _get_potential_cards(self) -> List[Card]:
         if self.player_type is PlayerType.SELF:
