@@ -28,11 +28,11 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
         return result
 
     def calculate_damage_for_row(self, row: CombatRow, weather: List[Weather]) -> int:
-        cards = _calculate_damage_for_row(self[row], weather)
+        cards = _calculate_damage_for_row(self[row], row, weather)
         return sum([card.damage for card in cards])
 
     def get_damage_adjusted_cards(self, row: CombatRow, weather: List[Weather]) -> List[Card]:
-        return _calculate_damage_for_row(self[row], weather)
+        return _calculate_damage_for_row(self[row], row, weather)
 
     def get_all_cards(self) -> List[Card]:
         result = []
@@ -47,7 +47,7 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
         return copy
 
 
-def _calculate_damage_for_row(cards: List[Card], weather: List[Weather]) -> List[Card]:
+def _calculate_damage_for_row(cards: List[Card], row: CombatRow, weather: List[Weather]) -> List[Card]:
     def check_weather(cards: List[Card], weather: List[Weather]) -> List[Card]:
         affected_rows: List[CombatRow] = []
         if Weather.FROST in weather:
@@ -57,9 +57,10 @@ def _calculate_damage_for_row(cards: List[Card], weather: List[Weather]) -> List
         if Weather.RAIN in weather:
             affected_rows.append(CombatRow.SIEGE)
 
-        for card in cards:
-            if card.combat_row in affected_rows and card.damage > 0 and not card.hero:
-                card.damage = 1
+        if row in affected_rows:
+            for card in cards:
+                if card.damage > 0 and not card.hero:
+                    card.damage = 1
         return cards
 
     def check_tight_bond(cards: List[Card]) -> List[Card]:
