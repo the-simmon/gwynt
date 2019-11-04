@@ -77,14 +77,10 @@ class Node:
                     player_copy = environment_copy.board.get_player(self.next_player)
                     game_over, next_player, card_source = environment_copy.step(player_copy, row, card)
 
-                    if game_over:
-                        winner = environment_copy.get_winner()
-                        self.backpropagate(winner)
-                    else:
-                        player_type = self._get_next_player_type(next_player)
-                        node = Node(environment_copy, self, player_type, next_player, card, row,
-                                    deepcopy(card_source))
-                        self.leafs.append(node)
+                    player_type = self._get_next_player_type(next_player)
+                    node = Node(environment_copy, self, player_type, next_player, card, row,
+                                deepcopy(card_source))
+                    self.leafs.append(node)
 
         game_over = self.environment.game_over()
         if not game_over and not self.environment.passed[self.next_player.id] \
@@ -113,13 +109,9 @@ class Node:
         player_copy = environment_copy.board.get_player(self.next_player)
         game_over, next_player, card_source = environment_copy.step(player_copy, None, None)
 
-        if game_over:
-            winner = environment_copy.get_winner()
-            self.backpropagate(winner)
-        else:
-            player_type = self._get_next_player_type(next_player)
-            node = Node(environment_copy, self, player_type, next_player, None, None, deepcopy(card_source))
-            self.leafs.append(node)
+        player_type = self._get_next_player_type(next_player)
+        node = Node(environment_copy, self, player_type, next_player, None, None, deepcopy(card_source))
+        self.leafs.append(node)
 
     def simulate(self):
         environment_copy = deepcopy(self.environment)
