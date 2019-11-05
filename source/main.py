@@ -27,27 +27,28 @@ class Main:
 
         self.gui.pack(in_=self.master)
         self.master.after(1, self.gui.redraw)
-        self._should_update_gui = threading.Event()
+        self._gui_is_updated = threading.Event()
         threading.Thread(target=self._run_mcts, args=[self.environment.current_player]).start()
-        self.master.after(1000, self._update_gui)
+        self.master.after_idle(self._update_gui)
         self.master.mainloop()
 
     def _update_gui(self):
-        if self._should_update_gui.is_set():
+        if not self._gui_is_updated.is_set():
             self.gui.redraw()
-            self._should_update_gui.clear()
+            self.master.update()
+            self.master.after_idle(self._gui_is_updated.set)
         self.master.after(1000, self._update_gui)
 
     def _run_mcts(self, current_player: Player, card_source: CardSource = CardSource.HAND):
         game_over = False
 
         while not game_over:
+            self._gui_is_updated.clear()
+            self._gui_is_updated.wait()
+
             mcts = MCTS(self.environment, current_player, card_source)
             card, row = mcts.run()
             game_over, current_player, card_source = self.environment.step(current_player, row, card)
-
-            self._should_update_gui.set()
-            time.sleep(1)
 
 
 if __name__ == '__main__':
