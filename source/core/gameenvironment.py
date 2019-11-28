@@ -53,7 +53,7 @@ class GameEnvironment:
                 player.graveyard.remove(card.combat_row, card)
             self.board.add(player, row, card)
 
-        if len(player.active_cards.get_all_cards()) is 0 or not card:
+        if len(player.active_cards.get_all_cards()) == 0 or not card:
             self.passed[player.id] = True
 
         self.current_player, self.current_card_source = self._determine_current_player(card, player)
@@ -67,13 +67,13 @@ class GameEnvironment:
         return all(self.passed.values())
 
     def game_over(self):
-        return self._player_won() or self.current_round is 2
+        return self._player_won() or self.current_round == 2
 
     def get_winner(self) -> Player:
         winner = None
-        if self.player1.rounds_won is 2 and self.player2.rounds_won is not 2:
+        if self.player1.rounds_won == 2 and self.player2.rounds_won != 2:
             winner = self.player1
-        elif self.player2.rounds_won is 2 and self.player1.rounds_won is not 2:
+        elif self.player2.rounds_won == 2 and self.player1.rounds_won != 2:
             winner = self.player2
         return winner
 

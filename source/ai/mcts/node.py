@@ -55,7 +55,7 @@ class Node:
 
             self.leafs[max_index].select()
         else:
-            if self.simulations is 0:
+            if self.simulations == 0:
                 self.simulate()
             else:
                 if not self.environment.game_over():
