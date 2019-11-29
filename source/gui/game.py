@@ -5,17 +5,18 @@ from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
 from source.gui.board import Board
 from source.gui.card import Card
+from source.gui.cookie_clicker import CookieClicker
 
 
 class Game(tk.Frame):
     WIDTH = 1920 / 2
     HEIGHT = 1080
 
-    def __init__(self, environment: GameEnvironment, player: Player):
+    def __init__(self, environment: GameEnvironment, player: Player, clicker: CookieClicker):
         super().__init__(width=Game.WIDTH, height=Game.HEIGHT)
         self.environment = environment
         self.player = player
-        self.board = Board(environment.board, player)
+        self.board = Board(environment.board, player, clicker)
 
         self.info_frame = tk.Frame(self)
         self.info_frame.grid(column=0, row=0, padx=5)

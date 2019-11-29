@@ -7,6 +7,7 @@ from source.ai.mcts.mcts import MCTS
 from source.core.cards.util import get_cards
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Faction, Player
+from source.gui.cookie_clicker import CookieClicker
 from source.gui.game import Game
 
 
@@ -23,11 +24,15 @@ class Main:
         self.player2 = Player(1, faction, cards[:22])
 
         self.environment = GameEnvironment(self.player1, self.player2)
-        self.gui = Game(self.environment, self.player1)
+
+        self._gui_is_updated = threading.Event()
+        self.clicker = CookieClicker(self.environment, self._gui_is_updated, self._run_mcts)
+
+        self.gui = Game(self.environment, self.player1, self.clicker)
 
         self.gui.pack(in_=self.master)
         self.master.after(1, self.gui.redraw)
-        self._gui_is_updated = threading.Event()
+
         threading.Thread(target=self._run_mcts_both_players, args=[self.environment.current_player]).start()
         self.master.after_idle(self._update_gui)
         self.master.mainloop()
