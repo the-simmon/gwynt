@@ -1,7 +1,7 @@
 import random
 import threading
-import time
 import tkinter as tk
+from typing import Tuple
 
 from source.ai.mcts.mcts import MCTS
 from source.core.cards.util import get_cards
@@ -28,7 +28,7 @@ class Main:
         self.gui.pack(in_=self.master)
         self.master.after(1, self.gui.redraw)
         self._gui_is_updated = threading.Event()
-        threading.Thread(target=self._run_mcts, args=[self.environment.current_player]).start()
+        threading.Thread(target=self._run_mcts_both_players, args=[self.environment.current_player]).start()
         self.master.after_idle(self._update_gui)
         self.master.mainloop()
 
@@ -39,16 +39,22 @@ class Main:
             self.master.after_idle(self._gui_is_updated.set)
         self.master.after(1000, self._update_gui)
 
-    def _run_mcts(self, current_player: Player, card_source: CardSource = CardSource.HAND):
+    def _run_mcts_both_players(self, current_player: Player, card_source: CardSource = CardSource.HAND):
         game_over = False
 
         while not game_over:
-            self._gui_is_updated.clear()
-            self._gui_is_updated.wait()
+            game_over, current_player, card_source = self._run_mcts(current_player, card_source)
 
-            mcts = MCTS(self.environment, current_player, card_source)
-            card, row = mcts.run()
-            game_over, current_player, card_source = self.environment.step(current_player, row, card)
+    def _run_mcts(self, current_player: Player, card_source: CardSource = CardSource.HAND) \
+            -> Tuple[bool, Player, CardSource]:
+        mcts = MCTS(self.environment, current_player, card_source)
+        card, row = mcts.run()
+        game_over, current_player, card_source = self.environment.step(current_player, row, card)
+
+        self._gui_is_updated.clear()
+        self._gui_is_updated.wait()
+
+        return game_over, current_player, card_source
 
 
 if __name__ == '__main__':
