@@ -11,7 +11,9 @@ def simulate_random_game(environment: GameEnvironment, current_player: Player, c
     game_over = environment.game_over()
     while not game_over:
         potential_cards = _get_potential_cards(current_player, card_source)
-        potential_cards.append(None)  # None == pass
+
+        if not environment.passed[current_player.id]:
+            potential_cards.append(None)  # None == pass
 
         random_card = random.choice(potential_cards)
         if random_card:
