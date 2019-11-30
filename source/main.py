@@ -1,3 +1,4 @@
+import asyncio
 import random
 import threading
 import tkinter as tk
@@ -9,6 +10,8 @@ from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Faction, Player
 from source.gui.cookie_clicker import CookieClicker
 from source.gui.game import Game
+
+simulate_both_players = True
 
 
 class Main:
@@ -33,8 +36,8 @@ class Main:
         self.gui.pack(in_=self.master)
         self.master.after(1, self.gui.redraw)
 
-        threading.Thread(target=self._run_mcts_both_players, args=[self.environment.current_player]).start()
         self.master.after_idle(self._update_gui)
+        threading.Thread(target=self._start_game).start()
         self.master.mainloop()
 
     def _update_gui(self):
@@ -43,6 +46,13 @@ class Main:
             self.master.update()
             self.master.after_idle(self._gui_is_updated.set)
         self.master.after(1000, self._update_gui)
+
+    def _start_game(self):
+        if simulate_both_players:
+            self._run_mcts_both_players(self.environment.current_player)
+        else:
+            while self.environment.current_player is not self.player1:
+                self._run_mcts(self.environment.current_player, self.environment.current_card_source)
 
     def _run_mcts_both_players(self, current_player: Player, card_source: CardSource = CardSource.HAND):
         game_over = False

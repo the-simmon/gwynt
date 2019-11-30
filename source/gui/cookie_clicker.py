@@ -20,11 +20,11 @@ class CookieClicker:
         if self.environment.current_player is player:
             game_over, current_player, card_source = self.environment.step(player, row, card)
             self.gui_is_updated.clear()
-            self.gui_is_updated.wait()
             if current_player is not player:
                 threading.Thread(target=self._run_mcts, args=[game_over, current_player, card_source]).start()
 
     def _run_mcts(self, game_over: bool, player: Player, card_source: CardSource):
+        self.gui_is_updated.wait()
         current_player = player
         # play enemy cards
         while current_player is player and not game_over:

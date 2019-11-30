@@ -3,7 +3,6 @@ from typing import Callable, Optional
 
 from source.core.card import Card as CoreCard
 from source.core.comabt_row import CombatRow
-from source.gui.cookie_clicker import CookieClicker
 
 
 class Card(tk.Canvas):
