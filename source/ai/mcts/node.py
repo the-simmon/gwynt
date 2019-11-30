@@ -58,9 +58,11 @@ class Node:
             if self.simulations == 0:
                 self.simulate()
             else:
-                if not self.environment.game_over():
+                if self.environment.game_over():
+                    self.simulate()
+                else:
                     self.expand()
-                self.select()
+                    self.select()
 
     def get_ucb1(self):
         simulations = self.simulations or sys.float_info.epsilon * 10
