@@ -4,7 +4,7 @@ import enum
 import random
 from collections import defaultdict
 from copy import deepcopy
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Optional
 
 from source.core.card import Ability
 from source.core.comabt_row import CombatRow
@@ -44,7 +44,7 @@ class GameEnvironment:
                 player.deck.remove(card.combat_row, card)
                 player.active_cards.add(card.combat_row, card)
 
-    def step(self, player: Player, row: CombatRow, card: Card) -> Tuple[bool, Player, CardSource]:
+    def step(self, player: Player, row: Optional[CombatRow], card: Optional[Card]) -> Tuple[bool, Player, CardSource]:
         # card == None => player passes
         if card:
             if self.current_card_source is CardSource.HAND:

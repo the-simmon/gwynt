@@ -11,7 +11,7 @@ from source.core.player import Faction, Player
 from source.gui.cookie_clicker import CookieClicker
 from source.gui.game import Game
 
-simulate_both_players = True
+simulate_both_players = False
 
 
 class Main:

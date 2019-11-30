@@ -1,4 +1,5 @@
 import tkinter as tk
+from functools import partial
 
 from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment
@@ -16,6 +17,7 @@ class Game(tk.Frame):
         super().__init__(width=Game.WIDTH, height=Game.HEIGHT)
         self.environment = environment
         self.player = player
+        self.clicker = clicker
         self.board = Board(environment.board, player, clicker)
 
         self.info_frame = tk.Frame(self)
@@ -66,6 +68,7 @@ class Game(tk.Frame):
         tk.Frame(self.info_frame, height=Card.HEIGHT).pack()
         tk.Label(self.info_frame, text=f'Enemy passed: {self.environment.passed[enemy.id]}').pack()
         tk.Label(self.info_frame, text=f'Self passed: {self.environment.passed[self.player.id]}').pack()
+        tk.Button(self.info_frame, text="Pass", command=partial(self.clicker.pass_click, self.player)).pack()
 
         tk.Frame(self.info_frame, height=Card.HEIGHT).pack()
         tk.Label(self.info_frame, text=f'Enemy: {core_board.get_enemy_player(self.player).faction.name}').pack()
