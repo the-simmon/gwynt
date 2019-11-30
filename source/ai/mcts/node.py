@@ -105,11 +105,12 @@ class Node:
     def _add_pass_node(self):
         environment_copy = deepcopy(self.environment)
         player_copy = environment_copy.board.get_player(self.next_player)
-        game_over, next_player, card_source = environment_copy.step(player_copy, None, None)
+        if not environment_copy.passed[player_copy.id]:
+            game_over, next_player, card_source = environment_copy.step(player_copy, None, None)
 
-        player_type = self._get_next_player_type(next_player)
-        node = Node(environment_copy, self, player_type, next_player, None, None, deepcopy(card_source))
-        self.leafs.append(node)
+            player_type = self._get_next_player_type(next_player)
+            node = Node(environment_copy, self, player_type, next_player, None, None, deepcopy(card_source))
+            self.leafs.append(node)
 
     def simulate(self):
         environment_copy = deepcopy(self.environment)
