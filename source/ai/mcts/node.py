@@ -6,7 +6,7 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from math import sqrt
-from typing import List
+from typing import List, Tuple
 
 from source.ai.random_simulator import simulate_random_game
 from source.core.card import Card, Ability
@@ -78,6 +78,13 @@ class Node:
                 if self.environment.board.check_commanders_horn(self.next_player, card, row):
                     environment_copy = deepcopy(self.environment)
                     player_copy = environment_copy.board.get_player(self.next_player)
+
+                    # enemy player gets all possible cards assigned
+                    # for technical reasons, the card has to be added to the player
+                    # (active cards will be overwritten in next node/ random simulation)
+                    if self.player_type is PlayerType.ENEMY:
+                        player_copy.active_cards.add(card.combat_row, card)
+
                     game_over, next_player, card_source = environment_copy.step(player_copy, row, card)
 
                     player_type = self._get_next_player_type(next_player)
@@ -92,7 +99,8 @@ class Node:
             player = self.next_player
         else:
             player = deepcopy(self.next_player)
-            self._add_random_cards_to_enemy(self.environment, player)
+            not_played_cards, _ = self._get_already_placed_cards(self.environment, player)
+            player.active_cards = CardCollection(not_played_cards)
 
         if self.next_card_source is CardSource.HAND:
             return player.active_cards.get_all_cards()
@@ -129,9 +137,16 @@ class Node:
         self.backpropagate(winner)
 
     def _add_random_cards_to_enemy(self, environment: GameEnvironment, player_to_add_cards: Player):
-        all_cards = get_cards(player_to_add_cards.faction)
-        played_cards = environment.board.cards[player_to_add_cards].get_all_cards()
-        played_cards.extend(player_to_add_cards.graveyard.get_all_cards())
+        all_cards, total_active_cards = self._get_already_placed_cards(environment, player_to_add_cards)
+
+        number_of_played_cards = len(environment.board.cards[player_to_add_cards].get_all_cards())
+        player_to_add_cards.active_cards = CardCollection(all_cards[:total_active_cards - number_of_played_cards])
+        player_to_add_cards.deck = CardCollection(all_cards[total_active_cards:])
+
+    def _get_already_placed_cards(self, environment: GameEnvironment, player: Player) -> Tuple[List[Card], int]:
+        all_cards = get_cards(player.faction)
+        played_cards = environment.board.cards[player].get_all_cards()
+        played_cards.extend(player.graveyard.get_all_cards())
 
         total_active_cards = 10
         for card in played_cards:
@@ -140,16 +155,15 @@ class Node:
                 total_active_cards -= 1
 
         # spy cards are placed on the enemy side
-        enemy = environment.board.get_enemy_player(player_to_add_cards)
+        enemy = environment.board.get_enemy_player(player)
         enemy_cards = environment.board.cards[enemy].get_all_cards()
         for card in enemy_cards:
             if card in all_cards and card.ability is Ability.SPY:
+                all_cards.remove(card)
                 total_active_cards += 2
         random.shuffle(all_cards)
 
-        number_of_played_cards = len(environment.board.cards[player_to_add_cards].get_all_cards())
-        player_to_add_cards.active_cards = CardCollection(all_cards[:total_active_cards - number_of_played_cards])
-        player_to_add_cards.deck = CardCollection(all_cards[total_active_cards:])
+        return all_cards, total_active_cards
 
     def backpropagate(self, winner: Player):
         self.simulations += 1
