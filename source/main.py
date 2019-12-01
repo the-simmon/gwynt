@@ -37,7 +37,7 @@ class Main:
         self.master.after(1, self.gui.redraw)
 
         self.master.after_idle(self._update_gui)
-        threading.Thread(target=self._start_game).start()
+        self.master.after_idle(threading.Thread(target=self._start_game).start)
         self.master.mainloop()
 
     def _update_gui(self):
