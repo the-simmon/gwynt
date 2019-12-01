@@ -22,7 +22,7 @@ class PlayerType(Enum):
     ENEMY = 1
 
     def invert(self):
-        if self.value is PlayerType.SELF:
+        if self is PlayerType.SELF:
             return PlayerType.ENEMY
         return PlayerType.SELF
 
