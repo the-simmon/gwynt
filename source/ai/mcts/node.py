@@ -161,7 +161,7 @@ class Node:
             if card in all_cards:
                 all_cards.remove(card)
             if card.ability is Ability.SPY:
-                total_active_cards += 2
+                total_active_cards += 1
             else:
                 total_active_cards -= 1
 
