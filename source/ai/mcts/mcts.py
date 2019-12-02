@@ -1,4 +1,5 @@
 import time
+from collections import defaultdict
 from typing import Tuple
 
 from source.ai.mcts.node import Node, PlayerType
@@ -15,7 +16,7 @@ class MCTS:
         self.player = player
         self.max_time = max_time
         self.start_time = None
-        self.node = Node(environment, None, PlayerType.SELF, player, None, None, card_source)
+        self.node = Node(environment, None, PlayerType.SELF, player, None, None, card_source, defaultdict(lambda: []))
 
     def run(self) -> Tuple[Card, CombatRow]:
         self.start_time = time.time()

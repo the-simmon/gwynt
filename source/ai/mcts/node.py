@@ -6,7 +6,7 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from math import sqrt
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 from source.ai.random_simulator import simulate_random_game
 from source.core.card import Card, Ability
@@ -30,7 +30,7 @@ class PlayerType(Enum):
 class Node:
 
     def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, player: Player, card: Card,
-                 row: CombatRow, card_source: CardSource):
+                 row: CombatRow, card_source: CardSource, played_cards: Dict[int, List[Card]]):
         self.environment = environment
         self.parent = parent
         self.player_type = player_type
@@ -38,6 +38,8 @@ class Node:
         self.card = card
         self.row = row
         self.next_card_source = card_source
+        self.played_cards = played_cards
+
         self.leafs: List[Node] = []
         self.simulations = 0
         self.wins = 0
@@ -88,23 +90,27 @@ class Node:
                     game_over, next_player, card_source = environment_copy.step(player_copy, row, card)
 
                     player_type = self._get_next_player_type(next_player)
+
+                    played_cards = deepcopy(self.played_cards)
+                    played_cards[player_copy.id].append(card)
+
                     node = Node(environment_copy, self, player_type, next_player, card, row,
-                                deepcopy(card_source))
+                                deepcopy(card_source), played_cards)
                     self.leafs.append(node)
 
         self._add_pass_node()
 
     def _get_potential_cards(self) -> List[Card]:
+        result: List[Card] = []
         if self.player_type is PlayerType.SELF:
-            player = self.next_player
+            result = self.next_player.active_cards.get_all_cards()
         else:
-            player = deepcopy(self.next_player)
-            not_played_cards, _ = self._get_already_placed_cards(self.environment, player)
-            player.active_cards = CardCollection(not_played_cards)
+            not_played_cards, _ = self._get_available_cards(self.environment, self.next_player)
+            result = list(set(not_played_cards))
 
         if self.next_card_source is CardSource.HAND:
-            return player.active_cards.get_all_cards()
-        return player.graveyard.get_all_cards()
+            return result
+        return self.next_player.graveyard.get_all_cards()
 
     def _get_next_player_type(self, next_player: Player) -> PlayerType:
         player_type = deepcopy(self.player_type)
@@ -119,7 +125,10 @@ class Node:
             game_over, next_player, card_source = environment_copy.step(player_copy, None, None)
 
             player_type = self._get_next_player_type(next_player)
-            node = Node(environment_copy, self, player_type, next_player, None, None, deepcopy(card_source))
+            played_cards = deepcopy(self.played_cards)
+
+            node = Node(environment_copy, self, player_type, next_player, None, None, deepcopy(card_source),
+                        played_cards)
             self.leafs.append(node)
 
     def simulate(self):
@@ -137,31 +146,24 @@ class Node:
         self.backpropagate(winner)
 
     def _add_random_cards_to_enemy(self, environment: GameEnvironment, player_to_add_cards: Player):
-        all_cards, total_active_cards = self._get_already_placed_cards(environment, player_to_add_cards)
+        all_cards, total_active_cards = self._get_available_cards(environment, player_to_add_cards)
+        random.shuffle(all_cards)
 
         number_of_played_cards = len(environment.board.cards[player_to_add_cards].get_all_cards())
         player_to_add_cards.active_cards = CardCollection(all_cards[:total_active_cards - number_of_played_cards])
         player_to_add_cards.deck = CardCollection(all_cards[total_active_cards:])
 
-    def _get_already_placed_cards(self, environment: GameEnvironment, player: Player) -> Tuple[List[Card], int]:
+    def _get_available_cards(self, environment: GameEnvironment, player: Player) -> Tuple[List[Card], int]:
         all_cards = get_cards(player.faction)
-        played_cards = environment.board.cards[player].get_all_cards()
-        played_cards.extend(player.graveyard.get_all_cards())
+        total_active_cards = 0
 
-        total_active_cards = 10
-        for card in played_cards:
-            if card in all_cards and card.ability is not Ability.SPY:
+        for card in self.played_cards[player.id]:
+            if card in all_cards:
                 all_cards.remove(card)
-                total_active_cards -= 1
-
-        # spy cards are placed on the enemy side
-        enemy = environment.board.get_enemy_player(player)
-        enemy_cards = environment.board.cards[enemy].get_all_cards()
-        for card in enemy_cards:
-            if card in all_cards and card.ability is Ability.SPY:
-                all_cards.remove(card)
+            if card.ability is Ability.SPY:
                 total_active_cards += 2
-        random.shuffle(all_cards)
+            else:
+                total_active_cards -= 1
 
         return all_cards, total_active_cards
 
