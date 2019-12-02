@@ -155,9 +155,11 @@ class Node:
 
     def _get_available_cards(self, environment: GameEnvironment, player: Player) -> Tuple[List[Card], int]:
         all_cards = get_cards(player.faction)
+        played_cards = self.played_cards[player.id]
+        played_cards.extend(player.graveyard.get_all_cards())
         total_active_cards = 0
 
-        for card in self.played_cards[player.id]:
+        for card in played_cards:
             if card in all_cards:
                 all_cards.remove(card)
             if card.ability is Ability.SPY:
