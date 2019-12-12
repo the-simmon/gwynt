@@ -102,7 +102,7 @@ class Node:
 
     def _get_potential_cards(self) -> List[Card]:
         result: List[Card] = []
-        if self.player_type is PlayerType.SELF:
+        if self.player_type is self._get_next_player_type(self.next_player):
             result = self.next_player.active_cards.get_all_cards()
         else:
             not_played_cards, _ = self._get_available_cards(self.next_player)
