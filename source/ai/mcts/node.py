@@ -105,7 +105,7 @@ class Node:
         if self.player_type is PlayerType.SELF:
             result = self.next_player.active_cards.get_all_cards()
         else:
-            not_played_cards, _ = self._get_available_cards(self.environment, self.next_player)
+            not_played_cards, _ = self._get_available_cards(self.next_player)
             result = list(set(not_played_cards))
 
         if self.next_card_source is CardSource.HAND:
@@ -146,14 +146,14 @@ class Node:
         self.backpropagate(winner)
 
     def _add_random_cards_to_enemy(self, environment: GameEnvironment, player_to_add_cards: Player):
-        all_cards, total_active_cards = self._get_available_cards(environment, player_to_add_cards)
+        all_cards, total_active_cards = self._get_available_cards(player_to_add_cards)
         random.shuffle(all_cards)
 
         number_of_played_cards = len(environment.board.cards[player_to_add_cards].get_all_cards())
         player_to_add_cards.active_cards = CardCollection(all_cards[:total_active_cards - number_of_played_cards])
         player_to_add_cards.deck = CardCollection(all_cards[total_active_cards:])
 
-    def _get_available_cards(self, environment: GameEnvironment, player: Player) -> Tuple[List[Card], int]:
+    def _get_available_cards(self, player: Player) -> Tuple[List[Card], int]:
         all_cards = get_cards(player.faction)
         played_cards = self.played_cards[player.id]
         played_cards.extend(player.graveyard.get_all_cards())
