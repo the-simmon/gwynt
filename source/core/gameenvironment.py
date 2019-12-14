@@ -66,7 +66,7 @@ class GameEnvironment:
         return all(self.passed.values())
 
     def game_over(self):
-        return self._player_won() or self.current_round == 2
+        return self._player_won() or self.current_round == 3
 
     def get_winner(self) -> Player:
         winner = None
