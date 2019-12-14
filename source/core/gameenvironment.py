@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import enum
 import random
-from collections import defaultdict
 from copy import deepcopy
 from typing import Tuple, Dict, Optional
 
@@ -100,7 +99,7 @@ class GameEnvironment:
 
         self.board.all_cards_to_graveyard(self.player1)
         self.board.all_cards_to_graveyard(self.player2)
-        self.passed = defaultdict(lambda: False)
+        self.passed = {self.player1.id: False, self.player2.id: False}
 
         self.board.weather = [Weather.CLEAR]
 
