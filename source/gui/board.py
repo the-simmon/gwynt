@@ -6,6 +6,7 @@ from typing import List, Dict
 from source.core.board import Board as CoreBoard
 from source.core.card import Card as CoreCard
 from source.core.comabt_row import CombatRow
+from source.core.gameenvironment import CardSource
 from source.core.player import Player
 from source.gui.card import Card
 from source.gui.cookie_clicker import CookieClicker
@@ -21,9 +22,9 @@ class Board(tk.Frame):
         self.player = player
         self.clicker = clicker
 
-    def redraw(self):
+    def redraw(self, card_source: CardSource):
         self.clear_cards()
-        frames = self._get_frames_per_player()
+        frames = self._get_frames_per_player(card_source)
 
         enemy = self.board.get_enemy_player(self.player)
         frames[enemy].pack()
@@ -34,7 +35,7 @@ class Board(tk.Frame):
 
         frames[self.player].pack()
 
-    def _get_frames_per_player(self) -> Dict[Player, tk.Frame]:
+    def _get_frames_per_player(self, card_source: CardSource) -> Dict[Player, tk.Frame]:
 
         frame_dict: Dict[Player, tk.Frame] = {}
 
@@ -49,7 +50,11 @@ class Board(tk.Frame):
                 self._draw_row(card_list, player).pack(in_=frame)
 
             if player.id is self.player.id:
-                self._draw_row(player.active_cards.get_all_cards(), player, True).pack(in_=frame)
+                if card_source is CardSource.HAND:
+                    cards = player.active_cards.get_all_cards()
+                else:
+                    cards = player.graveyard.get_all_cards()
+                self._draw_row(cards, player, True).pack(in_=frame)
             combat_row_sorting.reverse()
 
         return frame_dict

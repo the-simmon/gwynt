@@ -32,7 +32,7 @@ class Game(tk.Frame):
         self._clear_frame()
         self._draw_info_frame()
         self._draw_damage_frame()
-        self.board.redraw()
+        self.board.redraw(self.environment.current_card_source)
 
     def _clear_frame(self):
         for widget in self.damage_frame.winfo_children():
