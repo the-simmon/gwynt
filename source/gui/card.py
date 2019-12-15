@@ -9,7 +9,7 @@ class Card(tk.Canvas):
     HEIGHT = 100
     WIDTH = 56
 
-    def __init__(self, card: CoreCard, clicker: Optional[Callable[[CombatRow, CoreCard], None]]):
+    def __init__(self, card: CoreCard, clicker: Optional[Callable[[CoreCard], None]]):
         super().__init__(height=Card.HEIGHT, width=Card.WIDTH, background='white')
         self.card = card
         self.clicker = clicker
@@ -33,5 +33,4 @@ class Card(tk.Canvas):
         self.config(background=self.fill)
 
     def _click(self, _):
-        row = CombatRow.get_possible_rows(self.card)[0]
-        self.clicker(row, self.card)
+        self.clicker(self.card)

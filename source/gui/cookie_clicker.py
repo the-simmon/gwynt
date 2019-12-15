@@ -16,8 +16,24 @@ class CookieClicker:
         self.gui_is_updated = gui_is_updated
         self.mcts = mcts
 
-    def card_click(self, player: Player, row: CombatRow, card: Card):
-        if self.environment.current_player is player:
+        self._last_clicked_card: Card = None
+        self._last_clicked_player: Player = None
+
+    def card_click(self, player: Player, card: Card):
+        self._last_clicked_player = player
+        self._last_clicked_card = card
+
+        # place card immediately, if only one combat row is possible
+        if len(possible_rows := CombatRow.get_possible_rows(card)) == 1:
+            self.click_row(possible_rows[0])
+
+    def click_row(self, row: CombatRow):
+        player = self._last_clicked_player
+        card = self._last_clicked_card
+
+        possible_rows = CombatRow.get_possible_rows(self._last_clicked_card)
+
+        if self.environment.current_player is player and row in possible_rows:
             game_over, current_player, card_source = self.environment.step(player, row, card)
             self.gui_is_updated.clear()
             if current_player is not player:

@@ -81,7 +81,12 @@ class Game(tk.Frame):
         for player in [core_board.get_enemy_player(self.player), self.player]:
             for row in combat_row_sorting:
                 damage = core_board.cards[player.id].calculate_damage_for_row(row, core_board.weather)
-                text = tk.Label(self.damage_frame, text=F'{row.name}: {damage}')
-                text.pack()
+                label = tk.Label(self.damage_frame, text=F'{row.name}: {damage}')
+                label.pack()
+
+                # row=row is necessary, otherwise the all lambdas would reference the current value of row
+                # which would be 'SIEGE', as it is the last value of row
+                label.bind('<Button-1>', lambda _, row=row: self.clicker.click_row(row))
+
                 tk.Frame(self.damage_frame, height=Card.HEIGHT).pack()
             combat_row_sorting.reverse()
