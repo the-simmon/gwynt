@@ -35,6 +35,8 @@ class CookieClicker:
 
         if self._last_clicked_card:
             possible_rows = CombatRow.get_possible_rows(self._last_clicked_card)
+        else:
+            possible_rows = []
 
         if self.environment.current_player is player and row in possible_rows:
             game_over, current_player, card_source = self.environment.step(player, row, card)
