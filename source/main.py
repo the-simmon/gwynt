@@ -1,4 +1,3 @@
-import asyncio
 import random
 import threading
 import tkinter as tk

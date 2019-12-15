@@ -2,7 +2,6 @@ import tkinter as tk
 from typing import Callable, Optional
 
 from source.core.card import Card as CoreCard
-from source.core.comabt_row import CombatRow
 
 
 class Card(tk.Canvas):

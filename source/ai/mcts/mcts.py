@@ -5,7 +5,7 @@ from typing import Tuple
 from source.ai.mcts.node import Node, PlayerType
 from source.core.card import Card
 from source.core.comabt_row import CombatRow
-from source.core.gameenvironment import GameEnvironment, CardSource
+from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
 
 
