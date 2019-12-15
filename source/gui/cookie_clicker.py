@@ -26,12 +26,15 @@ class CookieClicker:
         # place card immediately, if only one combat row is possible
         if len(possible_rows := CombatRow.get_possible_rows(card)) == 1:
             self.click_row(possible_rows[0])
+            self._last_clicked_card = None
+            self._last_clicked_player = None
 
     def click_row(self, row: CombatRow):
         player = self._last_clicked_player
         card = self._last_clicked_card
 
-        possible_rows = CombatRow.get_possible_rows(self._last_clicked_card)
+        if self._last_clicked_card:
+            possible_rows = CombatRow.get_possible_rows(self._last_clicked_card)
 
         if self.environment.current_player is player and row in possible_rows:
             game_over, current_player, card_source = self.environment.step(player, row, card)
