@@ -5,7 +5,6 @@ from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from source.core.card import Card
-from source.core.weather import Weather
 
 
 class CombatRow(enum.Enum):
@@ -18,9 +17,7 @@ class CombatRow(enum.Enum):
     @staticmethod
     def get_possible_rows(card: Card) -> List[CombatRow]:
         result = []
-        if Weather.ability_is_weather(card.ability):
-            result = [card.combat_row]
-        elif card.combat_row is CombatRow.AGILE or card.combat_row is CombatRow.SPECIAL:
+        if card.combat_row is CombatRow.AGILE or card.combat_row is CombatRow.SPECIAL:
             result.append(CombatRow.CLOSE)
             result.append(CombatRow.RANGE)
             if card.combat_row is CombatRow.SPECIAL:
