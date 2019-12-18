@@ -13,6 +13,7 @@ class CombatRow(enum.Enum):
     SIEGE = 2
     SPECIAL = 3
     AGILE = 4
+    NONE = 5
 
     @staticmethod
     def get_possible_rows(card: Card) -> List[CombatRow]:

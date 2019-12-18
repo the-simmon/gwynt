@@ -66,7 +66,7 @@ class BoardTest(unittest.TestCase):
         for card in cards_to_scorch2 + surviving_cards2:
             self.board.add(self.player2, card.combat_row, card)
 
-        self.board.add(self.player2, CombatRow.SPECIAL, Card(CombatRow.SPECIAL, 0, Ability.SCORCH))
+        self.board.add(self.player2, CombatRow.NONE, Card(CombatRow.NONE, 0, Ability.SCORCH))
 
         self.assertEqual([cards_to_scorch1[0]], self.player1.graveyard[CombatRow.CLOSE])
         self.assertEqual([cards_to_scorch1[1]], self.player1.graveyard[CombatRow.SIEGE])

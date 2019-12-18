@@ -19,7 +19,6 @@ class CardTest(unittest.TestCase):
         actual = CombatRow.get_possible_rows(card)
         self.assertCountEqual(actual, [CombatRow.CLOSE])
 
-        card.combat_row = CombatRow.SPECIAL
-        card.ability = Ability.CLEAR_WEATHER
+        card.combat_row = CombatRow.NONE
         actual = CombatRow.get_possible_rows(card)
-        self.assertCountEqual(actual, [CombatRow.SPECIAL])
+        self.assertCountEqual(actual, [CombatRow.NONE])

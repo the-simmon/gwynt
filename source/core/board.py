@@ -34,7 +34,7 @@ class Board:
         return self.player1
 
     def add(self, player: Player, row: CombatRow, card: Card):
-        if row is not CombatRow.SPECIAL:
+        if row is not CombatRow.NONE:
             if card.ability is Ability.SPY:
                 enemy = self.get_enemy_player(player)
                 self.cards[enemy.id].add(row, card)
@@ -58,7 +58,7 @@ class Board:
         # remove cards that cannot be revived
         for cards in player.graveyard.values():
             for card in cards:
-                if card.hero or card.combat_row is CombatRow.SPECIAL:
+                if card.hero or card.combat_row is CombatRow.SPECIAL or card.combat_row is CombatRow.NONE:
                     cards.remove(card)
 
     def check_commanders_horn(self, player: Player, horn_card: Card, row: CombatRow) -> bool:
@@ -110,7 +110,7 @@ class Board:
 
     def _check_scorch(self, card: Card, player: Player):
         enemy = self.get_enemy_player(player)
-        if card.combat_row is CombatRow.SPECIAL:
+        if card.combat_row is CombatRow.NONE:
             self._scorch_special()
         else:
             enemy_damage = self.cards[enemy.id].calculate_damage_for_row(card.combat_row, self.weather)
