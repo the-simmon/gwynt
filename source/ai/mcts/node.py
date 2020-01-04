@@ -5,7 +5,6 @@ import random
 import sys
 from copy import deepcopy
 from enum import Enum
-from math import sqrt
 from typing import List, Tuple, Dict
 
 from source.ai.random_simulator import simulate_random_game
@@ -68,7 +67,7 @@ class Node:
 
     def get_ucb1(self):
         simulations = self.simulations or sys.float_info.epsilon * 10
-        return self.wins / simulations + 2 * sqrt(math.log(self.parent.simulations) / simulations)
+        return self.wins / simulations + 2 * math.sqrt(math.log(self.parent.simulations) / simulations)
 
     def expand(self):
         self.expanded = True
