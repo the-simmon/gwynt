@@ -1,6 +1,6 @@
 import unittest
 
-from source.core.card import Card, Ability
+from source.core.card import Card
 from source.core.comabt_row import CombatRow
 
 

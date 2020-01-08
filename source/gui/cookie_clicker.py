@@ -1,4 +1,4 @@
-import threading
+import asyncio
 from typing import Callable, Tuple
 
 from source.core.card import Card
@@ -7,14 +7,15 @@ from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 
 _MCTS = Callable[[Player, CardSource], Tuple[bool, Player, CardSource]]
+_UPDATE_GUI = Callable
 
 
 class CookieClicker:
 
-    def __init__(self, environment: GameEnvironment, gui_is_updated: threading.Event, mcts: _MCTS):
+    def __init__(self, environment: GameEnvironment, mcts: _MCTS, update_gui: _UPDATE_GUI):
         self.environment = environment
-        self.gui_is_updated = gui_is_updated
         self.mcts = mcts
+        self.update_ui = update_gui
 
         self._last_clicked_card: Card = None
         self._last_clicked_player: Player = None
@@ -40,20 +41,18 @@ class CookieClicker:
 
         if self.environment.current_player is player and row in possible_rows:
             game_over, current_player, card_source = self.environment.step(player, row, card)
-            self.gui_is_updated.clear()
+            self.update_ui()
             if current_player is not player:
-                threading.Thread(target=self._run_mcts, args=[game_over, current_player, card_source]).start()
+                asyncio.create_task(self._run_mcts(game_over, current_player, card_source))
 
     def pass_click(self, player: Player):
         if self.environment.current_player is player:
             game_over, current_player, card_source = self.environment.step(player, None, None)
-            self.gui_is_updated.clear()
+            self.update_ui()
             if current_player is not player:
-                threading.Thread(target=self._run_mcts, args=[game_over, current_player, card_source]).start()
+                asyncio.create_task(self._run_mcts(game_over, current_player, card_source))
 
-    def _run_mcts(self, game_over: bool, player: Player, card_source: CardSource):
-        # wait for gui update before 'blocking' the GIL
-        self.gui_is_updated.wait()
+    async def _run_mcts(self, game_over: bool, player: Player, card_source: CardSource):
         current_player = player
         # play enemy cards
         while current_player is player and not game_over:
