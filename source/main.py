@@ -28,13 +28,14 @@ class Main:
         self.clicker = CookieClicker(self.environment, self._run_async_mcts, self._update_gui)
 
         self.gui = GUI(self.environment, self.player1, self.clicker)
-        self.gui.after(1000, asyncio.create_task, self._start_game())
+        self.gui.after_idle(asyncio.create_task, self._start_game())
         self.gui.mainloop()
 
     async def _update_gui(self):
         await self.gui.redraw()
 
     async def _start_game(self):
+        await self._update_gui()
         if simulate_both_players:
             await self._run_mcts_both_players(self.environment.current_player)
         else:
