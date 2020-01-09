@@ -1,3 +1,4 @@
+import asyncio
 import random
 from typing import Tuple
 
@@ -24,27 +25,33 @@ class Main:
 
         self.environment = GameEnvironment(self.player1, self.player2)
 
-        self.clicker = CookieClicker(self.environment, self._run_mcts, self._update_gui)
+        self.clicker = CookieClicker(self.environment, self._run_async_mcts, self._update_gui)
 
         self.gui = GUI(self.environment, self.player1, self.clicker)
-        self.gui.after(1000, self._start_game)
+        self.gui.after(1000, asyncio.create_task, self._start_game())
         self.gui.mainloop()
 
-    def _update_gui(self):
-        self.gui.redraw()
+    async def _update_gui(self):
+        await self.gui.redraw()
 
-    def _start_game(self):
+    async def _start_game(self):
         if simulate_both_players:
-            self._run_mcts_both_players(self.environment.current_player)
+            await self._run_mcts_both_players(self.environment.current_player)
         else:
             while self.environment.current_player is not self.player1:
-                self._run_mcts(self.environment.current_player, self.environment.current_card_source)
+                await self._run_async_mcts(self.environment.current_player, self.environment.current_card_source)
 
-    def _run_mcts_both_players(self, current_player: Player, card_source: CardSource = CardSource.HAND):
+    async def _run_mcts_both_players(self, current_player: Player, card_source: CardSource = CardSource.HAND):
         game_over = False
 
         while not game_over:
-            game_over, current_player, card_source = self._run_mcts(current_player, card_source)
+            game_over, current_player, card_source = await self._run_async_mcts(current_player, card_source)
+
+    async def _run_async_mcts(self, current_player: Player, card_source: CardSource = CardSource.HAND) \
+            -> Tuple[bool, Player, CardSource]:
+        result = await asyncio.get_event_loop().run_in_executor(None, self._run_mcts, current_player, card_source)
+        await self._update_gui()
+        return result
 
     def _run_mcts(self, current_player: Player, card_source: CardSource = CardSource.HAND) \
             -> Tuple[bool, Player, CardSource]:
