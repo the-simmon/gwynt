@@ -52,8 +52,6 @@ class Main:
         card, row = mcts.run()
         game_over, current_player, card_source = self.environment.step(current_player, row, card)
 
-        self._update_gui()
-
         return game_over, current_player, card_source
 
 
