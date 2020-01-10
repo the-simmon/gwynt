@@ -2,8 +2,8 @@ import enum
 import random
 from typing import List
 
-from .card import Card
-from .cardcollection import CardCollection
+from source.core.card import Card
+from source.core.cardcollection import CardCollection
 
 
 class Faction(enum.Enum):

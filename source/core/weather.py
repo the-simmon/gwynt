@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 
-from .card import Ability
+from source.core.card import Ability
 
 
 class Weather(enum.Enum):

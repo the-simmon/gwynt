@@ -3,8 +3,8 @@ from copy import deepcopy
 from typing import DefaultDict, List, Callable
 
 from source.core.comabt_row import CombatRow
-from .card import Card, Ability
-from .weather import Weather
+from source.core.card import Card, Ability
+from source.core.weather import Weather
 
 
 class CardCollection(DefaultDict[CombatRow, List[Card]]):

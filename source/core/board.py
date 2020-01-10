@@ -5,10 +5,10 @@ from copy import deepcopy
 from typing import DefaultDict, List, TYPE_CHECKING
 
 from source.core.comabt_row import CombatRow
-from .card import Card, Ability
-from .cardcollection import CardCollection
-from .player import Player
-from .weather import Weather
+from source.core.card import Card, Ability
+from source.core.cardcollection import CardCollection
+from source.core.player import Player
+from source.core.weather import Weather
 
 if TYPE_CHECKING:
     from .gameenvironment import GameEnvironment

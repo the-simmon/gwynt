@@ -1,1 +1,1 @@
-from .core import *
+from test.core import *

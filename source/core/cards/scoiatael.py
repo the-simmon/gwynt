@@ -1,6 +1,6 @@
 from source.core.comabt_row import CombatRow
-from ._flatten import flatten
-from ..card import Card, Ability, Muster
+from source.core.cards._flatten import flatten
+from source.core.card import Card, Ability, Muster
 
 cards = [
     Card(CombatRow.AGILE, 6),

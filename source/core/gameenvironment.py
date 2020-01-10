@@ -8,9 +8,9 @@ from typing import Tuple, Dict, Optional
 from source.core.card import Ability
 from source.core.comabt_row import CombatRow
 from source.core.weather import Weather
-from .board import Board
-from .card import Card
-from .player import Player
+from source.core.board import Board
+from source.core.card import Card
+from source.core.player import Player
 
 
 class CardSource(enum.Enum):
