@@ -38,7 +38,7 @@ class GameEnvironmentTest(unittest.TestCase):
 
     def test_end_of_game(self):
         card = Card(CombatRow.CLOSE, 3)
-        self.environment.current_round = 1
+        self.environment.current_round = 2
 
         self.player1.active_cards = CardCollection([card])
         self.player2.active_cards = CardCollection([card])
