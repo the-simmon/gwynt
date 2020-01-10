@@ -71,8 +71,10 @@ class Node:
 
     def expand(self):
         self.expanded = True
-        potential_cards = self._get_potential_cards()
 
+        self._add_pass_node()
+
+        potential_cards = self._get_potential_cards()
         for card in potential_cards:
             for row in card.combat_row.get_possible_rows(card):
                 # only one commanders horn per row is possible
@@ -96,8 +98,6 @@ class Node:
                     node = Node(environment_copy, self, player_type, next_player, card, row,
                                 deepcopy(card_source), played_cards)
                     self.leafs.append(node)
-
-        self._add_pass_node()
 
     def _get_potential_cards(self) -> List[Card]:
         if self.player_type is self._get_next_player_type(self.next_player):
