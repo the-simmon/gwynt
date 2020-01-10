@@ -100,7 +100,6 @@ class Node:
         self._add_pass_node()
 
     def _get_potential_cards(self) -> List[Card]:
-        result: List[Card] = []
         if self.player_type is self._get_next_player_type(self.next_player):
             result = self.next_player.active_cards.get_all_cards()
         else:
