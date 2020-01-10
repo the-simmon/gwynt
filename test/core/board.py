@@ -92,6 +92,7 @@ class BoardTest(unittest.TestCase):
     def test_all_cards_to_graveyard(self):
         for card in self.player1_deck_cards:
             self.board.add(self.player1, card.combat_row, card)
+        self.board.add(self.player1, CombatRow.CLOSE, Card(CombatRow.CLOSE, 9, hero=True))
 
         self.board.all_cards_to_graveyard(self.player1)
         self.assertCountEqual(self.player1_deck_cards, self.player1.graveyard.get_all_cards())
