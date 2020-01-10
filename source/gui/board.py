@@ -45,16 +45,18 @@ class Board(tk.Frame):
             frame = tk.Frame(self)
             frame_dict[player] = frame
 
+            enable_clicking = player.id is self.player.id
+
             cards = [card_collection.get_damage_adjusted_cards(row, self.board.weather) for row in combat_row_sorting]
-            for card_list in cards:
-                self._draw_row(card_list, player).pack(in_=frame)
+            for card_list, row in zip(cards, combat_row_sorting):
+                self._draw_row(card_list, player, row, enable_clicking).pack(in_=frame)
 
             if player.id is self.player.id:
                 if card_source is CardSource.HAND:
-                    cards = player.active_cards.get_all_cards()
+                    cards = player.hand.get_all_cards()
                 else:
                     cards = player.graveyard.get_all_cards()
-                self._draw_row(cards, player, True).pack(in_=frame)
+                self._draw_row(cards, player, None, True).pack(in_=frame)
             combat_row_sorting.reverse()
 
         return frame_dict
@@ -63,8 +65,9 @@ class Board(tk.Frame):
         for widget in self.winfo_children():
             widget.destroy()
 
-    def _draw_row(self, card_list: List[CoreCard], player: Player, enable_clicking: bool = False) -> tk.Frame:
-        clicker = partial(self.clicker.card_click, player) if enable_clicking else None
+    def _draw_row(self, card_list: List[CoreCard], player: Player, row: CombatRow,
+                  enable_clicking: bool = False) -> tk.Frame:
+        clicker = partial(self.clicker.card_click, player, row) if enable_clicking else None
 
         frame = tk.Frame(height=Card.HEIGHT * 1.1)
         for card in sorted(card_list, key=attrgetter('damage', 'ability')):

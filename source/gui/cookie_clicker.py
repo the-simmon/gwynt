@@ -1,7 +1,7 @@
 import asyncio
 from typing import Callable, Tuple, Awaitable
 
-from source.core.card import Card
+from source.core.card import Card, Ability
 from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
@@ -20,13 +20,28 @@ class CookieClicker:
         self._last_clicked_card: Card = None
         self._last_clicked_player: Player = None
 
-    def card_click(self, player: Player, card: Card):
-        self._last_clicked_player = player
-        self._last_clicked_card = card
+    def card_click(self, player: Player, row: CombatRow, card: Card):
+        if self._last_clicked_card and self._last_clicked_card.ability is Ability.DECOY:
+            asyncio.create_task(self._decoy(card, row))
+        else:
+            self._last_clicked_player = player
+            self._last_clicked_card = card
 
-        # place card immediately, if only one combat row is possible
-        if len(possible_rows := CombatRow.get_possible_rows(card)) == 1:
-            self.click_row(possible_rows[0])
+            # place card immediately, if only one combat row is possible
+            if len(possible_rows := CombatRow.get_possible_rows(card)) == 1:
+                self.click_row(possible_rows[0])
+
+    async def _decoy(self, replace: Card, row: CombatRow):
+        decoy = self._last_clicked_card
+        if self.environment.current_player is self._last_clicked_player:
+            game_over, current_player, card_source = self.environment.step_decoy(self._last_clicked_player, row, decoy,
+                                                                                 replace)
+            await self.update_ui()
+            if current_player is not self._last_clicked_player:
+                await self._run_mcts(game_over, current_player, card_source)
+
+        self._last_clicked_player = None
+        self._last_clicked_card = None
 
     def click_row(self, row: CombatRow):
         """Wrapper function because tkinter cant execute coroutine directly"""

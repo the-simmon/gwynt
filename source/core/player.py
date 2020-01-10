@@ -20,7 +20,7 @@ class Player:
         self.faction = faction
         self.deck = CardCollection(cards)
         self.graveyard = CardCollection([])
-        self.active_cards = CardCollection([])
+        self.hand = CardCollection([])
         self.rounds_won = 0
 
     def pick_random_from_deck(self):
@@ -28,4 +28,4 @@ class Player:
         if cards:
             card = random.choice(cards)
             self.deck.remove(card.combat_row, card)
-            self.active_cards.add(card.combat_row, card)
+            self.hand.add(card.combat_row, card)

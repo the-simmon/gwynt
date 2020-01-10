@@ -84,7 +84,7 @@ class Node:
                     # for technical reasons, the card has to be added to the player
                     # (active cards will be overwritten in next node/ random simulation)
                     if self.player_type is PlayerType.ENEMY:
-                        player_copy.active_cards.add(card.combat_row, card)
+                        player_copy.hand.add(card.combat_row, card)
 
                     game_over, next_player, card_source = environment_copy.step(player_copy, row, card)
 
@@ -101,7 +101,7 @@ class Node:
 
     def _get_potential_cards(self) -> List[Card]:
         if self.player_type is self._get_next_player_type(self.next_player):
-            result = self.next_player.active_cards.get_all_cards()
+            result = self.next_player.hand.get_all_cards()
         else:
             not_played_cards, _ = self._get_available_cards(self.next_player)
             result = list(set(not_played_cards))
@@ -143,28 +143,28 @@ class Node:
         self.backpropagate(winner)
 
     def _add_random_cards_to_enemy(self, environment: GameEnvironment, player_to_add_cards: Player):
-        all_cards, total_active_cards = self._get_available_cards(player_to_add_cards)
+        all_cards, total_hand = self._get_available_cards(player_to_add_cards)
         random.shuffle(all_cards)
 
         number_of_played_cards = len(environment.board.cards[player_to_add_cards].get_all_cards())
-        player_to_add_cards.active_cards = CardCollection(all_cards[:total_active_cards - number_of_played_cards])
-        player_to_add_cards.deck = CardCollection(all_cards[total_active_cards:])
+        player_to_add_cards.hand = CardCollection(all_cards[:total_hand - number_of_played_cards])
+        player_to_add_cards.deck = CardCollection(all_cards[total_hand:])
 
     def _get_available_cards(self, player: Player) -> Tuple[List[Card], int]:
         all_cards = get_cards(player.faction)
         played_cards = self.played_cards[player.id]
         played_cards.extend(player.graveyard.get_all_cards())
-        total_active_cards = 0
+        total_hand = 0
 
         for card in played_cards:
             if card in all_cards:
                 all_cards.remove(card)
             if card.ability is Ability.SPY:
-                total_active_cards += 1
+                total_hand += 1
             else:
-                total_active_cards -= 1
+                total_hand -= 1
 
-        return all_cards, total_active_cards
+        return all_cards, total_hand
 
     def backpropagate(self, winner: Player):
         self.simulations += 1

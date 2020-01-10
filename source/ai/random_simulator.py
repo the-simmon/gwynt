@@ -26,5 +26,5 @@ def simulate_random_game(environment: GameEnvironment, current_player: Player, c
 
 def _get_potential_cards(player: Player, next_card_source: CardSource) -> List[Card]:
     if next_card_source is CardSource.HAND:
-        return player.active_cards.get_all_cards()
+        return player.hand.get_all_cards()
     return player.graveyard.get_all_cards()

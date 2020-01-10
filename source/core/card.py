@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 class Ability(enum.Enum):
     NONE = 0
-    EMPTY_PLACEHOLDER = 1
+    DECOY = 1
     MEDIC = 2
     MORALE_BOOST = 3
     MUSTER = 4

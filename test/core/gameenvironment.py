@@ -15,18 +15,18 @@ class GameEnvironmentTest(unittest.TestCase):
         self.environment = GameEnvironment(self.player1, self.player2)
 
     def test_active_card_choice(self):
-        self.assertEqual(10, len(self.player1.active_cards.get_all_cards()))
-        self.assertEqual(10, len(self.player2.active_cards.get_all_cards()))
+        self.assertEqual(10, len(self.player1.hand.get_all_cards()))
+        self.assertEqual(10, len(self.player2.hand.get_all_cards()))
 
     def test_step(self):
         expected = (False, self.player2, CardSource.HAND)
-        card = self.player1.active_cards[CombatRow.CLOSE][0]
+        card = self.player1.hand[CombatRow.CLOSE][0]
         self.environment.current_player = self.player1
         actual = self.environment.step(self.player1, card.combat_row, card)
         self.assertCountEqual(expected, actual)
 
     def test_pass(self):
-        card = self.player1.active_cards[CombatRow.CLOSE][0]
+        card = self.player1.hand[CombatRow.CLOSE][0]
         self.environment.step(self.player1, card.combat_row, card)
 
         self.environment.current_player = self.player1
@@ -40,8 +40,8 @@ class GameEnvironmentTest(unittest.TestCase):
         card = Card(CombatRow.CLOSE, 3)
         self.environment.current_round = 2
 
-        self.player1.active_cards = CardCollection([card])
-        self.player2.active_cards = CardCollection([card])
+        self.player1.hand = CardCollection([card])
+        self.player2.hand = CardCollection([card])
 
         self.environment.current_player = self.player1
         actual = self.environment.step(self.player1, card.combat_row, card)

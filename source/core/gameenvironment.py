@@ -29,9 +29,9 @@ class GameEnvironment:
         self.current_round = 0
         self.passed: Dict[int, bool] = {player1.id: False, player2.id: False}
 
-        self._chose_active_cards()
+        self._chose_hand()
 
-    def _chose_active_cards(self):
+    def _chose_hand(self):
         for player in [self.player1, self.player2]:
 
             #  random.choices not applicable, because it can return the same object multiple times
@@ -41,18 +41,18 @@ class GameEnvironment:
 
             for card in chosen_cards:
                 player.deck.remove(card.combat_row, card)
-                player.active_cards.add(card.combat_row, card)
+                player.hand.add(card.combat_row, card)
 
     def step(self, player: Player, row: Optional[CombatRow], card: Optional[Card]) -> Tuple[bool, Player, CardSource]:
         # card == None => player passes
         if card:
             if self.current_card_source is CardSource.HAND:
-                player.active_cards.remove(card.combat_row, card)
+                player.hand.remove(card.combat_row, card)
             else:
                 player.graveyard.remove(card.combat_row, card)
             self.board.add(player, row, card)
 
-        if len(player.active_cards.get_all_cards()) == 0 or not card:
+        if len(player.hand.get_all_cards()) == 0 or not card:
             self.passed[player.id] = True
 
         self.current_player, self.current_card_source = self._determine_current_player(card, player)
@@ -61,6 +61,11 @@ class GameEnvironment:
             self.current_player, self.current_card_source = self._end_of_round()
 
         return self.game_over(), self.current_player, self.current_card_source
+
+    def step_decoy(self, player: Player, row: CombatRow, decoy: Card, replace_card: Card) \
+            -> Tuple[bool, Player, CardSource]:
+        print('decoy')
+        raise
 
     def round_over(self):
         return all(self.passed.values())

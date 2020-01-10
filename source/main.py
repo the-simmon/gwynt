@@ -3,7 +3,9 @@ import random
 from typing import Tuple
 
 from source.ai.mcts.mcts import MCTS
+from source.core.card import Card, Ability
 from source.core.cards.util import get_cards
+from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Faction, Player
 from source.gui.cookie_clicker import CookieClicker
@@ -18,6 +20,7 @@ class Main:
         faction = random.choice(list(Faction))
         cards = get_cards(faction)
         self.player1 = Player(0, faction, cards[:22])
+        self.player1.hand.add(CombatRow.SPECIAL, Card(CombatRow.SPECIAL, 0, Ability.DECOY))
 
         faction = random.choice(list(Faction))
         cards = get_cards(faction)

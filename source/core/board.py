@@ -102,7 +102,7 @@ class Board:
                     card_collection.remove(current_card.combat_row, current_card)
             return result
 
-        cards_to_add = search_and_remove(card, player.active_cards)
+        cards_to_add = search_and_remove(card, player.hand)
         cards_to_add.extend(search_and_remove(card, player.deck))
 
         for card in cards_to_add:
