@@ -52,6 +52,20 @@ class GameEnvironment:
                 player.graveyard.remove(card.combat_row, card)
             self.board.add(player, row, card)
 
+        self._end_of_step(player, card)
+        return self.game_over(), self.current_player, self.current_card_source
+
+    def step_decoy(self, player: Player, row: CombatRow, decoy: Card, replace_card: Card) \
+            -> Tuple[bool, Player, CardSource]:
+        player.hand.remove(decoy.combat_row, decoy)
+        player.hand.add(replace_card.combat_row, replace_card)
+        self.board.add(player, row, decoy)
+
+        self.board.remove(player, row, replace_card, ignore_graveyard=True)
+        self._end_of_step(player, decoy)
+        return self.game_over(), self.current_player, self.current_card_source
+
+    def _end_of_step(self, player: Player, card: Card):
         if len(player.hand.get_all_cards()) == 0 or not card:
             self.passed[player.id] = True
 
@@ -59,13 +73,6 @@ class GameEnvironment:
 
         if self.round_over():
             self.current_player, self.current_card_source = self._end_of_round()
-
-        return self.game_over(), self.current_player, self.current_card_source
-
-    def step_decoy(self, player: Player, row: CombatRow, decoy: Card, replace_card: Card) \
-            -> Tuple[bool, Player, CardSource]:
-        print('decoy')
-        raise
 
     def round_over(self):
         return all(self.passed.values())

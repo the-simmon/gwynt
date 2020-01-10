@@ -43,9 +43,10 @@ class Board:
 
         self._check_ability(player, card)
 
-    def remove(self, player: Player, row: CombatRow, card: Card):
+    def remove(self, player: Player, row: CombatRow, card: Card, ignore_graveyard: bool = False):
         self.cards[player.id].remove(row, card)
-        player.graveyard.add(card.combat_row, card)
+        if not ignore_graveyard:
+            player.graveyard.add(card.combat_row, card)
 
     def calculate_damage(self, player: Player) -> int:
         return self.cards[player.id].calculate_damage(self.weather)
