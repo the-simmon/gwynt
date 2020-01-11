@@ -7,7 +7,7 @@ from typing import DefaultDict, List, TYPE_CHECKING
 from source.core.card import Card, Ability
 from source.core.cardcollection import CardCollection
 from source.core.comabt_row import CombatRow
-from source.core.faction_ablilty import monster_ability_get_card_to_survive
+from source.core.faction_abililty import monster_ability_get_card_to_survive
 from source.core.player import Player
 from source.core.weather import Weather
 

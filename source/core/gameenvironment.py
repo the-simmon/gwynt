@@ -9,6 +9,7 @@ from source.core.board import Board
 from source.core.card import Ability
 from source.core.card import Card
 from source.core.comabt_row import CombatRow
+from source.core.faction_abililty import nilfgaard_check_draw
 from source.core.player import Player
 from source.core.weather import Weather
 
@@ -105,8 +106,7 @@ class GameEnvironment:
             self.player2.rounds_won += 1
             current_player = self.player2
         else:
-            self.player1.rounds_won += 1
-            self.player2.rounds_won += 1
+            nilfgaard_check_draw(self)
         card_source = CardSource.HAND
 
         self.board.all_cards_to_graveyard(self.player1)
