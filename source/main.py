@@ -20,7 +20,6 @@ class Main:
         faction = random.choice(list(Faction))
         cards = get_cards(faction)
         self.player1 = Player(0, faction, cards[:22])
-        self.player1.hand.add(CombatRow.SPECIAL, Card(CombatRow.SPECIAL, 0, Ability.DECOY))
 
         faction = random.choice(list(Faction))
         cards = get_cards(faction)
@@ -60,8 +59,12 @@ class Main:
     def _run_mcts(self, current_player: Player, card_source: CardSource = CardSource.HAND) \
             -> Tuple[bool, Player, CardSource]:
         mcts = MCTS(self.environment, current_player, card_source)
-        card, row = mcts.run()
-        game_over, current_player, card_source = self.environment.step(current_player, row, card)
+        card, row, replaced_card = mcts.run()
+        if card and card.ability is Ability.DECOY:
+            game_over, current_player, card_source = self.environment.step_decoy(current_player, row, card,
+                                                                                 replaced_card)
+        else:
+            game_over, current_player, card_source = self.environment.step(current_player, row, card)
 
         return game_over, current_player, card_source
 

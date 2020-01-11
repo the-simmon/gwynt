@@ -5,7 +5,7 @@ import random
 import sys
 from copy import deepcopy
 from enum import Enum
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Optional
 
 from source.ai.random_simulator import simulate_random_game
 from source.core.card import Card, Ability
@@ -29,7 +29,8 @@ class PlayerType(Enum):
 class Node:
 
     def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, player: Player, card: Card,
-                 row: CombatRow, card_source: CardSource, played_cards: Dict[int, List[Card]]):
+                 row: CombatRow, card_source: CardSource, played_cards: Dict[int, List[Card]],
+                 replaced_card: Optional[Card] = None):
         self.environment = environment
         self.parent = parent
         self.player_type = player_type
@@ -38,6 +39,8 @@ class Node:
         self.row = row
         self.next_card_source = card_source
         self.played_cards = played_cards
+        # if the node represents a decoy, it must contain the replaced card
+        self.replaced_card = replaced_card
 
         self.leafs: List[Node] = []
         self.simulations = 0
@@ -76,28 +79,31 @@ class Node:
 
         potential_cards = self._get_potential_cards()
         for card in potential_cards:
-            for row in card.combat_row.get_possible_rows(card):
-                # only one commanders horn per row is possible
-                if self.environment.board.check_commanders_horn(self.next_player, card, row):
-                    environment_copy = deepcopy(self.environment)
-                    player_copy = environment_copy.board.get_player(self.next_player)
+            if card.ability is Ability.DECOY:
+                self._add_decoys(card)
+            else:
+                for row in card.combat_row.get_possible_rows(card):
+                    # only one commanders horn per row is possible
+                    if self.environment.board.check_commanders_horn(self.next_player, card, row):
+                        environment_copy = deepcopy(self.environment)
+                        player_copy = environment_copy.board.get_player(self.next_player)
 
-                    # enemy player gets all possible cards assigned
-                    # for technical reasons, the card has to be added to the player
-                    # (active cards will be overwritten in next node/ random simulation)
-                    if self.player_type is PlayerType.ENEMY:
-                        player_copy.hand.add(card.combat_row, card)
+                        # enemy player gets all possible cards assigned
+                        # for technical reasons, the card has to be added to the player
+                        # (active cards will be overwritten in next node/ random simulation)
+                        if self.player_type is PlayerType.ENEMY:
+                            player_copy.hand.add(card.combat_row, card)
 
-                    game_over, next_player, card_source = environment_copy.step(player_copy, row, card)
+                        game_over, next_player, card_source = environment_copy.step(player_copy, row, card)
 
-                    player_type = self._get_next_player_type(next_player)
+                        player_type = self._get_next_player_type(next_player)
 
-                    played_cards = deepcopy(self.played_cards)
-                    played_cards[player_copy.id].append(card)
+                        played_cards = deepcopy(self.played_cards)
+                        played_cards[player_copy.id].append(card)
 
-                    node = Node(environment_copy, self, player_type, next_player, card, row,
-                                deepcopy(card_source), played_cards)
-                    self.leafs.append(node)
+                        node = Node(environment_copy, self, player_type, next_player, card, row,
+                                    deepcopy(card_source), played_cards)
+                        self.leafs.append(node)
 
     def _get_potential_cards(self) -> List[Card]:
         if self.player_type is self._get_next_player_type(self.next_player):
@@ -127,6 +133,27 @@ class Node:
         node = Node(environment_copy, self, player_type, next_player, None, None, deepcopy(card_source),
                     played_cards)
         self.leafs.append(node)
+
+    def _add_decoys(self, decoy: Card):
+        for row, card_list in self.environment.board.cards[self.next_player.id].items():
+            for card in card_list:
+                if card.ability is not Ability.DECOY and card.ability is not Ability.SPECIAL_COMMANDERS_HORN and not card.hero:
+                    environment_copy = deepcopy(self.environment)
+                    player_copy = environment_copy.board.get_player(self.next_player)
+                    game_over, next_player, card_source = environment_copy.step_decoy(player_copy, row, decoy, card)
+
+                    player_type = self._get_next_player_type(next_player)
+                    played_cards = deepcopy(self.played_cards)
+
+                    # enemy spies are not in played cards
+                    if card in played_cards:
+                        # remove card from played cards, as it returns to the players hand
+                        played_cards[player_copy.id].remove(card)
+                    played_cards[player_copy.id].append(decoy)
+
+                    node = Node(environment_copy, self, player_type, next_player, decoy, row, deepcopy(card_source),
+                                played_cards, card)
+                    self.leafs.append(node)
 
     def simulate(self):
         environment_copy = deepcopy(self.environment)
