@@ -2,7 +2,8 @@ import unittest
 
 from source.core.card import Card
 from source.core.comabt_row import CombatRow
-from source.core.faction_abililty import monster_ability_get_card_to_survive, nilfgaard_check_draw
+from source.core.faction_abililty import monster_ability_get_card_to_survive, nilfgaard_check_draw, \
+    northern_realms_check_extra_card
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player, Faction
 
@@ -31,3 +32,8 @@ class FactionAbilityText(unittest.TestCase):
         nilfgaard_check_draw(environment)
         self.assertEqual(0, player1.rounds_won)
         self.assertEqual(1, player2.rounds_won)
+
+    def test_northern_realms(self):
+        player1 = Player(0, Faction.NOTHERN_REALMS, [Card(CombatRow.CLOSE, 2)])
+        northern_realms_check_extra_card(player1)
+        self.assertEqual(1, len(player1.hand))
