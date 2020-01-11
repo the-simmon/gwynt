@@ -1,5 +1,4 @@
 import time
-from collections import defaultdict
 from typing import Tuple, List, Dict, Optional
 
 from source.ai.mcts.node import Node, PlayerType

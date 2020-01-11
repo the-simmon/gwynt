@@ -2,8 +2,8 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import DefaultDict, List, Callable
 
-from source.core.comabt_row import CombatRow
 from source.core.card import Card, Ability
+from source.core.comabt_row import CombatRow
 from source.core.weather import Weather
 
 
@@ -86,10 +86,10 @@ def _calculate_damage_for_row(cards: List[Card], row: CombatRow, weather: List[W
 
         def apply_function(f: Callable[[Card], None], cards: List[Card], current_card: Card):
             for card in cards:
-                if card != current_card and not card.hero:
+                if card != current_card and not card.hero and card.combat_row is not CombatRow.SPECIAL:
                     f(card)
 
-        # there are tow types of commanders horn, dandelion and the generic horn
+        # there are two types of commanders horn, dandelion and the generic horn
         horn_applied = False
         special_horn_applied = False
         for current_card in cards:

@@ -1,11 +1,11 @@
 import random
 
-from source.core.player import Faction
 from source.core.cards.monster import cards as monster_cards
 from source.core.cards.neutral import cards as neutral_cards
 from source.core.cards.nilfgaard import cards as niflgaard_cards
 from source.core.cards.nothern_realms import cards as nothern_reamls_cards
 from source.core.cards.scoiatael import cards as scoiatael_cards
+from source.core.player import Faction
 
 
 def get_cards(faction: Faction):

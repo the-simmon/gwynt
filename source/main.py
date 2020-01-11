@@ -3,9 +3,8 @@ import random
 from typing import Tuple
 
 from source.ai.mcts.mcts import MCTS
-from source.core.card import Card, Ability
+from source.core.card import Ability
 from source.core.cards.util import get_cards
-from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Faction, Player
 from source.gui.cookie_clicker import CookieClicker
