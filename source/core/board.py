@@ -7,11 +7,12 @@ from typing import DefaultDict, List, TYPE_CHECKING
 from source.core.card import Card, Ability
 from source.core.cardcollection import CardCollection
 from source.core.comabt_row import CombatRow
+from source.core.faction_ablilty import monster_ability_get_card_to_survive
 from source.core.player import Player
 from source.core.weather import Weather
 
 if TYPE_CHECKING:
-    from .gameenvironment import GameEnvironment
+    from source.core.gameenvironment import GameEnvironment
 
 
 class Board:
@@ -52,9 +53,13 @@ class Board:
         return self.cards[player.id].calculate_damage(self.weather)
 
     def all_cards_to_graveyard(self, player: Player):
+        # monster faction ability
+        card_to_keep = monster_ability_get_card_to_survive(self, player)
+
         for row, cards in self.cards[player.id].items():
             for card in deepcopy(cards):
-                self.remove(player, row, card)
+                if card != card_to_keep:
+                    self.remove(player, row, card)
 
         # remove cards that cannot be revived
         for cards in player.graveyard.values():

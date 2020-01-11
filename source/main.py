@@ -17,6 +17,7 @@ class Main:
 
     def __init__(self):
         faction = random.choice(list(Faction))
+        faction = Faction.MONSTER
         cards = get_cards(faction)
         self.player1 = Player(0, faction, cards[:22])
 
