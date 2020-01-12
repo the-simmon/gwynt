@@ -9,7 +9,8 @@ from source.core.board import Board
 from source.core.card import Ability
 from source.core.card import Card
 from source.core.comabt_row import CombatRow
-from source.core.faction_abililty import nilfgaard_check_draw, northern_realms_check_extra_card
+from source.core.faction_abililty import nilfgaard_check_draw, northern_realms_check_extra_card, \
+    scoiatael_decide_starting_player
 from source.core.player import Player
 from source.core.weather import Weather
 
@@ -24,12 +25,14 @@ class GameEnvironment:
     def __init__(self, player1: Player, player2: Player):
         self.player1 = player1
         self.player2 = player2
-        self.current_player = random.choice([player1, player2])
+        self.current_player = None
         self.current_card_source = CardSource.HAND
         self.board = Board(player1, player2, self)
         self.current_round = 0
         self.passed: Dict[int, bool] = {player1.id: False, player2.id: False}
 
+    def init(self):
+        self.current_player = scoiatael_decide_starting_player(self)
         self._chose_hand()
 
     def _chose_hand(self):

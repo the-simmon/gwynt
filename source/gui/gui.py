@@ -24,8 +24,6 @@ class GUI(tk.Tk):
         asyncio.get_event_loop().run_until_complete(self._mainloop())
 
     async def _mainloop(self):
-        self.game.redraw()
-
         try:
             while True:
                 self.update()

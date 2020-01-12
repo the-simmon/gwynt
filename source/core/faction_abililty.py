@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+from tkinter import messagebox
 from operator import xor
 from typing import Optional, TYPE_CHECKING
 
@@ -40,3 +41,12 @@ def northern_realms_check_extra_card(player: Player):
     """Nothern Reamls gets an extra card when winning a round"""
     if player.faction is Faction.NOTHERN_REALMS:
         player.pick_random_from_deck()
+
+
+def scoiatael_decide_starting_player(environment: GameEnvironment) -> Player:
+    if environment.player1.faction is Faction.SCOIATAEL:
+        wants_to_start = messagebox.askyesno('Scoia´tael faction ability', 'Would you like to lay the first card?')
+        result = environment.player1 if wants_to_start else environment.player2
+    else:
+        result = random.choice([environment.player1, environment.player2])
+    return result

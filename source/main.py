@@ -36,7 +36,9 @@ class Main:
         await self.gui.redraw()
 
     async def _start_game(self):
+        self.environment.init()
         await self._update_gui()
+
         if simulate_both_players:
             await self._run_mcts_both_players(self.environment.current_player)
         else:
