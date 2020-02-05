@@ -13,6 +13,7 @@ class GameEnvironmentTest(unittest.TestCase):
         self.player1 = Player(1, Faction.NOTHERN_REALMS, Card(CombatRow.CLOSE, 6) * 22)
         self.player2 = Player(2, Faction.NILFGAARD, Card(CombatRow.RANGE, 10) * 22)
         self.environment = GameEnvironment(self.player1, self.player2)
+        self.environment.init()
 
     def test_active_card_choice(self):
         self.assertEqual(10, len(self.player1.hand.get_all_cards()))

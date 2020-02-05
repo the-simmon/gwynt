@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import enum
 from copy import deepcopy
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from source.core.comabt_row import CombatRow
+from source.core.comabt_row import CombatRow
 
 
 class Ability(enum.Enum):
