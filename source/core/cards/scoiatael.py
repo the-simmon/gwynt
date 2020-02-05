@@ -1,4 +1,4 @@
-from source.core.card import Card, Ability, Muster
+from source.core.card import Card, Ability, Muster, LeaderCard, LeaderAbility
 from source.core.cards._flatten import flatten
 from source.core.comabt_row import CombatRow
 
@@ -29,3 +29,11 @@ cards = [
 ]
 
 cards = flatten(cards)
+
+leaders = [
+    LeaderCard(leader_ability=LeaderAbility.EXTRA_CARD),
+    LeaderCard(leader_ability=LeaderAbility.OPTIMIZE_AGILE),
+    LeaderCard(leader_ability=LeaderAbility.FROST_DECK),
+    LeaderCard(CombatRow.CLOSE, ability=Ability.SCORCH),
+    LeaderCard(CombatRow.RANGE, ability=Ability.COMMANDERS_HORN)
+]

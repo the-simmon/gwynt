@@ -1,4 +1,4 @@
-from source.core.card import Card, Ability
+from source.core.card import Card, Ability, LeaderCard, LeaderAbility
 from source.core.cards._flatten import flatten
 from source.core.comabt_row import CombatRow
 
@@ -33,3 +33,10 @@ cards = [
 ]
 
 cards = flatten(cards)
+
+leaders = [
+    LeaderCard(leader_ability=LeaderAbility.RAIN_DECK),
+    LeaderCard(leader_ability=LeaderAbility.RANDOM_MEDIC),
+    LeaderCard(leader_ability=LeaderAbility.ENEMY_GRAVEYARD2HAND),
+    LeaderCard(leader_ability=LeaderAbility.BLOCK_LEADER)
+]

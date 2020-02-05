@@ -60,3 +60,28 @@ class Card:
 
     def __mul__(self, count: int):
         return [deepcopy(self) for _ in range(count)]
+
+
+class LeaderAbility(enum.Enum):
+    NORMAL_CARD = 0
+    SPY_DAMAGE = 1
+    GRAVEYARD2HAND = 2
+    SWAP_CARDS = 3
+    PICK_WEATHER = 4
+    RAIN_DECK = 5
+    RANDOM_MEDIC = 6
+    ENEMY_GRAVEYARD2HAND = 7
+    BLOCK_LEADER = 8
+    FOG_DECK = 9
+    EXTRA_CARD = 10
+    OPTIMIZE_AGILE = 11
+    FROST_DECK = 12
+
+
+class LeaderCard(Card):
+
+    def __init__(self, combat_row: CombatRow = CombatRow.NONE, damage: int = 0, ability: Ability = Ability.NONE,
+                 hero: bool = False, muster: Muster = Muster.NONE,
+                 leader_ability: LeaderAbility = LeaderAbility.NORMAL_CARD):
+        super(LeaderCard, self).__init__(combat_row, damage, ability, hero, muster)
+        self.leader_ability = leader_ability
