@@ -75,10 +75,6 @@ class LeaderAbility(enum.Enum):
     OPTIMIZE_AGILE = 11
     FROST_DECK = 12
 
-    def passive(self):
-        return self.value is LeaderAbility.SPY_DAMAGE or self.value is LeaderAbility.RANDOM_MEDIC or \
-               self.value is LeaderAbility.BLOCK_LEADER or self.value is LeaderAbility.EXTRA_CARD
-
 
 class LeaderCard(Card):
 
@@ -87,3 +83,7 @@ class LeaderCard(Card):
                  leader_ability: LeaderAbility = LeaderAbility.NONE):
         super(LeaderCard, self).__init__(combat_row, damage, ability, hero, muster)
         self.leader_ability = leader_ability
+
+    def is_passive(self):
+        return self.leader_ability is LeaderAbility.SPY_DAMAGE or self.leader_ability is LeaderAbility.RANDOM_MEDIC or \
+               self.leader_ability is LeaderAbility.BLOCK_LEADER or self.leader_ability is LeaderAbility.EXTRA_CARD
