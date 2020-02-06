@@ -4,7 +4,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import DefaultDict, List
 
-from source.core.card import Card, Ability, LeaderCard
+from source.core.card import Card, Ability, LeaderAbility
 from source.core.cardcollection import CardCollection
 from source.core.comabt_row import CombatRow
 from source.core.faction_abililty import monster_ability_get_card_to_survive
@@ -14,7 +14,7 @@ from source.core.weather import Weather
 
 class Board:
 
-    def __init__(self, player1: Player, player2: Player, passive_leaders: List[LeaderCard]):
+    def __init__(self, player1: Player, player2: Player, passive_leaders: List[LeaderAbility]):
         self.cards: DefaultDict[int, CardCollection] = defaultdict(lambda: CardCollection(cards=[]))
         self.weather: List[Weather] = [Weather.CLEAR]
         self.player1 = player1

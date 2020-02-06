@@ -20,6 +20,30 @@ class CardSource(enum.Enum):
     GRAVEYARD = 1
 
 
+class PassiveLeaderState:
+
+    def __init__(self):
+        # Leader card 'Emhyr var Emreis: The White Flame'
+        self.block_leader = False
+        # Emhyr var Emreis: Invader of the North
+        self.random_medic = False
+        self.leaders_ability: List[LeaderAbility] = []
+
+    def check_leader(self, leader: LeaderCard):
+        if leader.is_passive() and not self.block_leader:
+            self.leaders_ability.append(leader.leader_ability)
+            if leader.ability is LeaderAbility.BLOCK_LEADER:
+                self._set_block_leader()
+
+    def _set_block_leader(self):
+        self.block_leader = True
+        self.random_medic = False
+        self.leaders_ability = [LeaderAbility.BLOCK_LEADER]
+
+    def set_random_medic(self):
+        self.random_medic = True
+
+
 class GameEnvironment:
 
     def __init__(self, player1: Player, player2: Player):
@@ -28,23 +52,17 @@ class GameEnvironment:
         self.current_player = None
         self.current_card_source = CardSource.HAND
 
-        # Leader card 'Emhyr var Emreis: The White Flame'
-        self.block_leader = False
+        self.passive_leader_state = PassiveLeaderState()
         passive_leaders = self._check_passive_leaders()
         self.board = Board(player1, player2, passive_leaders)
 
         self.current_round = 0
         self.passed: Dict[int, bool] = {player1.id: False, player2.id: False}
 
-    def _check_passive_leaders(self) -> List[LeaderCard]:
-        result = []
+    def _check_passive_leaders(self) -> List[LeaderAbility]:
         for player in [self.player1, self.player2]:
-            if player.leader.is_passive() and not self.block_leader:
-                result.append(player.leader)
-                if player.leader.ability is LeaderAbility.BLOCK_LEADER:
-                    self.block_leader = True
-                    result = [player.leader]
-        return result
+            self.passive_leader_state.check_leader(player.leader)
+        return self.passive_leader_state.leaders_ability
 
     def init(self):
         self.current_player = scoiatael_decide_starting_player(self)

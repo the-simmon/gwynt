@@ -35,7 +35,6 @@ class CardCollectionTest(unittest.TestCase):
     def test_double_spy_leader(self):
         spy = Card(CombatRow.CLOSE, 2, Ability.SPY)
         self.card_collection.add(spy.combat_row, spy)
-        expected = 44
-        actual = self.card_collection.calculate_damage([Weather.CLEAR],
-                                                       [LeaderCard(leader_ability=LeaderAbility.SPY_DAMAGE)])
+        expected = 48
+        actual = self.card_collection.calculate_damage([Weather.CLEAR], [LeaderAbility.SPY_DAMAGE])
         self.assertEqual(expected, actual)

@@ -2,7 +2,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import DefaultDict, List, Callable
 
-from source.core.card import Card, Ability, LeaderCard, LeaderAbility
+from source.core.card import Card, Ability, LeaderAbility
 from source.core.comabt_row import CombatRow
 from source.core.weather import Weather
 
@@ -21,18 +21,18 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
     def remove(self, row: CombatRow, card: Card):
         self[row].remove(card)
 
-    def calculate_damage(self, weather: List[Weather], passive_leaders: List[LeaderCard]) -> int:
+    def calculate_damage(self, weather: List[Weather], passive_leaders: List[LeaderAbility]) -> int:
         result = 0
         for row, cards in self.items():
             result += self.calculate_damage_for_row(row, weather, passive_leaders)
         return result
 
     def calculate_damage_for_row(self, row: CombatRow, weather: List[Weather],
-                                 passive_leaders: List[LeaderCard]) -> int:
+                                 passive_leaders: List[LeaderAbility]) -> int:
         cards = _calculate_damage_for_row(self[row], row, weather, passive_leaders)
         return sum([card.damage for card in cards])
 
-    def get_damage_adjusted_cards(self, row: CombatRow, weather: List[Weather], passive_leaders: List[LeaderCard]) -> \
+    def get_damage_adjusted_cards(self, row: CombatRow, weather: List[Weather], passive_leaders: List[LeaderAbility]) -> \
             List[Card]:
         return _calculate_damage_for_row(self[row], row, weather, passive_leaders)
 
@@ -50,7 +50,7 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
 
 
 def _calculate_damage_for_row(cards: List[Card], row: CombatRow, weather: List[Weather],
-                              passive_leaders: List[LeaderCard]) -> List[Card]:
+                              passive_leaders: List[LeaderAbility]) -> List[Card]:
     def doulbe_spy_leader(cards: List[Card]) -> List[Card]:
         for card in cards:
             if card.ability is Ability.SPY:
@@ -116,7 +116,7 @@ def _calculate_damage_for_row(cards: List[Card], row: CombatRow, weather: List[W
         return cards
 
     cards = deepcopy(cards)
-    if LeaderAbility.SPY_DAMAGE in [leader.ability for leader in passive_leaders]:
+    if LeaderAbility.SPY_DAMAGE in passive_leaders:
         cards = doulbe_spy_leader(cards)
     cards = check_weather(cards, weather)
     cards = check_tight_bond(cards)
