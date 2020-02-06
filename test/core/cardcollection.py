@@ -1,6 +1,6 @@
 import unittest
 
-from source.core.card import Ability, Card
+from source.core.card import Ability, Card, LeaderCard, LeaderAbility
 from source.core.cardcollection import CardCollection
 from source.core.comabt_row import CombatRow
 from source.core.weather import Weather
@@ -31,3 +31,11 @@ class CardCollectionTest(unittest.TestCase):
     def test_get_all_cards(self):
         expected = self.close_cards + self.range_cards
         self.assertCountEqual(expected, self.card_collection.get_all_cards())
+
+    def test_double_spy_leader(self):
+        spy = Card(CombatRow.CLOSE, 2, Ability.SPY)
+        self.card_collection.add(spy.combat_row, spy)
+        expected = 44
+        actual = self.card_collection.calculate_damage([Weather.CLEAR],
+                                                       [LeaderCard(leader_ability=LeaderAbility.SPY_DAMAGE)])
+        self.assertEqual(expected, actual)

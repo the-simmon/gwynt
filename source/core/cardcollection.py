@@ -2,7 +2,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import DefaultDict, List, Callable
 
-from source.core.card import Card, Ability, LeaderCard
+from source.core.card import Card, Ability, LeaderCard, LeaderAbility
 from source.core.comabt_row import CombatRow
 from source.core.weather import Weather
 
@@ -29,12 +29,12 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
 
     def calculate_damage_for_row(self, row: CombatRow, weather: List[Weather],
                                  passive_leaders: List[LeaderCard]) -> int:
-        cards = _calculate_damage_for_row(self[row], row, weather)
+        cards = _calculate_damage_for_row(self[row], row, weather, passive_leaders)
         return sum([card.damage for card in cards])
 
     def get_damage_adjusted_cards(self, row: CombatRow, weather: List[Weather], passive_leaders: List[LeaderCard]) -> \
             List[Card]:
-        return _calculate_damage_for_row(self[row], row, weather)
+        return _calculate_damage_for_row(self[row], row, weather, passive_leaders)
 
     def get_all_cards(self) -> List[Card]:
         result = []
@@ -49,7 +49,14 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
         return copy
 
 
-def _calculate_damage_for_row(cards: List[Card], row: CombatRow, weather: List[Weather]) -> List[Card]:
+def _calculate_damage_for_row(cards: List[Card], row: CombatRow, weather: List[Weather],
+                              passive_leaders: List[LeaderCard]) -> List[Card]:
+    def doulbe_spy_leader(cards: List[Card]) -> List[Card]:
+        for card in cards:
+            if card.ability is Ability.SPY:
+                card.damage *= 2
+        return cards
+
     def check_weather(cards: List[Card], weather: List[Weather]) -> List[Card]:
         affected_rows: List[CombatRow] = []
         if Weather.FROST in weather:
@@ -109,6 +116,8 @@ def _calculate_damage_for_row(cards: List[Card], row: CombatRow, weather: List[W
         return cards
 
     cards = deepcopy(cards)
+    if LeaderAbility.SPY_DAMAGE in [leader.ability for leader in passive_leaders]:
+        cards = doulbe_spy_leader(cards)
     cards = check_weather(cards, weather)
     cards = check_tight_bond(cards)
     cards = check_other_abilities(cards)

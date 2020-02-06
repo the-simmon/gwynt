@@ -21,4 +21,4 @@ class PlayerTest(unittest.TestCase):
 
     def test_pick_random(self):
         self.player.pick_random_from_deck()
-        self.assertEquals(self.hand + self.deck_cards, self.player.hand.get_all_cards())
+        self.assertEqual(self.hand + self.deck_cards, self.player.hand.get_all_cards())
