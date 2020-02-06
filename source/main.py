@@ -4,7 +4,7 @@ from typing import Tuple
 
 from source.ai.mcts.mcts import MCTS
 from source.core.card import Ability
-from source.core.cards.util import get_cards
+from source.core.cards.util import get_cards, get_leaders
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Faction, Player
 from source.gui.cookie_clicker import CookieClicker
@@ -18,11 +18,13 @@ class Main:
     def __init__(self):
         faction = random.choice(list(Faction))
         cards = get_cards(faction)
-        self.player1 = Player(0, faction, cards[:22])
+        leader = random.choice(get_leaders(faction))
+        self.player1 = Player(0, faction, cards[:22], leader)
 
         faction = random.choice(list(Faction))
         cards = get_cards(faction)
-        self.player2 = Player(1, faction, cards[:22])
+        leader = random.choice(get_leaders(faction))
+        self.player2 = Player(1, faction, cards[:22], leader)
 
         self.environment = GameEnvironment(self.player1, self.player2)
 

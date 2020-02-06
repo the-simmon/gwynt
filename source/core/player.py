@@ -2,7 +2,7 @@ import enum
 import random
 from typing import List
 
-from source.core.card import Card
+from source.core.card import Card, LeaderCard
 from source.core.cardcollection import CardCollection
 
 
@@ -15,12 +15,13 @@ class Faction(enum.Enum):
 
 class Player:
 
-    def __init__(self, id: int, faction: Faction, cards: List[Card]):
+    def __init__(self, id: int, faction: Faction, cards: List[Card], leader: LeaderCard):
         self.id: int = id
         self.faction = faction
         self.deck = CardCollection(cards)
         self.graveyard = CardCollection([])
         self.hand = CardCollection([])
+        self.leader = leader
         self.rounds_won = 0
 
     def pick_random_from_deck(self):

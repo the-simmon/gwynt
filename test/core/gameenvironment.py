@@ -1,6 +1,6 @@
 import unittest
 
-from source.core.card import Card
+from source.core.card import Card, LeaderCard
 from source.core.cardcollection import CardCollection
 from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment, CardSource
@@ -10,8 +10,8 @@ from source.core.player import Player, Faction
 class GameEnvironmentTest(unittest.TestCase):
 
     def setUp(self):
-        self.player1 = Player(1, Faction.NOTHERN_REALMS, Card(CombatRow.CLOSE, 6) * 22)
-        self.player2 = Player(2, Faction.NILFGAARD, Card(CombatRow.RANGE, 10) * 22)
+        self.player1 = Player(1, Faction.NOTHERN_REALMS, Card(CombatRow.CLOSE, 6) * 22, LeaderCard())
+        self.player2 = Player(2, Faction.NILFGAARD, Card(CombatRow.RANGE, 10) * 22, LeaderCard())
         self.environment = GameEnvironment(self.player1, self.player2)
         self.environment.init()
 

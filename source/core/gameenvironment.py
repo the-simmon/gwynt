@@ -6,7 +6,7 @@ from copy import deepcopy
 from typing import Tuple, Dict, Optional
 
 from source.core.board import Board
-from source.core.card import Ability
+from source.core.card import Ability, LeaderAbility
 from source.core.card import Card
 from source.core.comabt_row import CombatRow
 from source.core.faction_abililty import nilfgaard_check_draw, northern_realms_check_extra_card, \
@@ -30,6 +30,7 @@ class GameEnvironment:
         self.board = Board(player1, player2, self)
         self.current_round = 0
         self.passed: Dict[int, bool] = {player1.id: False, player2.id: False}
+        self.passiv_leader_ability = LeaderAbility.NONE
 
     def init(self):
         self.current_player = scoiatael_decide_starting_player(self)

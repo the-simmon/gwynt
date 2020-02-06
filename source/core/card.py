@@ -61,7 +61,7 @@ class Card:
 
 
 class LeaderAbility(enum.Enum):
-    NORMAL_CARD = 0
+    NONE = 0
     SPY_DAMAGE = 1
     GRAVEYARD2HAND = 2
     SWAP_CARDS = 3
@@ -75,11 +75,15 @@ class LeaderAbility(enum.Enum):
     OPTIMIZE_AGILE = 11
     FROST_DECK = 12
 
+    def passive(self):
+        return self.value is LeaderAbility.SPY_DAMAGE or self.value is LeaderAbility.RANDOM_MEDIC or \
+               self.value is LeaderAbility.BLOCK_LEADER or self.value is LeaderAbility.EXTRA_CARD
+
 
 class LeaderCard(Card):
 
     def __init__(self, combat_row: CombatRow = CombatRow.NONE, damage: int = 0, ability: Ability = Ability.NONE,
                  hero: bool = False, muster: Muster = Muster.NONE,
-                 leader_ability: LeaderAbility = LeaderAbility.NORMAL_CARD):
+                 leader_ability: LeaderAbility = LeaderAbility.NONE):
         super(LeaderCard, self).__init__(combat_row, damage, ability, hero, muster)
         self.leader_ability = leader_ability

@@ -1,7 +1,7 @@
 import unittest
 
 from source.core.board import Board
-from source.core.card import Card, Ability, Muster
+from source.core.card import Card, Ability, Muster, LeaderCard
 from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Faction, Player
@@ -12,16 +12,16 @@ class BoardTest(unittest.TestCase):
 
     def setUp(self):
         self.player1_deck_cards = [Card(CombatRow.CLOSE, 4, Ability.NONE), Card(CombatRow.CLOSE, 5, Ability.NONE)]
-        self.player1 = Player(0, Faction.NILFGAARD, self.player1_deck_cards)
+        self.player1 = Player(0, Faction.NILFGAARD, self.player1_deck_cards, LeaderCard())
         self.player1_active_card = Card(CombatRow.RANGE, 9)
         self.player1.hand.add(self.player1_active_card.combat_row, self.player1_active_card)
 
         self.player2_muster_cards = Card(CombatRow.CLOSE, 8, Ability.MUSTER, muster=Muster.NEKKER) * 3
         self.player2_deck_cards = [Card(CombatRow.CLOSE, 3, Ability.NONE)] + self.player2_muster_cards
-        self.player2 = Player(1, Faction.NOTHERN_REALMS, self.player2_deck_cards)
+        self.player2 = Player(1, Faction.NOTHERN_REALMS, self.player2_deck_cards, LeaderCard())
         self.player2.hand.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 0))
 
-        dummy_player = Player(0, Faction.NILFGAARD, [])
+        dummy_player = Player(0, Faction.NILFGAARD, [], LeaderCard())
         self.board = Board(self.player1, self.player2, GameEnvironment(dummy_player, dummy_player))
 
     def test_weather_card(self):
