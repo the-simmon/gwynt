@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from copy import deepcopy
-from typing import DefaultDict, List, TYPE_CHECKING
+from typing import DefaultDict, List
 
 from source.core.card import Card, Ability
 from source.core.cardcollection import CardCollection
@@ -11,18 +11,14 @@ from source.core.faction_abililty import monster_ability_get_card_to_survive
 from source.core.player import Player
 from source.core.weather import Weather
 
-if TYPE_CHECKING:
-    from source.core.gameenvironment import GameEnvironment
-
 
 class Board:
 
-    def __init__(self, player1: Player, player2: Player, environment: GameEnvironment):
+    def __init__(self, player1: Player, player2: Player):
         self.cards: DefaultDict[int, CardCollection] = defaultdict(lambda: CardCollection(cards=[]))
         self.weather: List[Weather] = [Weather.CLEAR]
         self.player1 = player1
         self.player2 = player2
-        self.environment = environment
 
     def get_player(self, player: Player) -> Player:
         if player.id is self.player1.id:

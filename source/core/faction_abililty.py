@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import random
-from tkinter import messagebox
 from operator import xor
+from tkinter import messagebox
 from typing import Optional, TYPE_CHECKING
 
 from source.core.card import Card
