@@ -20,7 +20,7 @@ class BoardTest(unittest.TestCase):
         self.player2 = Player(1, Faction.NOTHERN_REALMS, self.player2_deck_cards, LeaderCard())
         self.player2.hand.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 0))
 
-        self.board = Board(self.player1, self.player2)
+        self.board = Board(self.player1, self.player2, [])
 
     def test_weather_card(self):
         self.board.add(self.player1, CombatRow.SPECIAL, Card(CombatRow.SPECIAL, 0, Ability.FOG))

@@ -3,10 +3,10 @@ from __future__ import annotations
 import enum
 import random
 from copy import deepcopy
-from typing import Tuple, Dict, Optional
+from typing import Tuple, Dict, Optional, List
 
 from source.core.board import Board
-from source.core.card import Ability
+from source.core.card import Ability, LeaderCard, LeaderAbility
 from source.core.card import Card
 from source.core.comabt_row import CombatRow
 from source.core.faction_abililty import nilfgaard_check_draw, northern_realms_check_extra_card, \
@@ -27,9 +27,24 @@ class GameEnvironment:
         self.player2 = player2
         self.current_player = None
         self.current_card_source = CardSource.HAND
-        self.board = Board(player1, player2)
+
+        # Leader card 'Emhyr var Emreis: The White Flame'
+        self.block_leader = False
+        passive_leaders = self._check_passive_leaders()
+        self.board = Board(player1, player2, passive_leaders)
+
         self.current_round = 0
         self.passed: Dict[int, bool] = {player1.id: False, player2.id: False}
+
+    def _check_passive_leaders(self) -> List[LeaderCard]:
+        result = []
+        for player in [self.player1, self.player2]:
+            if player.leader.is_passive() and not self.block_leader:
+                result.append(player.leader)
+                if player.leader.ability is LeaderAbility.BLOCK_LEADER:
+                    self.block_leader = True
+                    result = [player.leader]
+        return result
 
     def init(self):
         self.current_player = scoiatael_decide_starting_player(self)
