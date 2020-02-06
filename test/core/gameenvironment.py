@@ -1,9 +1,9 @@
 import unittest
 
-from source.core.card import Card, LeaderCard
+from source.core.card import Card, LeaderCard, LeaderAbility
 from source.core.cardcollection import CardCollection
 from source.core.comabt_row import CombatRow
-from source.core.gameenvironment import GameEnvironment, CardSource
+from source.core.gameenvironment import GameEnvironment, CardSource, PassiveLeaderState
 from source.core.player import Player, Faction
 
 
@@ -50,3 +50,39 @@ class GameEnvironmentTest(unittest.TestCase):
 
         actual = self.environment.step(self.player2, card.combat_row, card)
         self.assertCountEqual((True, self.player2, CardSource.HAND), actual)
+
+
+class PassiveLeaderStateTest(unittest.TestCase):
+
+    def setUp(self):
+        self.state = PassiveLeaderState()
+
+    def test_no_leader(self):
+        self.assertEqual(False, self.state.block_leader)
+        self.assertEqual(False, self.state.random_medic)
+        self.assertCountEqual([], self.state.leaders_ability)
+
+    def test_active_leader(self):
+        self.state.check_leader(LeaderCard())
+        self.assertEqual(False, self.state.block_leader)
+        self.assertEqual(False, self.state.random_medic)
+        self.assertCountEqual([], self.state.leaders_ability)
+
+    def test_block_leader(self):
+        self.state.check_leader(LeaderCard(leader_ability=LeaderAbility.BLOCK_LEADER))
+        self.assertEqual(True, self.state.block_leader)
+        self.assertEqual(False, self.state.random_medic)
+        self.assertCountEqual([LeaderAbility.BLOCK_LEADER], self.state.leaders_ability)
+
+    def test_random_medic(self):
+        self.state.check_leader(LeaderCard(leader_ability=LeaderAbility.RANDOM_MEDIC))
+        self.assertEqual(False, self.state.block_leader)
+        self.assertEqual(True, self.state.random_medic)
+        self.assertCountEqual([LeaderAbility.RANDOM_MEDIC], self.state.leaders_ability)
+
+    def test_block_leader_with_medic(self):
+        self.state.check_leader(LeaderCard(leader_ability=LeaderAbility.RANDOM_MEDIC))
+        self.state.check_leader(LeaderCard(leader_ability=LeaderAbility.BLOCK_LEADER))
+        self.assertEqual(True, self.state.block_leader)
+        self.assertEqual(False, self.state.random_medic)
+        self.assertCountEqual([LeaderAbility.BLOCK_LEADER], self.state.leaders_ability)

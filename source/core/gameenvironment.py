@@ -32,15 +32,17 @@ class PassiveLeaderState:
     def check_leader(self, leader: LeaderCard):
         if leader.is_passive() and not self.block_leader:
             self.leaders_ability.append(leader.leader_ability)
-            if leader.ability is LeaderAbility.BLOCK_LEADER:
+            if leader.leader_ability is LeaderAbility.BLOCK_LEADER:
                 self._set_block_leader()
+            elif leader.leader_ability is LeaderAbility.RANDOM_MEDIC:
+                self._set_random_medic()
 
     def _set_block_leader(self):
         self.block_leader = True
         self.random_medic = False
         self.leaders_ability = [LeaderAbility.BLOCK_LEADER]
 
-    def set_random_medic(self):
+    def _set_random_medic(self):
         self.random_medic = True
 
 
