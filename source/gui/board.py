@@ -47,7 +47,8 @@ class Board(tk.Frame):
 
             enable_clicking = player.id is self.player.id
 
-            cards = [card_collection.get_damage_adjusted_cards(row, self.board.weather) for row in combat_row_sorting]
+            cards = [card_collection.get_damage_adjusted_cards(row, self.board.weather, self.board.passive_leaders) for
+                     row in combat_row_sorting]
             for card_list, row in zip(cards, combat_row_sorting):
                 self._draw_row(card_list, player, row, enable_clicking).pack(in_=frame)
 

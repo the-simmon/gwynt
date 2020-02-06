@@ -80,7 +80,8 @@ class Game(tk.Frame):
 
         for player in [core_board.get_enemy_player(self.player), self.player]:
             for row in combat_row_sorting:
-                damage = core_board.cards[player.id].calculate_damage_for_row(row, core_board.weather)
+                damage = core_board.cards[player.id].calculate_damage_for_row(row, core_board.weather,
+                                                                              core_board.passive_leaders)
                 label = tk.Label(self.damage_frame, text=F'{row.name}: {damage}')
                 label.pack()
 

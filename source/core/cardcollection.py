@@ -2,7 +2,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import DefaultDict, List, Callable
 
-from source.core.card import Card, Ability
+from source.core.card import Card, Ability, LeaderCard
 from source.core.comabt_row import CombatRow
 from source.core.weather import Weather
 
@@ -21,17 +21,19 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
     def remove(self, row: CombatRow, card: Card):
         self[row].remove(card)
 
-    def calculate_damage(self, weather: List[Weather]) -> int:
+    def calculate_damage(self, weather: List[Weather], passive_leaders: List[LeaderCard]) -> int:
         result = 0
         for row, cards in self.items():
-            result += self.calculate_damage_for_row(row, weather)
+            result += self.calculate_damage_for_row(row, weather, passive_leaders)
         return result
 
-    def calculate_damage_for_row(self, row: CombatRow, weather: List[Weather]) -> int:
+    def calculate_damage_for_row(self, row: CombatRow, weather: List[Weather],
+                                 passive_leaders: List[LeaderCard]) -> int:
         cards = _calculate_damage_for_row(self[row], row, weather)
         return sum([card.damage for card in cards])
 
-    def get_damage_adjusted_cards(self, row: CombatRow, weather: List[Weather]) -> List[Card]:
+    def get_damage_adjusted_cards(self, row: CombatRow, weather: List[Weather], passive_leaders: List[LeaderCard]) -> \
+            List[Card]:
         return _calculate_damage_for_row(self[row], row, weather)
 
     def get_all_cards(self) -> List[Card]:
