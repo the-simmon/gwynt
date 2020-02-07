@@ -206,7 +206,10 @@ class _PossibleCardsTracker:
                 not_played_cards = self.get_available_cards()
                 result = list(set(not_played_cards))
         else:
+            # leader ability
             result = self.environment.current_player.graveyard.get_all_cards()
+            if self.environment.passive_leader_state.random_medic:
+                result = [random.choice(result)]
 
         return result
 

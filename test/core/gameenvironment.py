@@ -109,6 +109,13 @@ class PossibleCardsTrackerTest(unittest.TestCase):
         self.player1_cards[0] = Card(CombatRow.CLOSE, 1)
         self.player1_cards[1] = Card(CombatRow.CLOSE, 2)
         self.player1_cards[2] = Card(CombatRow.CLOSE, 2, Ability.SPY)
+        self.player1_cards[3] = Card(CombatRow.RANGE, 2)
+        self.player1_cards[4] = Card(CombatRow.CLOSE, 6)
+        self.player1_cards[5] = Card(CombatRow.SIEGE, 6)
+        self.player1_cards[6] = Card(CombatRow.CLOSE, 2)
+        self.player1_cards[7] = Card(CombatRow.CLOSE, 5)
+        self.player1_cards[8] = Card(CombatRow.CLOSE, 5)
+        self.player1_cards[9] = Card(CombatRow.RANGE, 2)
 
         self.player1.hand = CardCollection(self.player1_cards[:10])
         self.environment.current_player = self.player1
@@ -136,3 +143,31 @@ class PossibleCardsTrackerTest(unittest.TestCase):
     def test_get_hand_count(self):
         actual = self.tracker.get_hand_count()
         self.assertEqual(8, actual)
+
+    def test_get_possible_cards(self):
+        actual = self.tracker.get_possible_cards(False)
+        self.assertCountEqual(self.player1_cards[2:10], actual)
+
+    def test_get_possible_cards_obfuscate(self):
+        actual = self.tracker.get_possible_cards(True)
+        self.assertCountEqual(set(self.player1_cards[2:]), actual)
+
+    def test_get_possible_cards_medic(self):
+        self.environment.current_card_source = CardSource.GRAVEYARD
+        self.player1.graveyard = CardCollection(
+            [Card(CombatRow.CLOSE, 6), Card(CombatRow.SIEGE, 6), Card(CombatRow.CLOSE, 2)])
+
+        expected = self.player1.graveyard.get_all_cards()
+        actual = self.tracker.get_possible_cards(False)
+        self.assertCountEqual(expected, actual)
+
+    @patch('random.choice', lambda x: x[0])
+    def test_get_possible_cards_random_medic_leader(self):
+        self.environment.current_card_source = CardSource.GRAVEYARD
+        self.environment.passive_leader_state.random_medic = True
+        self.player1.graveyard = CardCollection(
+            [Card(CombatRow.CLOSE, 6), Card(CombatRow.SIEGE, 6), Card(CombatRow.CLOSE, 2)])
+
+        expected = self.player1.graveyard.get_all_cards()[0]
+        actual = self.tracker.get_possible_cards(False)
+        self.assertCountEqual([expected], actual)
