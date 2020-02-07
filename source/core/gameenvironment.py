@@ -8,6 +8,7 @@ from typing import Tuple, Dict, Optional, List
 from source.core.board import Board
 from source.core.card import Ability, LeaderCard, LeaderAbility
 from source.core.card import Card
+from source.core.cards.util import get_cards
 from source.core.comabt_row import CombatRow
 from source.core.faction_abililty import nilfgaard_check_draw, northern_realms_check_extra_card, \
     scoiatael_decide_starting_player
@@ -60,6 +61,7 @@ class GameEnvironment:
 
         self.current_round = 0
         self.passed: Dict[int, bool] = {player1.id: False, player2.id: False}
+        self.played_cards: Dict[int, List[Card]] = {player1.id: [], player2.id: []}
 
     def _check_passive_leaders(self) -> List[LeaderAbility]:
         for player in [self.player1, self.player2]:
@@ -90,6 +92,7 @@ class GameEnvironment:
             else:
                 player.graveyard.remove(card.combat_row, card)
             self.board.add(player, row, card)
+            self.played_cards[player.id].append(card)
 
         self._end_of_step(player, card)
         return self.game_over(), self.current_player, self.current_card_source
@@ -101,6 +104,9 @@ class GameEnvironment:
         self.board.add(player, row, decoy)
 
         self.board.remove(player, row, replace_card, ignore_graveyard=True)
+        if replace_card in self.played_cards[player.id]:
+            self.played_cards[player.id].remove(replace_card)
+
         self._end_of_step(player, decoy)
         return self.game_over(), self.current_player, self.current_card_source
 
@@ -183,3 +189,38 @@ class GameEnvironment:
         copy.current_card_source = deepcopy(self.current_card_source)
         copy.current_round = deepcopy(self.current_round)
         return copy
+
+
+class _PossibleCardsTracker:
+
+    def __init__(self, environment: GameEnvironment):
+        self.environment = environment
+
+    def get_possible_cards(self, obfuscate: bool) -> List[Card]:
+        """Returns all cards current player can play. If obfuscate is true, the hand is ignored and only not played
+        cards are returned """
+        if self.environment.current_card_source is CardSource.HAND:
+            if not obfuscate:
+                result = self.environment.current_player.hand.get_all_cards()
+            else:
+                not_played_cards = self.get_available_cards()
+                result = list(set(not_played_cards))
+        else:
+            result = self.environment.current_player.graveyard.get_all_cards()
+
+        return result
+
+    def get_available_cards(self) -> List[Card]:
+        environment = self.environment
+        all_cards = get_cards(environment.current_player.faction)
+        played_cards = environment.played_cards[environment.current_player.id]
+        played_cards.extend(environment.current_player.graveyard.get_all_cards())
+
+        for card in played_cards:
+            if card in all_cards:
+                all_cards.remove(card)
+
+        return all_cards
+
+    def get_hand_count(self) -> int:
+        return len(self.environment.current_player.hand.get_all_cards())

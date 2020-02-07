@@ -59,6 +59,10 @@ class Card:
     def __mul__(self, count: int):
         return [deepcopy(self) for _ in range(count)]
 
+    def __str__(self):
+        return str(self.combat_row) + ' ' + str(self.damage) + ' ' + str(self.ability) + ' ' + str(
+            self.hero) + ' ' + str(self.muster)
+
 
 class LeaderAbility(enum.Enum):
     NONE = 0
