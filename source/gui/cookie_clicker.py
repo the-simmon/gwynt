@@ -6,7 +6,7 @@ from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 
-_MCTS = Callable[[Player, CardSource], Awaitable[Tuple[bool, Player, CardSource]]]
+_MCTS = Callable[[Player], Awaitable[Tuple[bool, Player, CardSource]]]
 _UPDATE_GUI = Callable[[], Awaitable]
 
 
@@ -62,7 +62,7 @@ class CookieClicker:
             game_over, current_player, card_source = self.environment.step(player, row, clicked_card)
             await self.update_ui()
             if current_player is not player:
-                await self._run_mcts(game_over, current_player, card_source)
+                await self._run_mcts(game_over, current_player)
 
     def pass_click(self, player: Player):
         """Wrapper function because tkinter cant execute coroutine directly"""
@@ -73,10 +73,10 @@ class CookieClicker:
             game_over, current_player, card_source = self.environment.step(player, None, None)
             await self.update_ui()
             if current_player is not player:
-                await self._run_mcts(game_over, current_player, card_source)
+                await self._run_mcts(game_over, current_player)
 
-    async def _run_mcts(self, game_over: bool, player: Player, card_source: CardSource):
+    async def _run_mcts(self, game_over: bool, player: Player):
         current_player = player
         # play enemy cards
         while current_player is player and not game_over:
-            game_over, current_player, card_source = await self.mcts(current_player, card_source)
+            game_over, current_player, card_source = await self.mcts(current_player)

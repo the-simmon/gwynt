@@ -10,7 +10,7 @@ from source.core.player import Player
 
 class MCTS:
 
-    def __init__(self, environment: GameEnvironment, player: Player, card_source, max_time=5):
+    def __init__(self, environment: GameEnvironment, player: Player, max_time=5):
         self.environment = environment
         self.player = player
         self.max_time = max_time

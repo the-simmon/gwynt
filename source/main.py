@@ -45,23 +45,21 @@ class Main:
             await self._run_mcts_both_players(self.environment.next_player)
         else:
             while self.environment.next_player is not self.player1:
-                await self._run_async_mcts(self.environment.next_player, self.environment.next_card_source)
+                await self._run_async_mcts(self.environment.next_player)
 
     async def _run_mcts_both_players(self, current_player: Player, card_source: CardSource = CardSource.HAND):
         game_over = False
 
         while not game_over:
-            game_over, current_player, card_source = await self._run_async_mcts(current_player, card_source)
+            game_over, current_player, card_source = await self._run_async_mcts(current_player)
 
-    async def _run_async_mcts(self, current_player: Player, card_source: CardSource = CardSource.HAND) \
-            -> Tuple[bool, Player, CardSource]:
-        result = await asyncio.get_event_loop().run_in_executor(None, self._run_mcts, current_player, card_source)
+    async def _run_async_mcts(self, current_player: Player) -> Tuple[bool, Player, CardSource]:
+        result = await asyncio.get_event_loop().run_in_executor(None, self._run_mcts, current_player)
         await self._update_gui()
         return result
 
-    def _run_mcts(self, current_player: Player, card_source: CardSource = CardSource.HAND) \
-            -> Tuple[bool, Player, CardSource]:
-        mcts = MCTS(self.environment, current_player, card_source)
+    def _run_mcts(self, current_player: Player) -> Tuple[bool, Player, CardSource]:
+        mcts = MCTS(self.environment, current_player)
         card, row, replaced_card = mcts.run()
         if card and card.ability is Ability.DECOY:
             game_over, current_player, card_source = self.environment.step_decoy(current_player, row, card,
