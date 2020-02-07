@@ -6,7 +6,7 @@ from typing import List, Dict
 from source.core.board import Board as CoreBoard
 from source.core.card import Card as CoreCard
 from source.core.comabt_row import CombatRow
-from source.core.gameenvironment import CardSource
+from source.core.gameenvironment import CardSource, GameEnvironment
 from source.core.player import Player
 from source.gui.card import Card
 from source.gui.cookie_clicker import CookieClicker
@@ -16,8 +16,9 @@ class Board(tk.Frame):
     WIDTH = 1920 / 2
     HEIGHT = 1080
 
-    def __init__(self, board: CoreBoard, player: Player, clicker: CookieClicker):
+    def __init__(self, environment: GameEnvironment, board: CoreBoard, player: Player, clicker: CookieClicker):
         super().__init__(width=Board.WIDTH, height=Board.HEIGHT)
+        self.environment = environment
         self.board = board
         self.player = player
         self.clicker = clicker
@@ -53,10 +54,10 @@ class Board(tk.Frame):
                 self._draw_row(card_list, player, row, enable_clicking).pack(in_=frame)
 
             if player.id is self.player.id:
-                if card_source is CardSource.HAND:
-                    cards = player.hand.get_all_cards()
+                if self.environment.next_player.id is self.player.id:
+                    cards = self.environment.card_tracker.get_possible_cards(False)
                 else:
-                    cards = player.graveyard.get_all_cards()
+                    cards = self.player.hand.get_all_cards()
                 self._draw_row(cards, player, None, True).pack(in_=frame)
             combat_row_sorting.reverse()
 

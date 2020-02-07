@@ -18,7 +18,7 @@ class Game(tk.Frame):
         self.environment = environment
         self.player = player
         self.clicker = clicker
-        self.board = Board(environment.board, player, clicker)
+        self.board = Board(environment, environment.board, player, clicker)
 
         self.info_frame = tk.Frame(self)
         self.info_frame.grid(column=0, row=0, padx=5)
