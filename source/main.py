@@ -42,10 +42,10 @@ class Main:
         await self._update_gui()
 
         if simulate_both_players:
-            await self._run_mcts_both_players(self.environment.current_player)
+            await self._run_mcts_both_players(self.environment.next_player)
         else:
-            while self.environment.current_player is not self.player1:
-                await self._run_async_mcts(self.environment.current_player, self.environment.current_card_source)
+            while self.environment.next_player is not self.player1:
+                await self._run_async_mcts(self.environment.next_player, self.environment.next_card_source)
 
     async def _run_mcts_both_players(self, current_player: Player, card_source: CardSource = CardSource.HAND):
         game_over = False

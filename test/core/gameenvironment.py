@@ -24,7 +24,7 @@ class GameEnvironmentTest(unittest.TestCase):
     def test_step(self):
         expected = (False, self.player2, CardSource.HAND)
         card = self.player1.hand[CombatRow.CLOSE][0]
-        self.environment.current_player = self.player1
+        self.environment.next_player = self.player1
         actual = self.environment.step(self.player1, card.combat_row, card)
         self.assertCountEqual(expected, actual)
 
@@ -32,7 +32,7 @@ class GameEnvironmentTest(unittest.TestCase):
         card = self.player1.hand[CombatRow.CLOSE][0]
         self.environment.step(self.player1, card.combat_row, card)
 
-        self.environment.current_player = self.player1
+        self.environment.next_player = self.player1
         actual = self.environment.step(self.player1, None, None)
         self.assertCountEqual((False, self.player2, CardSource.HAND), actual)
 
@@ -46,7 +46,7 @@ class GameEnvironmentTest(unittest.TestCase):
         self.player1.hand = CardCollection([card])
         self.player2.hand = CardCollection([card])
 
-        self.environment.current_player = self.player1
+        self.environment.next_player = self.player1
         actual = self.environment.step(self.player1, card.combat_row, card)
         self.assertCountEqual((False, self.player2, CardSource.HAND), actual)
 
@@ -116,12 +116,12 @@ class PossibleCardsTrackerTest(unittest.TestCase):
         self.player1_cards[9] = Card(CombatRow.RANGE, 2)
 
         self.player1.hand = CardCollection(self.player1_cards[:10])
-        self.environment.current_player = self.player1
+        self.environment.next_player = self.player1
 
         self.environment.step(self.player1, self.player1_cards[0].combat_row, self.player1_cards[0])
-        self.environment.current_player = self.player1
+        self.environment.next_player = self.player1
         self.environment.step(self.player1, self.player1_cards[1].combat_row, self.player1_cards[1])
-        self.environment.current_player = self.player1
+        self.environment.next_player = self.player1
 
     def test_get_available_cards(self):
         self.player1_cards.pop(0)
@@ -131,16 +131,12 @@ class PossibleCardsTrackerTest(unittest.TestCase):
 
     def test_get_available_cards_spy(self):
         self.environment.step(self.player1, self.player1_cards[2].combat_row, self.player1_cards[2])
-        self.environment.current_player = self.player1
+        self.environment.next_player = self.player1
         self.player1_cards.pop(0)
         self.player1_cards.pop(1)
         self.player1_cards.pop(2)
         actual = self.tracker.get_available_cards()
         self.assertCountEqual(self.player1_cards, actual)
-
-    def test_get_hand_count(self):
-        actual = self.tracker.get_hand_count()
-        self.assertEqual(8, actual)
 
     def test_get_possible_cards(self):
         actual = self.tracker.get_possible_cards(False)
@@ -151,7 +147,7 @@ class PossibleCardsTrackerTest(unittest.TestCase):
         self.assertCountEqual(set(self.player1_cards[2:]), actual)
 
     def test_get_possible_cards_medic(self):
-        self.environment.current_card_source = CardSource.GRAVEYARD
+        self.environment.next_card_source = CardSource.GRAVEYARD
         self.player1.graveyard = CardCollection(
             [Card(CombatRow.CLOSE, 6), Card(CombatRow.SIEGE, 6), Card(CombatRow.CLOSE, 2)])
 
@@ -161,7 +157,7 @@ class PossibleCardsTrackerTest(unittest.TestCase):
 
     @patch('random.choice', lambda x: x[0])
     def test_get_possible_cards_random_medic_leader(self):
-        self.environment.current_card_source = CardSource.GRAVEYARD
+        self.environment.next_card_source = CardSource.GRAVEYARD
         self.environment.passive_leader_state.random_medic = True
         self.player1.graveyard = CardCollection(
             [Card(CombatRow.CLOSE, 6), Card(CombatRow.SIEGE, 6), Card(CombatRow.CLOSE, 2)])

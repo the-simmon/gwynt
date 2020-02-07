@@ -52,12 +52,14 @@ class GameEnvironment:
     def __init__(self, player1: Player, player2: Player):
         self.player1 = player1
         self.player2 = player2
-        self.current_player = None
-        self.current_card_source = CardSource.HAND
+        self.next_player = None
+        self.next_card_source = CardSource.HAND
 
         self.passive_leader_state = PassiveLeaderState()
         passive_leaders = self._check_passive_leaders()
         self.board = Board(player1, player2, passive_leaders)
+
+        self.card_tracker = _PossibleCardsTracker(self)
 
         self.current_round = 0
         self.passed: Dict[int, bool] = {player1.id: False, player2.id: False}
@@ -69,7 +71,7 @@ class GameEnvironment:
         return self.passive_leader_state.leaders_ability
 
     def init(self):
-        self.current_player = scoiatael_decide_starting_player(self)
+        self.next_player = scoiatael_decide_starting_player(self)
         self._chose_hand()
 
     def _chose_hand(self):
@@ -87,7 +89,7 @@ class GameEnvironment:
     def step(self, player: Player, row: Optional[CombatRow], card: Optional[Card]) -> Tuple[bool, Player, CardSource]:
         # card == None => player passes
         if card:
-            if self.current_card_source is CardSource.HAND:
+            if self.next_card_source is CardSource.HAND:
                 player.hand.remove(card.combat_row, card)
             else:
                 player.graveyard.remove(card.combat_row, card)
@@ -95,7 +97,7 @@ class GameEnvironment:
             self.played_cards[player.id].append(card)
 
         self._end_of_step(player, card)
-        return self.game_over(), self.current_player, self.current_card_source
+        return self.game_over(), self.next_player, self.next_card_source
 
     def step_decoy(self, player: Player, row: CombatRow, decoy: Card, replace_card: Card) \
             -> Tuple[bool, Player, CardSource]:
@@ -108,16 +110,16 @@ class GameEnvironment:
             self.played_cards[player.id].remove(replace_card)
 
         self._end_of_step(player, decoy)
-        return self.game_over(), self.current_player, self.current_card_source
+        return self.game_over(), self.next_player, self.next_card_source
 
     def _end_of_step(self, player: Player, card: Card):
         if len(player.hand.get_all_cards()) == 0 or not card:
             self.passed[player.id] = True
 
-        self.current_player, self.current_card_source = self._determine_current_player(card, player)
+        self.next_player, self.next_card_source = self._determine_current_player(card, player)
 
         if self.round_over():
-            self.current_player, self.current_card_source = self._end_of_round()
+            self.next_player, self.next_card_source = self._end_of_round()
 
     def round_over(self):
         return all(self.passed.values())
@@ -142,7 +144,7 @@ class GameEnvironment:
         player1_damage = self.board.calculate_damage(self.player1)
         player2_damage = self.board.calculate_damage(self.player2)
 
-        current_player = self.current_player
+        current_player = self.next_player
         if player1_damage > player2_damage:
             self.player1.rounds_won += 1
             current_player = self.player1
@@ -165,11 +167,11 @@ class GameEnvironment:
 
     def _determine_current_player(self, played_card: Card, player: Player) -> Tuple[Player, CardSource]:
         if played_card and played_card.ability is Ability.MEDIC and len(player.graveyard.get_all_cards()):
-            result = self.current_player, CardSource.GRAVEYARD
+            result = self.next_player, CardSource.GRAVEYARD
         else:
-            enemy = self.board.get_enemy_player(self.current_player)
+            enemy = self.board.get_enemy_player(self.next_player)
             if self.passed[enemy.id]:
-                result = self.current_player, CardSource.HAND
+                result = self.next_player, CardSource.HAND
             else:
                 result = enemy, CardSource.HAND
 
@@ -184,9 +186,9 @@ class GameEnvironment:
         board.cards = deepcopy(self.board.cards)
         board.weather = deepcopy(self.board.weather)
 
-        copy.current_player = copy.board.get_player(self.current_player)
+        copy.next_player = copy.board.get_player(self.next_player)
         copy.passed = deepcopy(self.passed)
-        copy.current_card_source = deepcopy(self.current_card_source)
+        copy.next_card_source = deepcopy(self.next_card_source)
         copy.current_round = deepcopy(self.current_round)
         return copy
 
@@ -199,15 +201,15 @@ class _PossibleCardsTracker:
     def get_possible_cards(self, obfuscate: bool) -> List[Card]:
         """Returns all cards current player can play. If obfuscate is true, the hand is ignored and only not played
         cards are returned """
-        if self.environment.current_card_source is CardSource.HAND:
+        if self.environment.next_card_source is CardSource.HAND:
             if not obfuscate:
-                result = self.environment.current_player.hand.get_all_cards()
+                result = self.environment.next_player.hand.get_all_cards()
             else:
                 not_played_cards = self.get_available_cards()
                 result = list(set(not_played_cards))
         else:
             # leader ability
-            result = self.environment.current_player.graveyard.get_all_cards()
+            result = self.environment.next_player.graveyard.get_all_cards()
             if self.environment.passive_leader_state.random_medic:
                 result = [random.choice(result)]
 
@@ -215,15 +217,12 @@ class _PossibleCardsTracker:
 
     def get_available_cards(self) -> List[Card]:
         environment = self.environment
-        all_cards = get_cards(environment.current_player.faction)
-        played_cards = environment.played_cards[environment.current_player.id]
-        played_cards.extend(environment.current_player.graveyard.get_all_cards())
+        all_cards = get_cards(environment.next_player.faction)
+        played_cards = environment.played_cards[environment.next_player.id]
+        played_cards.extend(environment.next_player.graveyard.get_all_cards())
 
         for card in played_cards:
             if card in all_cards:
                 all_cards.remove(card)
 
         return all_cards
-
-    def get_hand_count(self) -> int:
-        return len(self.environment.current_player.hand.get_all_cards())

@@ -9,7 +9,7 @@ master = tk.Tk()
 player1 = Player(0, Faction.NILFGAARD, get_cards(Faction.NILFGAARD))
 player2 = Player(1, Faction.NOTHERN_REALMS, get_cards(Faction.NOTHERN_REALMS))
 environment = GameEnvironment(player1, player2)
-environment.current_player = player1
+environment.next_player = player1
 card = player1.hand.get_all_cards()[0]
 environment.step(player1, card.combat_row, card)
 

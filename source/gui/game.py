@@ -32,7 +32,7 @@ class Game(tk.Frame):
         self._clear_frame()
         self._draw_info_frame()
         self._draw_damage_frame()
-        self.board.redraw(self.environment.current_card_source)
+        self.board.redraw(self.environment.next_card_source)
 
     def _clear_frame(self):
         for widget in self.damage_frame.winfo_children():
@@ -52,7 +52,7 @@ class Game(tk.Frame):
         tk.Label(self.info_frame, text=f'Enemy: {enemy.rounds_won}').pack()
         tk.Label(self.info_frame, text=f'Self: {self.player.rounds_won}').pack()
 
-        current_player = 'Self' if self.environment.current_player.id == self.player.id else 'Enemy'
+        current_player = 'Self' if self.environment.next_player.id == self.player.id else 'Enemy'
         tk.Label(self.info_frame, text=f'Current player: {current_player}').pack()
         tk.Label(self.info_frame, text=f'Enemy cards: {len(enemy.hand.get_all_cards())}').pack()
 

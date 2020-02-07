@@ -33,7 +33,7 @@ class CookieClicker:
 
     async def _decoy(self, replace: Card, row: CombatRow):
         decoy = self._last_clicked_card
-        if self.environment.current_player is self._last_clicked_player:
+        if self.environment.next_player is self._last_clicked_player:
             game_over, current_player, card_source = self.environment.step_decoy(self._last_clicked_player, row, decoy,
                                                                                  replace)
             await self.update_ui()
@@ -58,7 +58,7 @@ class CookieClicker:
         else:
             possible_rows = []
 
-        if self.environment.current_player is player and row in possible_rows:
+        if self.environment.next_player is player and row in possible_rows:
             game_over, current_player, card_source = self.environment.step(player, row, clicked_card)
             await self.update_ui()
             if current_player is not player:
@@ -69,7 +69,7 @@ class CookieClicker:
         asyncio.create_task(self._async_pass_click(player))
 
     async def _async_pass_click(self, player: Player):
-        if self.environment.current_player is player:
+        if self.environment.next_player is player:
             game_over, current_player, card_source = self.environment.step(player, None, None)
             await self.update_ui()
             if current_player is not player:

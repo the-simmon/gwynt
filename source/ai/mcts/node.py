@@ -5,14 +5,13 @@ import random
 import sys
 from copy import deepcopy
 from enum import Enum
-from typing import List, Tuple, Dict, Optional
+from typing import List, Optional
 
 from source.ai.random_simulator import simulate_random_game
 from source.core.card import Card, Ability
 from source.core.cardcollection import CardCollection
-from source.core.cards.util import get_cards
 from source.core.comabt_row import CombatRow
-from source.core.gameenvironment import GameEnvironment, CardSource
+from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
 
 
@@ -28,17 +27,16 @@ class PlayerType(Enum):
 
 class Node:
 
-    def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, player: Player, card: Card,
-                 row: CombatRow, card_source: CardSource, played_cards: Dict[int, List[Card]],
-                 replaced_card: Optional[Card] = None):
+    def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, current_player: Player,
+                 card: Card, row: CombatRow, replaced_card: Optional[Card] = None):
         self.environment = environment
         self.parent = parent
-        self.player_type = player_type
-        self.next_player = player
+        self.current_player = current_player
+        self.current_player_type = player_type
+        self.next_player_type = self._get_next_player_type(self.environment.next_player)
+        self.next_player = self.environment.next_player
         self.card = card
         self.row = row
-        self.next_card_source = card_source
-        self.played_cards = played_cards
         # if the node represents a decoy, it must contain the replaced card
         self.replaced_card = replaced_card
 
@@ -91,47 +89,30 @@ class Node:
                         # enemy player gets all possible cards assigned
                         # for technical reasons, the card has to be added to the player
                         # (active cards will be overwritten in next node/ random simulation)
-                        if self.player_type is PlayerType.ENEMY:
+                        if self.next_player_type is PlayerType.ENEMY:
                             player_copy.hand.add(card.combat_row, card)
 
-                        game_over, next_player, card_source = environment_copy.step(player_copy, row, card)
+                        environment_copy.step(player_copy, row, card)
 
-                        player_type = self._get_next_player_type(next_player)
-
-                        played_cards = deepcopy(self.played_cards)
-                        played_cards[player_copy.id].append(card)
-
-                        node = Node(environment_copy, self, player_type, next_player, card, row,
-                                    deepcopy(card_source), played_cards)
+                        node = Node(environment_copy, self, self.next_player_type, self.next_player, card, row)
                         self.leafs.append(node)
 
     def _get_potential_cards(self) -> List[Card]:
-        if self.player_type is self._get_next_player_type(self.next_player):
-            result = self.next_player.hand.get_all_cards()
-        else:
-            not_played_cards, _ = self._get_available_cards(self.next_player)
-            result = list(set(not_played_cards))
-
-        if self.next_card_source is CardSource.HAND:
-            return result
-        return self.next_player.graveyard.get_all_cards()
+        obfuscate = self.next_player_type is PlayerType.ENEMY
+        return self.environment.card_tracker.get_possible_cards(obfuscate)
 
     def _get_next_player_type(self, next_player: Player) -> PlayerType:
-        player_type = deepcopy(self.player_type)
-        if next_player.id is not self.next_player.id:
-            player_type = deepcopy(self.player_type.invert())
+        player_type = deepcopy(self.current_player_type)
+        if next_player.id is not self.current_player.id:
+            player_type = deepcopy(self.current_player_type.invert())
         return player_type
 
     def _add_pass_node(self):
         environment_copy = deepcopy(self.environment)
         player_copy = environment_copy.board.get_player(self.next_player)
-        game_over, next_player, card_source = environment_copy.step(player_copy, None, None)
+        environment_copy.step(player_copy, None, None)
 
-        player_type = self._get_next_player_type(next_player)
-        played_cards = deepcopy(self.played_cards)
-
-        node = Node(environment_copy, self, player_type, next_player, None, None, deepcopy(card_source),
-                    played_cards)
+        node = Node(environment_copy, self, self.next_player_type, self.next_player, None, None)
         self.leafs.append(node)
 
     def _add_decoys(self, decoy: Card):
@@ -140,68 +121,36 @@ class Node:
                 if card.ability is not Ability.DECOY and card.ability is not Ability.SPECIAL_COMMANDERS_HORN and not card.hero:
                     environment_copy = deepcopy(self.environment)
                     player_copy = environment_copy.board.get_player(self.next_player)
-                    game_over, next_player, card_source = environment_copy.step_decoy(player_copy, row, decoy, card)
+                    environment_copy.step_decoy(player_copy, row, decoy, card)
 
-                    player_type = self._get_next_player_type(next_player)
-                    played_cards = deepcopy(self.played_cards)
-
-                    # enemy spies are not in played cards
-                    if card in played_cards:
-                        # remove card from played cards, as it returns to the players hand
-                        played_cards[player_copy.id].remove(card)
-                    played_cards[player_copy.id].append(decoy)
-
-                    node = Node(environment_copy, self, player_type, next_player, decoy, row, deepcopy(card_source),
-                                played_cards, card)
+                    node = Node(environment_copy, self, self.next_player_type, self.next_player, decoy, row)
                     self.leafs.append(node)
 
     def simulate(self):
         environment_copy = deepcopy(self.environment)
-        current_player = environment_copy.current_player
+        current_player = environment_copy.next_player
 
-        if self.player_type is PlayerType.SELF:
+        if self.next_player_type is PlayerType.SELF:
             player_to_add_cards = environment_copy.board.get_enemy_player(self.next_player)
         else:
             player_to_add_cards = environment_copy.board.get_player(self.next_player)
 
-        self._add_random_cards_to_enemy(environment_copy, player_to_add_cards)
-        winner = simulate_random_game(environment_copy, current_player, environment_copy.current_card_source)
+        self._add_random_cards_to_enemy(player_to_add_cards)
+        winner = simulate_random_game(environment_copy, current_player, environment_copy.next_card_source)
 
         self.backpropagate(winner)
 
-    def _add_random_cards_to_enemy(self, environment: GameEnvironment, player_to_add_cards: Player):
-        all_cards, total_hand = self._get_available_cards(player_to_add_cards)
+    def _add_random_cards_to_enemy(self, player_to_add_cards: Player):
+        all_cards = self.environment.card_tracker.get_possible_cards(True)
+        total_hand = len(player_to_add_cards.hand.get_all_cards())
         random.shuffle(all_cards)
 
-        number_of_played_cards = len(environment.board.cards[player_to_add_cards].get_all_cards())
-        player_to_add_cards.hand = CardCollection(all_cards[:total_hand - number_of_played_cards])
-        player_to_add_cards.deck = CardCollection(all_cards[total_hand:])
-
-    def _get_available_cards(self, player: Player) -> Tuple[List[Card], int]:
-        all_cards = get_cards(player.faction)
-        played_cards = self.played_cards[player.id]
-        played_cards.extend(player.graveyard.get_all_cards())
-        total_hand = 0
-
-        for card in played_cards:
-            if card in all_cards:
-                all_cards.remove(card)
-            if card.ability is Ability.SPY:
-                total_hand += 1
-            else:
-                total_hand -= 1
-
-        return all_cards, total_hand
+        player_to_add_cards.hand = CardCollection(all_cards[:total_hand + 1])
+        player_to_add_cards.deck = CardCollection(all_cards[total_hand + 1:])
 
     def backpropagate(self, winner: Player):
         self.simulations += 1
-
-        # self.card was not laid by self.next_player (as it is the next player to lay a card)
-        # if self.next_player wins, the enemy (relative to this node) won
-        # except the previous card was a medic (hence the CardSource.GRAVEYARD)
-        if winner and winner.id is not self.next_player.id and self.next_card_source is CardSource.HAND:
-            self.wins += 1
-        elif winner and winner.id is self.next_player.id and self.next_card_source is CardSource.GRAVEYARD:
+        if winner and winner.id is self.current_player.id:
             self.wins += 1
         if self.parent:
             self.parent.backpropagate(winner)
