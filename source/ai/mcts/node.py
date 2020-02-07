@@ -141,7 +141,7 @@ class Node:
             player_to_add_cards = environment_copy.board.get_player(self.next_player)
 
         self._add_random_cards_to_enemy(player_to_add_cards)
-        winner = simulate_random_game(environment_copy, current_player, environment_copy.next_card_source)
+        winner = simulate_random_game(environment_copy, current_player)
 
         self.backpropagate(winner)
 
