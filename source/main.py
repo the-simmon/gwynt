@@ -1,6 +1,5 @@
 import asyncio
 import random
-from typing import Tuple
 
 from source.ai.mcts.mcts import MCTS
 from source.core.card import Ability

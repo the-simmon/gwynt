@@ -1,9 +1,9 @@
 import asyncio
-from typing import Callable, Tuple, Awaitable
+from typing import Callable, Awaitable
 
 from source.core.card import Card, Ability
 from source.core.comabt_row import CombatRow
-from source.core.gameenvironment import GameEnvironment, CardSource
+from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
 
 _MCTS = Callable[[Player], Awaitable[bool]]
