@@ -208,8 +208,14 @@ class _PossibleCardsTracker:
                 not_played_cards = self.get_available_cards()
                 result = list(set(not_played_cards))
         else:
-            # leader ability
             result = self.environment.next_player.graveyard.get_all_cards()
+
+            # remove cards that cannot be revived
+            for card in result:
+                if card.hero or card.combat_row is CombatRow.SPECIAL or card.combat_row is CombatRow.NONE:
+                    result.remove(card)
+
+            # leader ability
             if self.environment.passive_leader_state.random_medic:
                 result = [random.choice(result)]
 

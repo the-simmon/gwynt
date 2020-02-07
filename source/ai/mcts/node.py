@@ -121,6 +121,11 @@ class Node:
                 if card.ability is not Ability.DECOY and card.ability is not Ability.SPECIAL_COMMANDERS_HORN and not card.hero:
                     environment_copy = deepcopy(self.environment)
                     player_copy = environment_copy.board.get_player(self.next_player)
+
+                    # for technical reasons, the card has to be added to the player
+                    if self.next_player_type is PlayerType.ENEMY:
+                        player_copy.hand.add(decoy.combat_row, decoy)
+
                     environment_copy.step_decoy(player_copy, row, decoy, card)
 
                     node = Node(environment_copy, self, self.next_player_type, self.next_player, decoy, row)
