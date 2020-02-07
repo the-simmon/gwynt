@@ -22,11 +22,12 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual(10, len(self.player2.hand.get_all_cards()))
 
     def test_step(self):
-        expected = (False, self.player2, CardSource.HAND)
         card = self.player1.hand[CombatRow.CLOSE][0]
         self.environment.next_player = self.player1
         actual = self.environment.step(self.player1, card.combat_row, card)
-        self.assertCountEqual(expected, actual)
+        self.assertEqual(False, actual)
+        self.assertEqual(self.player2, self.environment.next_player)
+        self.assertEqual(CardSource.HAND, self.environment.next_card_source)
 
     def test_pass(self):
         card = self.player1.hand[CombatRow.CLOSE][0]
@@ -34,10 +35,14 @@ class GameEnvironmentTest(unittest.TestCase):
 
         self.environment.next_player = self.player1
         actual = self.environment.step(self.player1, None, None)
-        self.assertCountEqual((False, self.player2, CardSource.HAND), actual)
+        self.assertEqual(False, actual)
+        self.assertEqual(self.player2, self.environment.next_player)
+        self.assertEqual(CardSource.HAND, self.environment.next_card_source)
 
         actual = self.environment.step(self.player2, None, None)
-        self.assertEqual((False, self.player1, CardSource.HAND), actual)
+        self.assertEqual(False, actual)
+        self.assertEqual(self.player1, self.environment.next_player)
+        self.assertEqual(CardSource.HAND, self.environment.next_card_source)
 
     def test_end_of_game(self):
         card = Card(CombatRow.CLOSE, 3)
@@ -48,10 +53,14 @@ class GameEnvironmentTest(unittest.TestCase):
 
         self.environment.next_player = self.player1
         actual = self.environment.step(self.player1, card.combat_row, card)
-        self.assertCountEqual((False, self.player2, CardSource.HAND), actual)
+        self.assertEqual(False, actual)
+        self.assertEqual(self.player2, self.environment.next_player)
+        self.assertEqual(CardSource.HAND, self.environment.next_card_source)
 
         actual = self.environment.step(self.player2, card.combat_row, card)
-        self.assertCountEqual((True, self.player2, CardSource.HAND), actual)
+        self.assertEqual(True, actual)
+        self.assertEqual(self.player2, self.environment.next_player)
+        self.assertEqual(CardSource.HAND, self.environment.next_card_source)
 
 
 class PassiveLeaderStateTest(unittest.TestCase):
