@@ -1,8 +1,6 @@
 import unittest
 from unittest.mock import patch
 
-from more_itertools import side_effect
-
 from source.core.card import Card, LeaderCard, LeaderAbility, Ability
 from source.core.cardcollection import CardCollection
 from source.core.cards.util import get_cards
