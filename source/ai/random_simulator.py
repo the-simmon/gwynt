@@ -7,7 +7,7 @@ from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 
 
-def simulate_random_game(environment: GameEnvironment, current_player: Player) -> Player:
+def simulate_random_game(environment: GameEnvironment) -> Player:
     game_over = environment.game_over()
     while not game_over:
         potential_cards = _get_potential_cards(environment)
@@ -19,7 +19,7 @@ def simulate_random_game(environment: GameEnvironment, current_player: Player) -
             row = random.choice(CombatRow.get_possible_rows(random_card))
         else:
             row = None
-        game_over, current_player, card_source = environment.step(current_player, row, random_card)
+        game_over = environment.step(environment.next_player, row, random_card)
 
     return environment.get_winner()
 

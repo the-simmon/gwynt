@@ -6,7 +6,7 @@ from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 
-_MCTS = Callable[[Player], Awaitable[Tuple[bool, Player, CardSource]]]
+_MCTS = Callable[[Player], Awaitable[bool]]
 _UPDATE_GUI = Callable[[], Awaitable]
 
 
@@ -34,11 +34,11 @@ class CookieClicker:
     async def _decoy(self, replace: Card, row: CombatRow):
         decoy = self._last_clicked_card
         if self.environment.next_player is self._last_clicked_player:
-            game_over, current_player, card_source = self.environment.step_decoy(self._last_clicked_player, row, decoy,
-                                                                                 replace)
+            game_over = self.environment.step_decoy(self._last_clicked_player, row, decoy,
+                                                    replace)
             await self.update_ui()
-            if current_player is not self._last_clicked_player:
-                await self._run_mcts(game_over, current_player, card_source)
+            if self.environment.next_player is not self._last_clicked_player:
+                await self._run_mcts(game_over, self.environment.next_player)
 
         self._last_clicked_player = None
         self._last_clicked_card = None
@@ -59,10 +59,10 @@ class CookieClicker:
             possible_rows = []
 
         if self.environment.next_player is player and row in possible_rows:
-            game_over, current_player, card_source = self.environment.step(player, row, clicked_card)
+            game_over = self.environment.step(player, row, clicked_card)
             await self.update_ui()
-            if current_player is not player:
-                await self._run_mcts(game_over, current_player)
+            if self.environment.next_player is not player:
+                await self._run_mcts(game_over, self.environment.next_player)
 
     def pass_click(self, player: Player):
         """Wrapper function because tkinter cant execute coroutine directly"""
@@ -70,13 +70,12 @@ class CookieClicker:
 
     async def _async_pass_click(self, player: Player):
         if self.environment.next_player is player:
-            game_over, current_player, card_source = self.environment.step(player, None, None)
+            game_over = self.environment.step(player, None, None)
             await self.update_ui()
-            if current_player is not player:
-                await self._run_mcts(game_over, current_player)
+            if self.environment.next_player is not player:
+                await self._run_mcts(game_over, self.environment.next_player)
 
     async def _run_mcts(self, game_over: bool, player: Player):
-        current_player = player
         # play enemy cards
-        while current_player is player and not game_over:
-            game_over, current_player, card_source = await self.mcts(current_player)
+        while self.environment.next_player is player and not game_over:
+            game_over = await self.mcts(self.environment.next_player)

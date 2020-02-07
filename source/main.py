@@ -53,21 +53,20 @@ class Main:
         while not game_over:
             game_over, current_player, card_source = await self._run_async_mcts(current_player)
 
-    async def _run_async_mcts(self, current_player: Player) -> Tuple[bool, Player, CardSource]:
+    async def _run_async_mcts(self, current_player: Player) -> bool:
         result = await asyncio.get_event_loop().run_in_executor(None, self._run_mcts, current_player)
         await self._update_gui()
         return result
 
-    def _run_mcts(self, current_player: Player) -> Tuple[bool, Player, CardSource]:
+    def _run_mcts(self, current_player: Player) -> bool:
         mcts = MCTS(self.environment, current_player)
         card, row, replaced_card = mcts.run()
         if card and card.ability is Ability.DECOY:
-            game_over, current_player, card_source = self.environment.step_decoy(current_player, row, card,
-                                                                                 replaced_card)
+            game_over = self.environment.step_decoy(current_player, row, card, replaced_card)
         else:
-            game_over, current_player, card_source = self.environment.step(current_player, row, card)
+            game_over = self.environment.step(current_player, row, card)
 
-        return game_over, current_player, card_source
+        return game_over
 
 
 if __name__ == '__main__':

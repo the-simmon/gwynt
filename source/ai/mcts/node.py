@@ -133,7 +133,6 @@ class Node:
 
     def simulate(self):
         environment_copy = deepcopy(self.environment)
-        current_player = environment_copy.next_player
 
         if self.next_player_type is PlayerType.SELF:
             player_to_add_cards = environment_copy.board.get_enemy_player(self.next_player)
@@ -141,7 +140,7 @@ class Node:
             player_to_add_cards = environment_copy.board.get_player(self.next_player)
 
         self._add_random_cards_to_enemy(player_to_add_cards)
-        winner = simulate_random_game(environment_copy, current_player)
+        winner = simulate_random_game(environment_copy)
 
         self.backpropagate(winner)
 

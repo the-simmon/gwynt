@@ -86,7 +86,7 @@ class GameEnvironment:
                 player.deck.remove(card.combat_row, card)
                 player.hand.add(card.combat_row, card)
 
-    def step(self, player: Player, row: Optional[CombatRow], card: Optional[Card]) -> Tuple[bool, Player, CardSource]:
+    def step(self, player: Player, row: Optional[CombatRow], card: Optional[Card]) -> bool:
         # card == None => player passes
         if card:
             if self.next_card_source is CardSource.HAND:
@@ -97,10 +97,9 @@ class GameEnvironment:
             self.played_cards[player.id].append(card)
 
         self._end_of_step(player, card)
-        return self.game_over(), self.next_player, self.next_card_source
+        return self.game_over()
 
-    def step_decoy(self, player: Player, row: CombatRow, decoy: Card, replace_card: Card) \
-            -> Tuple[bool, Player, CardSource]:
+    def step_decoy(self, player: Player, row: CombatRow, decoy: Card, replace_card: Card) -> bool:
         player.hand.remove(decoy.combat_row, decoy)
         player.hand.add(replace_card.combat_row, replace_card)
         self.board.add(player, row, decoy)
@@ -110,7 +109,7 @@ class GameEnvironment:
             self.played_cards[player.id].remove(replace_card)
 
         self._end_of_step(player, decoy)
-        return self.game_over(), self.next_player, self.next_card_source
+        return self.game_over()
 
     def _end_of_step(self, player: Player, card: Card):
         if len(player.hand.get_all_cards()) == 0 or not card:
