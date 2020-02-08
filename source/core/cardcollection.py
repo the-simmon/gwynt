@@ -77,7 +77,10 @@ def _calculate_damage_for_row(cards: List[Card], row: CombatRow, weather: List[W
         for card in deepcopy(cards):
             if card.ability is Ability.TIGHT_BOND:
                 current_damage = bonds[card]
-                bonds.update({card: current_damage + card.damage})
+                if current_damage == 0:
+                    bonds.update({card: card.damage})
+                else:
+                    bonds.update({card: current_damage * 2})
 
         for bond_card, new_damage in bonds.items():
             for card in cards:
