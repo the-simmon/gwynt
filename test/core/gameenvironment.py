@@ -5,7 +5,8 @@ from source.core.card import Card, LeaderCard, LeaderAbility, Ability
 from source.core.cardcollection import CardCollection
 from source.core.cards.util import get_cards
 from source.core.comabt_row import CombatRow
-from source.core.gameenvironment import GameEnvironment, CardSource, PassiveLeaderState, _PossibleCardsTracker
+from source.core.gameenvironment import GameEnvironment, CardSource, PassiveLeaderState, _PossibleCardsTracker, \
+    CardDestination
 from source.core.player import Player, Faction
 
 
@@ -28,6 +29,7 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual(False, actual)
         self.assertEqual(self.player2, self.environment.next_player)
         self.assertEqual(CardSource.HAND, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
 
     def test_pass(self):
         card = self.player1.hand[CombatRow.CLOSE][0]
@@ -38,11 +40,13 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual(False, actual)
         self.assertEqual(self.player2, self.environment.next_player)
         self.assertEqual(CardSource.HAND, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
 
         actual = self.environment.step(self.player2, None, None)
         self.assertEqual(False, actual)
         self.assertEqual(self.player1, self.environment.next_player)
         self.assertEqual(CardSource.HAND, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
 
     def test_end_of_game(self):
         card = Card(CombatRow.CLOSE, 3)
@@ -56,11 +60,13 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual(False, actual)
         self.assertEqual(self.player2, self.environment.next_player)
         self.assertEqual(CardSource.HAND, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
 
         actual = self.environment.step(self.player2, card.combat_row, card)
         self.assertEqual(True, actual)
         self.assertEqual(self.player2, self.environment.next_player)
         self.assertEqual(CardSource.HAND, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
 
     def test_step_decoy(self):
         card_to_replace = Card(CombatRow.CLOSE, 3)
@@ -73,6 +79,29 @@ class GameEnvironmentTest(unittest.TestCase):
         self.environment.step_decoy(self.player1, CombatRow.CLOSE, decoy, card_to_replace)
         self.assertCountEqual(expected, self.player1.hand.get_all_cards())
         self.assertCountEqual([decoy], self.environment.board.cards[self.player1.id].get_all_cards())
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
+
+    def test_normal_leader(self):
+        leader = LeaderCard(CombatRow.CLOSE, 1)
+        self.environment.step_leader(self.player1, leader)
+
+        self.assertCountEqual([leader], self.environment.board.cards[self.player1.id].get_all_cards())
+        self.assertEqual(CardSource.HAND, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
+
+    def test_blocked_leader(self):
+        leader = LeaderCard(CombatRow.CLOSE, 1)
+        self.environment.passive_leader_state.block_leader = True
+        self.environment.step_leader(self.player1, leader)
+
+        self.assertCountEqual([], self.environment.board.cards[self.player1.id].get_all_cards())
+        self.assertEqual(CardSource.HAND, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
+
+    def test_graveyard2hand_leader(self):
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.GRAVEYARD2HAND))
+        self.assertEqual(CardSource.GRAVEYARD, self.environment.next_card_source)
+        self.assertEqual(CardDestination.HAND, self.environment.next_card_destination)
 
 
 class PassiveLeaderStateTest(unittest.TestCase):
@@ -186,3 +215,10 @@ class PossibleCardsTrackerTest(unittest.TestCase):
         expected = self.player1.graveyard.get_all_cards()[0]
         actual = self.tracker.get_possible_cards(False)
         self.assertCountEqual([expected], actual)
+
+    def test_get_possible_cards_graveyard2hand_leader(self):
+        self.player1.graveyard.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 8))
+        self.player1.graveyard.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 9))
+        expected = self.player1.graveyard.get_all_cards()
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.GRAVEYARD2HAND))
+        self.assertCountEqual(expected, self.tracker.get_possible_cards(False))

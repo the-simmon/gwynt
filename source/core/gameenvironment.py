@@ -19,6 +19,7 @@ from source.core.weather import Weather
 class CardSource(enum.Enum):
     HAND = 0
     GRAVEYARD = 1
+    LEADER = 2
 
 
 class CardDestination(enum.Enum):
@@ -130,6 +131,7 @@ class GameEnvironment:
         player.leader = None
         if not self.passive_leader_state.block_leader:
             if card.leader_ability is LeaderAbility.NONE:
+                self.next_card_source = CardSource.LEADER
                 result = self.step(player, card.combat_row, card)
             else:
                 self._handle_leader_ability(card)
@@ -141,7 +143,7 @@ class GameEnvironment:
     def _handle_leader_ability(self, card: LeaderCard):
         if card.leader_ability is LeaderAbility.GRAVEYARD2HAND:
             self.next_card_source = CardSource.GRAVEYARD
-            self.next_card_destination = CardSource.HAND
+            self.next_card_destination = CardDestination.HAND
 
     def _end_of_step(self, player: Player, card: Card):
         if len(player.hand.get_all_cards()) == 0 or not card:
