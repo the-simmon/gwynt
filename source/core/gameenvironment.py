@@ -189,6 +189,9 @@ class GameEnvironment:
         copy.passed = deepcopy(self.passed)
         copy.next_card_source = deepcopy(self.next_card_source)
         copy.current_round = deepcopy(self.current_round)
+        copy.passive_leader_state = deepcopy(self.passive_leader_state)
+        copy.played_cards = deepcopy(self.played_cards)
+        copy.card_tracker = _PossibleCardsTracker(copy)
         return copy
 
 
