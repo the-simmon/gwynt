@@ -61,7 +61,19 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual(True, actual)
         self.assertEqual(self.player2, self.environment.next_player)
         self.assertEqual(CardSource.HAND, self.environment.next_card_source)
-   
+
+    def test_step_decoy(self):
+        card_to_replace = Card(CombatRow.CLOSE, 3)
+        decoy = Card(CombatRow.SPECIAL, 0, Ability.DECOY)
+        expected = self.player1.hand.get_all_cards() + [card_to_replace]
+        self.player1.hand.add(CombatRow.SPECIAL, decoy)
+        self.environment.board.cards[self.player1.id].add(card_to_replace.combat_row, card_to_replace)
+        self.environment.next_player = self.player1
+
+        self.environment.step_decoy(self.player1, CombatRow.CLOSE, decoy, card_to_replace)
+        self.assertCountEqual(expected, self.player1.hand.get_all_cards())
+        self.assertCountEqual([decoy], self.environment.board.cards[self.player1.id].get_all_cards())
+
 
 class PassiveLeaderStateTest(unittest.TestCase):
 
