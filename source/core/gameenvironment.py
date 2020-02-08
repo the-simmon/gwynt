@@ -19,7 +19,8 @@ from source.core.weather import Weather
 class CardSource(enum.Enum):
     HAND = 0
     GRAVEYARD = 1
-    LEADER = 2
+    ENEMY_GRAVEYARD = 2
+    LEADER = 3
 
 
 class CardDestination(enum.Enum):
@@ -144,6 +145,9 @@ class GameEnvironment:
         if card.leader_ability is LeaderAbility.GRAVEYARD2HAND:
             self.next_card_source = CardSource.GRAVEYARD
             self.next_card_destination = CardDestination.HAND
+        elif card.leader_ability is LeaderAbility.ENEMY_GRAVEYARD2HAND:
+            self.next_card_source = CardSource.ENEMY_GRAVEYARD
+            self.next_card_destination = CardDestination.HAND
 
     def _end_of_step(self, player: Player, card: Card):
         if len(player.hand.get_all_cards()) == 0 or not card:
@@ -238,14 +242,19 @@ class _PossibleCardsTracker:
     def get_possible_cards(self, obfuscate: bool) -> List[Card]:
         """Returns all cards current player can play. If obfuscate is true, the hand is ignored and only not played
         cards are returned """
-        if self.environment.next_card_source is CardSource.HAND:
+        card_source = self.environment.next_card_source
+        if card_source is CardSource.HAND:
             if not obfuscate:
                 result = self.environment.next_player.hand.get_all_cards()
             else:
                 not_played_cards = self.get_available_cards()
                 result = list(set(not_played_cards))
-        else:
-            result = self.environment.next_player.graveyard.get_all_cards()
+        elif card_source is CardSource.GRAVEYARD or card_source is CardSource.ENEMY_GRAVEYARD:
+            if card_source is CardSource.GRAVEYARD:
+                result = self.environment.next_player.graveyard.get_all_cards()
+            else:
+                enemy = self.environment.board.get_enemy_player(self.environment.next_player)
+                result = enemy.graveyard.get_all_cards()
             result = self._filter_non_revivable_cards(result)
 
             # leader ability

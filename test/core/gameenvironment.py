@@ -113,6 +113,19 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertCountEqual(expected, self.player1.hand.get_all_cards())
         self.assertCountEqual([], self.player1.graveyard.get_all_cards())
 
+    def test_enemy_graveyard2hand_leader(self):
+        revived_card = Card(CombatRow.CLOSE, 4)
+        self.player2.graveyard.add(revived_card.combat_row, revived_card)
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.ENEMY_GRAVEYARD2HAND))
+        self.assertEqual(CardSource.ENEMY_GRAVEYARD, self.environment.next_card_source)
+        self.assertEqual(CardDestination.HAND, self.environment.next_card_destination)
+        self.assertIsNone(self.player1.leader)
+
+        expected = self.player1.hand.get_all_cards() + [revived_card]
+        self.environment.step(self.player1, revived_card.combat_row, revived_card)
+        self.assertCountEqual(expected, self.player1.hand.get_all_cards())
+        self.assertCountEqual([], self.player1.graveyard.get_all_cards())
+
 
 class PassiveLeaderStateTest(unittest.TestCase):
 
@@ -231,4 +244,11 @@ class PossibleCardsTrackerTest(unittest.TestCase):
         self.player1.graveyard.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 9))
         expected = self.player1.graveyard.get_all_cards()
         self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.GRAVEYARD2HAND))
+        self.assertCountEqual(expected, self.tracker.get_possible_cards(False))
+
+    def test_get_possible_cards_enemy_graveyard2hand_leader(self):
+        self.player2.graveyard.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 8))
+        self.player2.graveyard.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 9))
+        expected = self.player2.graveyard.get_all_cards()
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.ENEMY_GRAVEYARD2HAND))
         self.assertCountEqual(expected, self.tracker.get_possible_cards(False))
