@@ -21,6 +21,11 @@ class CardSource(enum.Enum):
     GRAVEYARD = 1
 
 
+class CardDestination(enum.Enum):
+    BOARD = 0
+    HAND = 1
+
+
 class PassiveLeaderState:
 
     def __init__(self):
@@ -54,6 +59,7 @@ class GameEnvironment:
         self.player2 = player2
         self.next_player = None
         self.next_card_source = CardSource.HAND
+        self.next_card_destination = CardDestination.BOARD
 
         self.passive_leader_state = PassiveLeaderState()
         passive_leaders = self._check_passive_leaders()
@@ -89,15 +95,24 @@ class GameEnvironment:
     def step(self, player: Player, row: Optional[CombatRow], card: Optional[Card]) -> bool:
         # card == None => player passes
         if card:
-            if self.next_card_source is CardSource.HAND:
-                player.hand.remove(card.combat_row, card)
-            else:
-                player.graveyard.remove(card.combat_row, card)
-            self.board.add(player, row, card)
-            self.played_cards[player.id].append(card)
+            self._remove_card_from_source(player, card)
+            self._add_card_to_destination(player, row, card)
 
         self._end_of_step(player, card)
         return self.game_over()
+
+    def _remove_card_from_source(self, player: Player, card: Card):
+        if self.next_card_source is CardSource.HAND:
+            player.hand.remove(card.combat_row, card)
+        elif self.next_card_source is CardSource.GRAVEYARD:
+            player.graveyard.remove(card.combat_row, card)
+
+    def _add_card_to_destination(self, player: Player, row: CombatRow, card: Card):
+        if self.next_card_destination is CardDestination.BOARD:
+            self.board.add(player, row, card)
+            self.played_cards[player.id].append(card)
+        elif self.next_card_destination is CardDestination.HAND:
+            player.hand.add(card.combat_row, card)
 
     def step_decoy(self, player: Player, row: CombatRow, decoy: Card, replace_card: Card) -> bool:
         player.hand.remove(decoy.combat_row, decoy)
