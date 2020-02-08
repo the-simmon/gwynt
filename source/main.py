@@ -46,7 +46,7 @@ class Main:
             while self.environment.next_player is not self.player1:
                 await self._run_async_mcts(self.environment.next_player)
 
-    async def _run_mcts_both_players(self, current_player: Player, card_source: CardSource = CardSource.HAND):
+    async def _run_mcts_both_players(self, current_player: Player):
         game_over = False
 
         while not game_over:
