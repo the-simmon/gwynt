@@ -61,7 +61,7 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual(True, actual)
         self.assertEqual(self.player2, self.environment.next_player)
         self.assertEqual(CardSource.HAND, self.environment.next_card_source)
-
+   
 
 class PassiveLeaderStateTest(unittest.TestCase):
 

@@ -132,17 +132,23 @@ class GameEnvironment:
             if card.leader_ability is LeaderAbility.NONE:
                 result = self.step(player, card.combat_row, card)
             else:
-                # todo: handle leader ability
+                self._handle_leader_ability(card)
                 result = self.game_over()
         else:
             result = self.game_over()
         return result
+
+    def _handle_leader_ability(self, card: LeaderCard):
+        if card.leader_ability is LeaderAbility.GRAVEYARD2HAND:
+            self.next_card_source = CardSource.GRAVEYARD
+            self.next_card_destination = CardSource.HAND
 
     def _end_of_step(self, player: Player, card: Card):
         if len(player.hand.get_all_cards()) == 0 or not card:
             self.passed[player.id] = True
 
         self.next_player, self.next_card_source = self._determine_current_player(card, player)
+        self.next_card_destination = CardDestination.BOARD
 
         if self.round_over():
             self.next_player, self.next_card_source = self._end_of_round()
@@ -238,17 +244,20 @@ class _PossibleCardsTracker:
                 result = list(set(not_played_cards))
         else:
             result = self.environment.next_player.graveyard.get_all_cards()
-
-            # remove cards that cannot be revived
-            for card in result:
-                if card.hero or card.combat_row is CombatRow.SPECIAL or card.combat_row is CombatRow.NONE:
-                    result.remove(card)
+            result = self._filter_non_revivable_cards(result)
 
             # leader ability
             if self.environment.passive_leader_state.random_medic:
                 result = [random.choice(result)]
 
         return result
+
+    def _filter_non_revivable_cards(self, cards: List[Card]) -> List[Card]:
+        # remove cards that cannot be revived
+        for card in cards:
+            if card.hero or card.combat_row is CombatRow.SPECIAL or card.combat_row is CombatRow.NONE:
+                cards.remove(card)
+        return cards
 
     def get_available_cards(self) -> List[Card]:
         environment = self.environment
