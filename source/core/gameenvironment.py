@@ -111,6 +111,18 @@ class GameEnvironment:
         self._end_of_step(player, decoy)
         return self.game_over()
 
+    def step_leader(self, player: Player, card: LeaderCard) -> bool:
+        player.leader = None
+        if not self.passive_leader_state.block_leader:
+            if card.leader_ability is LeaderAbility.NONE:
+                result = self.step(player, card.combat_row, card)
+            else:
+                # todo: handle leader ability
+                result = self.game_over()
+        else:
+            result = self.game_over()
+        return result
+
     def _end_of_step(self, player: Player, card: Card):
         if len(player.hand.get_all_cards()) == 0 or not card:
             self.passed[player.id] = True
