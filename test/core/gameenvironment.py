@@ -88,6 +88,7 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertCountEqual([leader], self.environment.board.cards[self.player1.id].get_all_cards())
         self.assertEqual(CardSource.HAND, self.environment.next_card_source)
         self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
+        self.assertIsNone(self.player1.leader)
 
     def test_blocked_leader(self):
         leader = LeaderCard(CombatRow.CLOSE, 1)
@@ -97,11 +98,20 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertCountEqual([], self.environment.board.cards[self.player1.id].get_all_cards())
         self.assertEqual(CardSource.HAND, self.environment.next_card_source)
         self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
+        self.assertIsNone(self.player1.leader)
 
     def test_graveyard2hand_leader(self):
+        revived_card = Card(CombatRow.CLOSE, 4)
+        self.player1.graveyard.add(revived_card.combat_row, revived_card)
         self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.GRAVEYARD2HAND))
         self.assertEqual(CardSource.GRAVEYARD, self.environment.next_card_source)
         self.assertEqual(CardDestination.HAND, self.environment.next_card_destination)
+        self.assertIsNone(self.player1.leader)
+
+        expected = self.player1.hand.get_all_cards() + [revived_card]
+        self.environment.step(self.player1, revived_card.combat_row, revived_card)
+        self.assertCountEqual(expected, self.player1.hand.get_all_cards())
+        self.assertCountEqual([], self.player1.graveyard.get_all_cards())
 
 
 class PassiveLeaderStateTest(unittest.TestCase):

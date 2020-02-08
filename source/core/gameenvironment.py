@@ -107,8 +107,6 @@ class GameEnvironment:
             player.hand.remove(card.combat_row, card)
         elif self.next_card_source is CardSource.GRAVEYARD:
             player.graveyard.remove(card.combat_row, card)
-        elif self.next_card_source is CardSource.LEADER:
-            player.leader = None
 
     def _add_card_to_destination(self, player: Player, row: CombatRow, card: Card):
         if self.next_card_destination is CardDestination.BOARD:
@@ -130,6 +128,7 @@ class GameEnvironment:
         return self.game_over()
 
     def step_leader(self, player: Player, card: LeaderCard) -> bool:
+        player.leader = None
         if not self.passive_leader_state.block_leader:
             if card.leader_ability is LeaderAbility.NONE:
                 self.next_card_source = CardSource.LEADER
