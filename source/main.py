@@ -4,7 +4,7 @@ import random
 from source.ai.mcts.mcts import MCTS
 from source.core.card import Ability
 from source.core.cards.util import get_cards, get_leaders
-from source.core.gameenvironment import GameEnvironment, CardSource
+from source.core.gameenvironment import GameEnvironment
 from source.core.player import Faction, Player
 from source.gui.cookie_clicker import CookieClicker
 from source.gui.gui import GUI
