@@ -23,6 +23,11 @@ class Ability(enum.Enum):
     RAIN = 13
     PASS = 14
 
+    @staticmethod
+    def is_weather(ability: Ability) -> bool:
+        return ability is Ability.CLEAR_WEATHER or ability is Ability.FROST or ability is Ability.FOG or \
+               ability is Ability.RAIN
+
     def __lt__(self, other):
         return self.value < other.value
 

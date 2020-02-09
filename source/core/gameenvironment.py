@@ -21,6 +21,7 @@ class CardSource(enum.Enum):
     GRAVEYARD = 1
     ENEMY_GRAVEYARD = 2
     LEADER = 3
+    WEATHER_DECK = 4
 
 
 class CardDestination(enum.Enum):
@@ -108,6 +109,8 @@ class GameEnvironment:
             player.hand.remove(card.combat_row, card)
         elif self.next_card_source is CardSource.GRAVEYARD:
             player.graveyard.remove(card.combat_row, card)
+        elif self.next_card_source is CardSource.WEATHER_DECK:
+            player.deck.remove(card.combat_row, card)
 
     def _add_card_to_destination(self, player: Player, row: CombatRow, card: Card):
         if self.next_card_destination is CardDestination.BOARD:
@@ -148,6 +151,9 @@ class GameEnvironment:
         elif card.leader_ability is LeaderAbility.ENEMY_GRAVEYARD2HAND:
             self.next_card_source = CardSource.ENEMY_GRAVEYARD
             self.next_card_destination = CardDestination.HAND
+        elif card.leader_ability is LeaderAbility.PICK_WEATHER:
+            self.next_card_source = CardSource.WEATHER_DECK
+            self.next_card_destination = CardDestination.BOARD
 
     def _end_of_step(self, player: Player, card: Card):
         if len(player.hand.get_all_cards()) == 0 or not card:
@@ -260,6 +266,10 @@ class _PossibleCardsTracker:
             # leader ability
             if self.environment.passive_leader_state.random_medic:
                 result = [random.choice(result)]
+
+        elif card_source is CardSource.WEATHER_DECK:
+            result = self.environment.next_player.deck.get_all_cards()
+            result = [card for card in result if Ability.is_weather(card.ability)]
 
         return result
 

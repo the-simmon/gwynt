@@ -4,7 +4,7 @@ from source.core.card import Card
 from source.core.comabt_row import CombatRow
 
 
-class CardTest(unittest.TestCase):
+class CombatRowTest(unittest.TestCase):
 
     def test_get_possible_rows(self):
         card = Card(CombatRow.AGILE, 0)
