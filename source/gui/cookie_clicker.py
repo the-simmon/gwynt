@@ -75,6 +75,17 @@ class CookieClicker:
             if self.environment.next_player is not player:
                 await self._run_mcts(game_over, self.environment.next_player)
 
+    def leader_click(self, player: Player):
+        """Wrapper function because tkinter cant execute coroutine directly"""
+        asyncio.create_task(self._async_leader_click(player))
+
+    async def _async_leader_click(self, player: Player):
+        if self.environment.next_player is player and player.leader:
+            game_over = self.environment.step_leader(player, player.leader)
+            await self.update_ui()
+            if self.environment.next_player is not player:
+                await self._run_mcts(game_over, self.environment.next_player)
+
     async def _run_mcts(self, game_over: bool, player: Player):
         # play enemy cards
         while self.environment.next_player is player and not game_over:

@@ -63,7 +63,7 @@ class PassiveLeaderState:
         self.leaders_ability: List[LeaderAbility] = []
 
     def check_leader(self, player: Player, leader: LeaderCard):
-        if leader.is_passive() and not self.block_leader:
+        if leader and leader.is_passive() and not self.block_leader:
             self.leaders_ability.append(leader.leader_ability)
             if leader.leader_ability is LeaderAbility.BLOCK_LEADER:
                 self._set_block_leader()

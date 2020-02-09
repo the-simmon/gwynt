@@ -91,3 +91,6 @@ class LeaderCard(Card):
     def is_passive(self):
         return self.leader_ability is LeaderAbility.SPY_DAMAGE or self.leader_ability is LeaderAbility.RANDOM_MEDIC or \
                self.leader_ability is LeaderAbility.BLOCK_LEADER or self.leader_ability is LeaderAbility.EXTRA_CARD
+
+    def __str__(self):
+        return f'{self.ability.name}, {self.combat_row.name}, {self.leader_ability.name}'
