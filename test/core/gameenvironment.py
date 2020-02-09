@@ -229,6 +229,13 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual(self.player2, self.environment.next_player)
         self.assertCountEqual(player1_hand[2:] + [card], self.player1.hand.get_all_cards())
 
+    def test_leader_no_cards_available(self):
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.GRAVEYARD2HAND))
+        self.assertEqual(CardSource.HAND, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
+        self.assertIsNone(self.player1.leader)
+        self.assertEqual(self.player2, self.environment.next_player)
+
 
 class PassiveLeaderStateTest(unittest.TestCase):
 
@@ -468,7 +475,7 @@ class PossibleCardsTrackerTest(unittest.TestCase):
         actual = self.tracker.get_possible_cards(True)
 
         self.assertCountEqual(expected, actual)
-        
+
         self.environment.next_card_source = CardSource.EXCHANGE_HAND_4_DECK1
         self.assertCountEqual(self.player1.hand.get_all_cards(), self.tracker.get_possible_cards(False))
 

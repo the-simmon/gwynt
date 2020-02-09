@@ -205,6 +205,12 @@ class GameEnvironment:
             self.next_card_source = CardSource.EXCHANGE_HAND_4_DECK2
             self.next_card_destination = CardDestination.GRAVEYARD
 
+        # revert leader ability if no cards can be placed on the board, to avoid blocking
+        if not self.card_tracker.get_possible_cards(False):
+            self.next_card_source = CardSource.HAND
+            self.next_card_destination = CardDestination.BOARD
+            self.next_player = self.board.get_enemy_player(self.next_player)
+
     def _end_of_step(self, player: Player, card: Card):
         if len(player.hand.get_all_cards()) == 0 or not card:
             self.passed[player.id] = True
