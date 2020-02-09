@@ -36,23 +36,34 @@ class PassiveLeaderState:
         self.block_leader = False
         # Emhyr var Emreis: Invader of the North
         self.random_medic = False
+        # Francesca Findabair: Daisy of the Valley
+        self.extra_card = False
+        self.extra_card_player = None
+
         self.leaders_ability: List[LeaderAbility] = []
 
-    def check_leader(self, leader: LeaderCard):
+    def check_leader(self, player: Player, leader: LeaderCard):
         if leader.is_passive() and not self.block_leader:
             self.leaders_ability.append(leader.leader_ability)
             if leader.leader_ability is LeaderAbility.BLOCK_LEADER:
                 self._set_block_leader()
             elif leader.leader_ability is LeaderAbility.RANDOM_MEDIC:
                 self._set_random_medic()
+            elif leader.leader_ability is LeaderAbility.EXTRA_CARD:
+                self._set_extra_card(player)
 
     def _set_block_leader(self):
         self.block_leader = True
         self.random_medic = False
+        self.extra_card = False
         self.leaders_ability = [LeaderAbility.BLOCK_LEADER]
 
     def _set_random_medic(self):
         self.random_medic = True
+
+    def _set_extra_card(self, player: Player):
+        self.extra_card = True
+        self.extra_card_player = player
 
 
 class GameEnvironment:
@@ -76,7 +87,7 @@ class GameEnvironment:
 
     def _check_passive_leaders(self) -> List[LeaderAbility]:
         for player in [self.player1, self.player2]:
-            self.passive_leader_state.check_leader(player.leader)
+            self.passive_leader_state.check_leader(player, player.leader)
         return self.passive_leader_state.leaders_ability
 
     def init(self):
@@ -89,7 +100,11 @@ class GameEnvironment:
             #  random.choices not applicable, because it can return the same object multiple times
             deck_cards = player.deck.get_all_cards()
             random.shuffle(deck_cards)
-            chosen_cards = deck_cards[:10]
+
+            card_count = 10
+            if self.passive_leader_state.extra_card and self.passive_leader_state.extra_card_player is player:
+                card_count += 1
+            chosen_cards = deck_cards[:card_count]
 
             for card in chosen_cards:
                 player.deck.remove(card.combat_row, card)

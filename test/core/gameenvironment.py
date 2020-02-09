@@ -23,6 +23,15 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual(10, len(self.player1.hand.get_all_cards()))
         self.assertEqual(10, len(self.player2.hand.get_all_cards()))
 
+    def test_extra_card_leader(self):
+        self.player1.hand = CardCollection([])
+        self.player2.hand = CardCollection([])
+        self.player1.leader = LeaderCard(leader_ability=LeaderAbility.EXTRA_CARD)
+        self.environment = GameEnvironment(self.player1, self.player2)
+        self.environment.init()
+        self.assertEqual(11, len(self.player1.hand.get_all_cards()))
+        self.assertEqual(10, len(self.player2.hand.get_all_cards()))
+
     def test_step(self):
         card = self.player1.hand[CombatRow.CLOSE][0]
         self.environment.next_player = self.player1
@@ -147,36 +156,55 @@ class PassiveLeaderStateTest(unittest.TestCase):
 
     def setUp(self):
         self.state = PassiveLeaderState()
+        self.player = Player(0, Faction.NILFGAARD, [], LeaderCard())
 
     def test_no_leader(self):
         self.assertEqual(False, self.state.block_leader)
         self.assertEqual(False, self.state.random_medic)
+        self.assertEqual(False, self.state.extra_card)
+        self.assertIsNone(self.state.extra_card_player)
         self.assertCountEqual([], self.state.leaders_ability)
 
     def test_active_leader(self):
-        self.state.check_leader(LeaderCard())
+        self.state.check_leader(self.player, LeaderCard())
         self.assertEqual(False, self.state.block_leader)
         self.assertEqual(False, self.state.random_medic)
+        self.assertEqual(False, self.state.extra_card)
+        self.assertIsNone(self.state.extra_card_player)
         self.assertCountEqual([], self.state.leaders_ability)
 
     def test_block_leader(self):
-        self.state.check_leader(LeaderCard(leader_ability=LeaderAbility.BLOCK_LEADER))
+        self.state.check_leader(self.player, LeaderCard(leader_ability=LeaderAbility.BLOCK_LEADER))
         self.assertEqual(True, self.state.block_leader)
         self.assertEqual(False, self.state.random_medic)
+        self.assertEqual(False, self.state.extra_card)
+        self.assertIsNone(self.state.extra_card_player)
         self.assertCountEqual([LeaderAbility.BLOCK_LEADER], self.state.leaders_ability)
 
     def test_random_medic(self):
-        self.state.check_leader(LeaderCard(leader_ability=LeaderAbility.RANDOM_MEDIC))
+        self.state.check_leader(self.player, LeaderCard(leader_ability=LeaderAbility.RANDOM_MEDIC))
         self.assertEqual(False, self.state.block_leader)
         self.assertEqual(True, self.state.random_medic)
+        self.assertEqual(False, self.state.extra_card)
+        self.assertIsNone(self.state.extra_card_player)
         self.assertCountEqual([LeaderAbility.RANDOM_MEDIC], self.state.leaders_ability)
 
     def test_block_leader_with_medic(self):
-        self.state.check_leader(LeaderCard(leader_ability=LeaderAbility.RANDOM_MEDIC))
-        self.state.check_leader(LeaderCard(leader_ability=LeaderAbility.BLOCK_LEADER))
+        self.state.check_leader(self.player, LeaderCard(leader_ability=LeaderAbility.RANDOM_MEDIC))
+        self.state.check_leader(self.player, LeaderCard(leader_ability=LeaderAbility.BLOCK_LEADER))
         self.assertEqual(True, self.state.block_leader)
         self.assertEqual(False, self.state.random_medic)
+        self.assertEqual(False, self.state.extra_card)
+        self.assertIsNone(self.state.extra_card_player)
         self.assertCountEqual([LeaderAbility.BLOCK_LEADER], self.state.leaders_ability)
+
+    def test_extra_card(self):
+        self.state.check_leader(self.player, LeaderCard(leader_ability=LeaderAbility.EXTRA_CARD))
+        self.assertEqual(False, self.state.block_leader)
+        self.assertEqual(False, self.state.random_medic)
+        self.assertEqual(True, self.state.extra_card)
+        self.assertEqual(self.player, self.state.extra_card_player)
+        self.assertCountEqual([LeaderAbility.EXTRA_CARD], self.state.leaders_ability)
 
 
 class PossibleCardsTrackerTest(unittest.TestCase):
