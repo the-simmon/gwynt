@@ -249,16 +249,22 @@ class _PossibleCardsTracker:
         """Returns all cards current player can play. If obfuscate is true, the hand is ignored and only not played
         cards are returned """
         card_source = self.environment.next_card_source
-        if card_source is CardSource.HAND:
-            if not obfuscate:
-                result = self.environment.next_player.hand.get_all_cards()
+        if card_source is CardSource.HAND or card_source is CardSource.WEATHER_DECK:
+            if obfuscate:
+                result = self._get_available_cards()
+                result = list(set(result))
             else:
-                not_played_cards = self._get_available_cards()
-                result = list(set(not_played_cards))
+                if card_source is CardSource.HAND:
+                    result = self.environment.next_player.hand.get_all_cards()
+                else:  # card_source is CardSource.WEATHER_DECK
+                    result = self.environment.next_player.deck.get_all_cards()
+            if card_source is CardSource.WEATHER_DECK:
+                result = [card for card in result if Weather.ability_is_weather(card.ability)]
+
         elif card_source is CardSource.GRAVEYARD or card_source is CardSource.ENEMY_GRAVEYARD:
             if card_source is CardSource.GRAVEYARD:
                 result = self.environment.next_player.graveyard.get_all_cards()
-            else:
+            else:  # card_source is CardSource.ENEMY_GRAVEYARD
                 enemy = self.environment.board.get_enemy_player(self.environment.next_player)
                 result = enemy.graveyard.get_all_cards()
             result = self._filter_non_revivable_cards(result)
@@ -266,14 +272,6 @@ class _PossibleCardsTracker:
             # leader ability
             if self.environment.passive_leader_state.random_medic:
                 result = [random.choice(result)]
-
-        elif card_source is CardSource.WEATHER_DECK:
-            if not obfuscate:
-                result = self.environment.next_player.deck.get_all_cards()
-            else:
-                result = self._get_available_cards()
-                result = list(set(result))
-            result = [card for card in result if Weather.ability_is_weather(card.ability)]
 
         return result
 
