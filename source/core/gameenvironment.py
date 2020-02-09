@@ -22,6 +22,14 @@ class CardSource(enum.Enum):
     ENEMY_GRAVEYARD = 2
     LEADER = 3
     WEATHER_DECK = 4
+    WEATHER_RAIN = 5
+    WEATHER_FOG = 6
+    WEATHER_FROST = 7
+
+    @staticmethod
+    def is_weather(source: CardSource) -> bool:
+        return source is CardSource.WEATHER_DECK or source is CardSource.WEATHER_RAIN or \
+               source is CardSource.WEATHER_FOG or source is CardSource.WEATHER_FROST
 
 
 class CardDestination(enum.Enum):
@@ -124,7 +132,7 @@ class GameEnvironment:
             player.hand.remove(card.combat_row, card)
         elif self.next_card_source is CardSource.GRAVEYARD:
             player.graveyard.remove(card.combat_row, card)
-        elif self.next_card_source is CardSource.WEATHER_DECK:
+        elif CardSource.is_weather(self.next_card_source):
             player.deck.remove(card.combat_row, card)
 
     def _add_card_to_destination(self, player: Player, row: CombatRow, card: Card):
@@ -153,6 +161,7 @@ class GameEnvironment:
                 self.next_card_source = CardSource.LEADER
                 result = self.step(player, card.combat_row, card)
             else:
+                self.next_player = player
                 self._handle_leader_ability(card)
                 result = self.game_over()
         else:
@@ -168,6 +177,15 @@ class GameEnvironment:
             self.next_card_destination = CardDestination.HAND
         elif card.leader_ability is LeaderAbility.PICK_WEATHER:
             self.next_card_source = CardSource.WEATHER_DECK
+            self.next_card_destination = CardDestination.BOARD
+        elif card.leader_ability is LeaderAbility.RAIN_DECK:
+            self.next_card_source = CardSource.WEATHER_RAIN
+            self.next_card_destination = CardDestination.BOARD
+        elif card.leader_ability is LeaderAbility.FOG_DECK:
+            self.next_card_source = CardSource.WEATHER_FOG
+            self.next_card_destination = CardDestination.BOARD
+        elif card.leader_ability is LeaderAbility.FROST_DECK:
+            self.next_card_source = CardSource.WEATHER_FROST
             self.next_card_destination = CardDestination.BOARD
 
     def _end_of_step(self, player: Player, card: Card):
@@ -265,17 +283,18 @@ class _PossibleCardsTracker:
         """Returns all cards current player can play. If obfuscate is true, the hand is ignored and only not played
         cards are returned """
         card_source = self.environment.next_card_source
-        if card_source is CardSource.HAND or card_source is CardSource.WEATHER_DECK:
+        if card_source is CardSource.HAND or CardSource.is_weather(card_source):
             if obfuscate:
                 result = self._get_available_cards()
                 result = list(set(result))
             else:
                 if card_source is CardSource.HAND:
                     result = self.environment.next_player.hand.get_all_cards()
-                else:  # card_source is CardSource.WEATHER_DECK
+                else:  # card_source is some kind of weather from deck
                     result = self.environment.next_player.deck.get_all_cards()
-            if card_source is CardSource.WEATHER_DECK:
-                result = [card for card in result if Weather.ability_is_weather(card.ability)]
+
+            if CardSource.is_weather(card_source):
+                result = self._filter_weather(result, card_source)
 
         elif card_source is CardSource.GRAVEYARD or card_source is CardSource.ENEMY_GRAVEYARD:
             if card_source is CardSource.GRAVEYARD:
@@ -288,8 +307,19 @@ class _PossibleCardsTracker:
             # leader ability
             if self.environment.passive_leader_state.random_medic:
                 result = [random.choice(result)]
-
         return result
+
+    def _filter_weather(self, cards: List[Card], card_source: CardSource) -> List[Card]:
+        if card_source is CardSource.WEATHER_DECK:
+            cards = [card for card in cards if Weather.ability_is_weather(card.ability)]
+        elif card_source is CardSource.WEATHER_RAIN:
+            cards = [card for card in cards if card.ability is Ability.RAIN]
+        elif card_source is CardSource.WEATHER_FOG:
+            cards = [card for card in cards if card.ability is Ability.FOG]
+        elif card_source is CardSource.WEATHER_FROST:
+            cards = [card for card in cards if card.ability is Ability.FROST]
+
+        return cards
 
     def _filter_non_revivable_cards(self, cards: List[Card]) -> List[Card]:
         # remove cards that cannot be revived

@@ -117,6 +117,7 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual(CardSource.GRAVEYARD, self.environment.next_card_source)
         self.assertEqual(CardDestination.HAND, self.environment.next_card_destination)
         self.assertIsNone(self.player1.leader)
+        self.assertEqual(self.player1, self.environment.next_player)
 
         expected = self.player1.hand.get_all_cards() + [revived_card]
         self.environment.step(self.player1, revived_card.combat_row, revived_card)
@@ -130,6 +131,7 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual(CardSource.ENEMY_GRAVEYARD, self.environment.next_card_source)
         self.assertEqual(CardDestination.HAND, self.environment.next_card_destination)
         self.assertIsNone(self.player1.leader)
+        self.assertEqual(self.player1, self.environment.next_player)
 
         expected = self.player1.hand.get_all_cards() + [revived_card]
         self.environment.step(self.player1, revived_card.combat_row, revived_card)
@@ -145,6 +147,55 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual(CardSource.WEATHER_DECK, self.environment.next_card_source)
         self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
         self.assertIsNone(self.player1.leader)
+        self.assertEqual(self.player1, self.environment.next_player)
+
+        expected = weather_cards[0]
+        self.environment.step(self.player1, expected.combat_row, expected)
+        self.assertEqual([Weather.ability_to_weather(expected.ability)], self.environment.board.weather)
+        self.assertCountEqual([weather_cards[1]] + deck_cards, self.player1.deck.get_all_cards())
+
+    def test_rain_leader(self):
+        deck_cards = self.player1.deck.get_all_cards()
+        weather_cards = [Card(CombatRow.NONE, 0, Ability.RAIN), Card(CombatRow.NONE, 0, Ability.CLEAR_WEATHER)]
+        self.player1.deck.add(CombatRow.NONE, weather_cards[0])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[1])
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.RAIN_DECK))
+        self.assertEqual(CardSource.WEATHER_RAIN, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
+        self.assertIsNone(self.player1.leader)
+        self.assertEqual(self.player1, self.environment.next_player)
+
+        expected = weather_cards[0]
+        self.environment.step(self.player1, expected.combat_row, expected)
+        self.assertEqual([Weather.ability_to_weather(expected.ability)], self.environment.board.weather)
+        self.assertCountEqual([weather_cards[1]] + deck_cards, self.player1.deck.get_all_cards())
+
+    def test_fog_leader(self):
+        deck_cards = self.player1.deck.get_all_cards()
+        weather_cards = [Card(CombatRow.NONE, 0, Ability.FOG), Card(CombatRow.NONE, 0, Ability.CLEAR_WEATHER)]
+        self.player1.deck.add(CombatRow.NONE, weather_cards[0])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[1])
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.FOG_DECK))
+        self.assertEqual(CardSource.WEATHER_FOG, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
+        self.assertIsNone(self.player1.leader)
+        self.assertEqual(self.player1, self.environment.next_player)
+
+        expected = weather_cards[0]
+        self.environment.step(self.player1, expected.combat_row, expected)
+        self.assertEqual([Weather.ability_to_weather(expected.ability)], self.environment.board.weather)
+        self.assertCountEqual([weather_cards[1]] + deck_cards, self.player1.deck.get_all_cards())
+
+    def test_frost_leader(self):
+        deck_cards = self.player1.deck.get_all_cards()
+        weather_cards = [Card(CombatRow.NONE, 0, Ability.FROST), Card(CombatRow.NONE, 0, Ability.CLEAR_WEATHER)]
+        self.player1.deck.add(CombatRow.NONE, weather_cards[0])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[1])
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.FROST_DECK))
+        self.assertEqual(CardSource.WEATHER_FROST, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
+        self.assertIsNone(self.player1.leader)
+        self.assertEqual(self.player1, self.environment.next_player)
 
         expected = weather_cards[0]
         self.environment.step(self.player1, expected.combat_row, expected)
@@ -319,3 +370,63 @@ class PossibleCardsTrackerTest(unittest.TestCase):
         expected = [card for card in expected if Weather.ability_is_weather(card.ability)]
         expected = list(set(expected))
         self.assertCountEqual(expected, self.tracker.get_possible_cards(True))
+
+    def test_get_possible_cards_rain_leader(self):
+        weather_cards = [Card(CombatRow.NONE, 0, Ability.RAIN), Card(CombatRow.NONE, 0, Ability.CLEAR_WEATHER)]
+        self.player1.deck = CardCollection([])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[0])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[1])
+        self.player1.deck.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 8))
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.RAIN_DECK))
+
+        self.assertCountEqual([weather_cards[0]], self.tracker.get_possible_cards(False))
+
+    def test_get_possible_cards_rain_leader_obfuscate(self):
+        weather_cards = [Card(CombatRow.NONE, 0, Ability.RAIN), Card(CombatRow.NONE, 0, Ability.CLEAR_WEATHER)]
+        self.player1.deck = CardCollection([])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[0])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[1])
+        self.player1.deck.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 8))
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.RAIN_DECK))
+
+        self.assertCountEqual([weather_cards[0]], self.tracker.get_possible_cards(True))
+
+    def test_get_possible_cards_fog_leader(self):
+        weather_cards = [Card(CombatRow.NONE, 0, Ability.FOG), Card(CombatRow.NONE, 0, Ability.CLEAR_WEATHER)]
+        self.player1.deck = CardCollection([])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[0])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[1])
+        self.player1.deck.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 8))
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.FOG_DECK))
+
+        self.assertCountEqual([weather_cards[0]], self.tracker.get_possible_cards(False))
+
+    def test_get_possible_cards_fog_leader_obfuscate(self):
+        weather_cards = [Card(CombatRow.NONE, 0, Ability.FOG), Card(CombatRow.NONE, 0, Ability.CLEAR_WEATHER)]
+        self.player1.deck = CardCollection([])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[0])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[1])
+        self.player1.deck.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 8))
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.FOG_DECK))
+
+        self.assertCountEqual([weather_cards[0]], self.tracker.get_possible_cards(True))
+
+    def test_get_possible_cards_frost_leader(self):
+        weather_cards = [Card(CombatRow.NONE, 0, Ability.FROST), Card(CombatRow.NONE, 0, Ability.CLEAR_WEATHER)]
+        self.player1.deck = CardCollection([])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[0])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[1])
+        self.player1.deck.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 8))
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.FROST_DECK))
+
+        self.assertCountEqual([weather_cards[0]], self.tracker.get_possible_cards(False))
+
+    def test_get_possible_cards_frost_leader_obfuscate(self):
+        weather_cards = [Card(CombatRow.NONE, 0, Ability.FROST), Card(CombatRow.NONE, 0, Ability.CLEAR_WEATHER)]
+        self.player1.deck = CardCollection([])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[0])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[1])
+        self.player1.deck.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 8))
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.FROST_DECK))
+
+        self.assertCountEqual([weather_cards[0]], self.tracker.get_possible_cards(True))
