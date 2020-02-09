@@ -15,7 +15,7 @@ from source.core.player import Faction
 
 
 def get_cards(faction: Faction) -> List[Card]:
-    result = neutral_cards
+    result = list(neutral_cards)
     if faction is Faction.MONSTER:
         result.extend(monster_cards)
     elif faction is Faction.NILFGAARD:
