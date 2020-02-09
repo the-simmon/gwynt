@@ -215,7 +215,7 @@ class PossibleCardsTrackerTest(unittest.TestCase):
     def test_get_available_cards(self):
         self.player1_cards.pop(0)
         self.player1_cards.pop(1)
-        actual = self.tracker.get_available_cards()
+        actual = self.tracker._get_available_cards()
         self.assertCountEqual(self.player1_cards, actual)
 
     def test_get_available_cards_spy(self):
@@ -224,7 +224,7 @@ class PossibleCardsTrackerTest(unittest.TestCase):
         self.player1_cards.pop(0)
         self.player1_cards.pop(1)
         self.player1_cards.pop(2)
-        actual = self.tracker.get_available_cards()
+        actual = self.tracker._get_available_cards()
         self.assertCountEqual(self.player1_cards, actual)
 
     def test_get_possible_cards(self):
@@ -278,3 +278,16 @@ class PossibleCardsTrackerTest(unittest.TestCase):
         self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.PICK_WEATHER))
 
         self.assertCountEqual(weather_cards, self.tracker.get_possible_cards(False))
+
+    def test_get_possible_cards_pick_weather_obfuscate(self):
+        weather_cards = [Card(CombatRow.NONE, 0, Ability.FOG), Card(CombatRow.NONE, 0, Ability.CLEAR_WEATHER)]
+        self.player1.deck = CardCollection([])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[0])
+        self.player1.deck.add(CombatRow.NONE, weather_cards[1])
+        self.player1.deck.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 8))
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.PICK_WEATHER))
+
+        expected = get_cards(self.player1.faction)
+        expected = [card for card in expected if Weather.ability_is_weather(card.ability)]
+        expected = list(set(expected))
+        self.assertCountEqual(expected, self.tracker.get_possible_cards(True))

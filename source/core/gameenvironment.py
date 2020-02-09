@@ -253,7 +253,7 @@ class _PossibleCardsTracker:
             if not obfuscate:
                 result = self.environment.next_player.hand.get_all_cards()
             else:
-                not_played_cards = self.get_available_cards()
+                not_played_cards = self._get_available_cards()
                 result = list(set(not_played_cards))
         elif card_source is CardSource.GRAVEYARD or card_source is CardSource.ENEMY_GRAVEYARD:
             if card_source is CardSource.GRAVEYARD:
@@ -268,8 +268,12 @@ class _PossibleCardsTracker:
                 result = [random.choice(result)]
 
         elif card_source is CardSource.WEATHER_DECK:
-            result = self.environment.next_player.deck.get_all_cards()
-            result = [card for card in result if Ability.is_weather(card.ability)]
+            if not obfuscate:
+                result = self.environment.next_player.deck.get_all_cards()
+            else:
+                result = self._get_available_cards()
+                result = list(set(result))
+            result = [card for card in result if Weather.ability_is_weather(card.ability)]
 
         return result
 
@@ -280,7 +284,7 @@ class _PossibleCardsTracker:
                 cards.remove(card)
         return cards
 
-    def get_available_cards(self) -> List[Card]:
+    def _get_available_cards(self) -> List[Card]:
         environment = self.environment
         all_cards = get_cards(environment.next_player.faction)
         played_cards = environment.played_cards[environment.next_player.id]
