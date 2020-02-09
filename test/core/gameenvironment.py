@@ -291,28 +291,18 @@ class PossibleCardsTrackerTest(unittest.TestCase):
         self.environment.step(self.player1, self.player1_cards[1].combat_row, self.player1_cards[1])
         self.environment.next_player = self.player1
 
-    def test_get_available_cards(self):
-        self.player1_cards.pop(0)
-        self.player1_cards.pop(1)
-        actual = self.tracker._get_available_cards()
-        self.assertCountEqual(self.player1_cards, actual)
-
-    def test_get_available_cards_spy(self):
-        self.environment.step(self.player1, self.player1_cards[2].combat_row, self.player1_cards[2])
-        self.environment.next_player = self.player1
-        self.player1_cards.pop(0)
-        self.player1_cards.pop(1)
-        self.player1_cards.pop(2)
-        actual = self.tracker._get_available_cards()
-        self.assertCountEqual(self.player1_cards, actual)
-
     def test_get_possible_cards(self):
         actual = self.tracker.get_possible_cards(False)
         self.assertCountEqual(self.player1_cards[2:10], actual)
 
     def test_get_possible_cards_obfuscate(self):
+        expected = get_cards(self.player1.faction)
+        expected.remove(self.player1_cards[0])
+        expected.remove(self.player1_cards[1])
+        expected = set(expected)
         actual = self.tracker.get_possible_cards(True)
-        self.assertCountEqual(set(self.player1_cards[2:]), actual)
+
+        self.assertCountEqual(expected, actual)
 
     def test_get_possible_cards_medic(self):
         self.environment.next_card_source = CardSource.GRAVEYARD
