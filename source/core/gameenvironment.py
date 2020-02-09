@@ -25,16 +25,28 @@ class CardSource(enum.Enum):
     WEATHER_RAIN = 5
     WEATHER_FOG = 6
     WEATHER_FROST = 7
+    EXCHANGE_HAND_4_DECK2 = 8
+    EXCHANGE_HAND_4_DECK1 = 9
+    DECK = 10
 
     @staticmethod
     def is_weather(source: CardSource) -> bool:
         return source is CardSource.WEATHER_DECK or source is CardSource.WEATHER_RAIN or \
                source is CardSource.WEATHER_FOG or source is CardSource.WEATHER_FROST
 
+    @staticmethod
+    def is_exchange_hand_4_deck(source: CardSource) -> bool:
+        return source is CardSource.EXCHANGE_HAND_4_DECK1 or source is CardSource.EXCHANGE_HAND_4_DECK2
+
+    @staticmethod
+    def is_deck(source: CardSource) -> bool:
+        return CardSource.is_weather(source) or source is CardSource.DECK
+
 
 class CardDestination(enum.Enum):
     BOARD = 0
     HAND = 1
+    GRAVEYARD = 2
 
 
 class PassiveLeaderState:
@@ -128,11 +140,11 @@ class GameEnvironment:
         return self.game_over()
 
     def _remove_card_from_source(self, player: Player, card: Card):
-        if self.next_card_source is CardSource.HAND:
+        if self.next_card_source is CardSource.HAND or CardSource.is_exchange_hand_4_deck(self.next_card_source):
             player.hand.remove(card.combat_row, card)
         elif self.next_card_source is CardSource.GRAVEYARD:
             player.graveyard.remove(card.combat_row, card)
-        elif CardSource.is_weather(self.next_card_source):
+        elif CardSource.is_deck(self.next_card_source):
             player.deck.remove(card.combat_row, card)
 
     def _add_card_to_destination(self, player: Player, row: CombatRow, card: Card):
@@ -141,6 +153,8 @@ class GameEnvironment:
             self.played_cards[player.id].append(card)
         elif self.next_card_destination is CardDestination.HAND:
             player.hand.add(card.combat_row, card)
+        elif self.next_card_destination is CardDestination.GRAVEYARD:
+            player.graveyard.add(card.combat_row, card)
 
     def step_decoy(self, player: Player, row: CombatRow, decoy: Card, replace_card: Card) -> bool:
         player.hand.remove(decoy.combat_row, decoy)
@@ -187,13 +201,16 @@ class GameEnvironment:
         elif card.leader_ability is LeaderAbility.FROST_DECK:
             self.next_card_source = CardSource.WEATHER_FROST
             self.next_card_destination = CardDestination.BOARD
+        elif card.leader_ability is LeaderAbility.SWAP_CARDS:
+            self.next_card_source = CardSource.EXCHANGE_HAND_4_DECK2
+            self.next_card_destination = CardDestination.GRAVEYARD
 
     def _end_of_step(self, player: Player, card: Card):
         if len(player.hand.get_all_cards()) == 0 or not card:
             self.passed[player.id] = True
 
-        self.next_player, self.next_card_source = self._determine_current_player(card, player)
-        self.next_card_destination = CardDestination.BOARD
+        self.next_player, self.next_card_source, self.next_card_destination = self._determine_current_player(card,
+                                                                                                             player)
 
         if self.round_over():
             self.next_player, self.next_card_source = self._end_of_round()
@@ -242,15 +259,23 @@ class GameEnvironment:
 
         return current_player, card_source
 
-    def _determine_current_player(self, played_card: Card, player: Player) -> Tuple[Player, CardSource]:
+    def _determine_current_player(self, played_card: Card, player: Player) -> Tuple[
+        Player, CardSource, CardDestination]:
         if played_card and played_card.ability is Ability.MEDIC and len(player.graveyard.get_all_cards()):
-            result = self.next_player, CardSource.GRAVEYARD
+            result = self.next_player, CardSource.GRAVEYARD, CardDestination.BOARD
+
+        elif CardSource.is_exchange_hand_4_deck(self.next_card_source):
+            if self.next_card_source is CardSource.EXCHANGE_HAND_4_DECK2:
+                result = player, CardSource.EXCHANGE_HAND_4_DECK1, CardDestination.GRAVEYARD
+            else:
+                result = player, CardSource.DECK, CardDestination.HAND
+
         else:
             enemy = self.board.get_enemy_player(self.next_player)
             if self.passed[enemy.id]:
-                result = self.next_player, CardSource.HAND
+                result = self.next_player, CardSource.HAND, CardDestination.BOARD
             else:
-                result = enemy, CardSource.HAND
+                result = enemy, CardSource.HAND, CardDestination.BOARD
 
         return result
 
@@ -283,13 +308,16 @@ class _PossibleCardsTracker:
         """Returns all cards current player can play. If obfuscate is true, the hand is ignored and only not played
         cards are returned """
         card_source = self.environment.next_card_source
-        if card_source is CardSource.HAND or CardSource.is_weather(card_source):
+        if card_source is CardSource.HAND or CardSource.is_weather(card_source) or CardSource.is_exchange_hand_4_deck(
+                card_source) or card_source is CardSource.DECK:
             if obfuscate:
                 result = self._get_available_cards()
                 result = list(set(result))
             else:
-                if card_source is CardSource.HAND:
+                if card_source is CardSource.HAND or CardSource.is_exchange_hand_4_deck(card_source):
                     result = self.environment.next_player.hand.get_all_cards()
+                elif card_source is CardSource.DECK:
+                    result = self.environment.next_player.deck.get_all_cards()
                 else:  # card_source is some kind of weather from deck
                     result = self.environment.next_player.deck.get_all_cards()
 

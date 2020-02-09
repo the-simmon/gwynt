@@ -202,6 +202,33 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertEqual([Weather.ability_to_weather(expected.ability)], self.environment.board.weather)
         self.assertCountEqual([weather_cards[1]] + deck_cards, self.player1.deck.get_all_cards())
 
+    def test_swap_cards_leader(self):
+        player1_hand = self.player1.hand.get_all_cards()
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.SWAP_CARDS))
+        self.assertEqual(CardSource.EXCHANGE_HAND_4_DECK2, self.environment.next_card_source)
+        self.assertEqual(CardDestination.GRAVEYARD, self.environment.next_card_destination)
+        self.assertIsNone(self.player1.leader)
+        self.assertEqual(self.player1, self.environment.next_player)
+
+        self.environment.step(self.player1, player1_hand[0].combat_row, player1_hand[0])
+        self.assertEqual(CardSource.EXCHANGE_HAND_4_DECK1, self.environment.next_card_source)
+        self.assertEqual(CardDestination.GRAVEYARD, self.environment.next_card_destination)
+        self.assertEqual(self.player1, self.environment.next_player)
+        self.assertCountEqual(player1_hand[1:], self.player1.hand.get_all_cards())
+
+        self.environment.step(self.player1, player1_hand[1].combat_row, player1_hand[1])
+        self.assertEqual(CardSource.DECK, self.environment.next_card_source)
+        self.assertEqual(CardDestination.HAND, self.environment.next_card_destination)
+        self.assertEqual(self.player1, self.environment.next_player)
+        self.assertCountEqual(player1_hand[2:], self.player1.hand.get_all_cards())
+
+        card = self.player1.deck.get_all_cards()[0]
+        self.environment.step(self.player1, card.combat_row, card)
+        self.assertEqual(CardSource.HAND, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
+        self.assertEqual(self.player2, self.environment.next_player)
+        self.assertCountEqual(player1_hand[2:] + [card], self.player1.hand.get_all_cards())
+
 
 class PassiveLeaderStateTest(unittest.TestCase):
 
@@ -420,3 +447,30 @@ class PossibleCardsTrackerTest(unittest.TestCase):
         self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.FROST_DECK))
 
         self.assertCountEqual([weather_cards[0]], self.tracker.get_possible_cards(True))
+
+    def test_get_possible_cards_swap_cards_leader(self):
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.SWAP_CARDS))
+        self.assertCountEqual(self.player1.hand.get_all_cards(), self.tracker.get_possible_cards(False))
+
+        self.environment.next_card_source = CardSource.EXCHANGE_HAND_4_DECK1
+        self.assertCountEqual(self.player1.hand.get_all_cards(), self.tracker.get_possible_cards(False))
+
+        self.environment.next_card_source = CardSource.DECK
+        self.assertCountEqual(self.player1.deck.get_all_cards(), self.tracker.get_possible_cards(False))
+
+    def test_get_possible_cards_swap_cards_leader_obfuscate(self):
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.SWAP_CARDS))
+
+        expected = get_cards(self.player1.faction)
+        expected.remove(self.player1_cards[0])
+        expected.remove(self.player1_cards[1])
+        expected = set(expected)
+        actual = self.tracker.get_possible_cards(True)
+
+        self.assertCountEqual(expected, actual)
+        
+        self.environment.next_card_source = CardSource.EXCHANGE_HAND_4_DECK1
+        self.assertCountEqual(self.player1.hand.get_all_cards(), self.tracker.get_possible_cards(False))
+
+        self.environment.next_card_source = CardSource.DECK
+        self.assertCountEqual(self.player1.deck.get_all_cards(), self.tracker.get_possible_cards(False))
