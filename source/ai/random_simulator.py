@@ -1,7 +1,7 @@
 import random
-from typing import List
+from typing import List, Tuple
 
-from source.core.card import Card
+from source.core.card import Card, Ability
 from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
@@ -19,10 +19,27 @@ def simulate_random_game(environment: GameEnvironment) -> Player:
             row = random.choice(CombatRow.get_possible_rows(random_card))
         else:
             row = None
-        game_over = environment.step(environment.next_player, row, random_card)
+
+        if random_card and random_card.ability is Ability.DECOY:
+            row, card = _get_decoy(environment)
+            if card:
+                game_over = environment.step_decoy(environment.next_player, row, random_card, card)
+        else:
+            game_over = environment.step(environment.next_player, row, random_card)
 
     return environment.get_winner()
 
 
 def _get_potential_cards(environment: GameEnvironment) -> List[Card]:
     return environment.card_tracker.get_possible_cards(False)
+
+
+def _get_decoy(environment: GameEnvironment) -> Tuple[CombatRow, Card]:
+    card_collection = environment.board.cards[environment.next_player.id]
+    try:
+        row = random.choice(list(card_collection.keys()))
+        card = random.choice(card_collection[row])
+    except IndexError:
+        row, card = None, None
+
+    return row, card
