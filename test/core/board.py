@@ -98,3 +98,18 @@ class BoardTest(unittest.TestCase):
     def test_get_enemy(self):
         actual = self.board.get_enemy_player(self.player1)
         self.assertEqual(self.player2, actual)
+
+    def test_agile_to_best_row_leader(self):
+        self.board.cards[self.player1.id].add(CombatRow.CLOSE, Card(CombatRow.AGILE, 9))
+        self.board.cards[self.player1.id].add(CombatRow.CLOSE, Card(CombatRow.AGILE, 5, hero=True))
+        self.board.cards[self.player1.id].add(CombatRow.RANGE, Card(CombatRow.AGILE, 9))
+        self.board.cards[self.player1.id].add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 3))
+        self.board.weather = [Weather.FROST]
+
+        self.assertEqual(16, self.board.calculate_damage(self.player1))
+        self.board.agile_to_best_row_leader(self.player1)
+        self.assertEqual(24, self.board.calculate_damage(self.player1))
+        expected_close = [Card(CombatRow.AGILE, 5, hero=True), Card(CombatRow.CLOSE, 3)]
+        expected_range = Card(CombatRow.AGILE, 9) * 2
+        self.assertCountEqual(expected_close, self.board.cards[self.player1.id][CombatRow.CLOSE])
+        self.assertCountEqual(expected_range, self.board.cards[self.player1.id][CombatRow.RANGE])

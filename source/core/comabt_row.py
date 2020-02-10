@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import enum
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from source.core.card import Card
@@ -16,13 +16,14 @@ class CombatRow(enum.Enum):
     NONE = 5
 
     @staticmethod
-    def get_possible_rows(card: Card) -> List[CombatRow]:
+    def get_possible_rows(input: Union[Card, CombatRow]) -> List[CombatRow]:
+        combat_row = input if type(input) is CombatRow else input.combat_row
         result = []
-        if card.combat_row is CombatRow.AGILE or card.combat_row is CombatRow.SPECIAL:
+        if combat_row is CombatRow.AGILE or combat_row is CombatRow.SPECIAL:
             result.append(CombatRow.CLOSE)
             result.append(CombatRow.RANGE)
-            if card.combat_row is CombatRow.SPECIAL:
+            if combat_row is CombatRow.SPECIAL:
                 result.append(CombatRow.SIEGE)
         else:
-            result.append(card.combat_row)
+            result.append(combat_row)
         return result

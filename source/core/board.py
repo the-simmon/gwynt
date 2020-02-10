@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import operator
 from collections import defaultdict
 from copy import deepcopy
-from typing import DefaultDict, List
+from typing import DefaultDict, List, Dict
 
 from source.core.card import Card, Ability, LeaderAbility
 from source.core.cardcollection import CardCollection
@@ -72,6 +73,31 @@ class Board:
                     row_possible = False
                     break
         return row_possible
+
+    def agile_to_best_row_leader(self, player: Player):
+        def extract_and_remove_agile_cards(card_collection: CardCollection) -> List[Card]:
+            agile_cards: List[Card] = []
+            for row in CombatRow.get_possible_rows(CombatRow.AGILE):
+                for card in card_collection[row]:
+                    if card.combat_row is CombatRow.AGILE and not card.hero:
+                        agile_cards.append(card)
+                        card_collection.remove(row, card)
+            return agile_cards
+
+        damage_per_row: Dict[CombatRow, int] = {}
+        card_collection = deepcopy(self.cards[player.id])
+        agile_cards = extract_and_remove_agile_cards(card_collection)
+
+        for row in CombatRow.get_possible_rows(CombatRow.AGILE):
+            copy_card_collection = deepcopy(card_collection)
+            for card in agile_cards:
+                copy_card_collection.add(row, card)
+            damage_per_row[row] = copy_card_collection.calculate_damage(self.weather, self.passive_leaders)
+
+        best_row = max(damage_per_row.items(), key=operator.itemgetter(1))[0]
+        for card in agile_cards:
+            card_collection.add(best_row, card)
+        self.cards[player.id] = card_collection
 
     def _check_ability(self, player: Player, card: Card):
         ability = card.ability
