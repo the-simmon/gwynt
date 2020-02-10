@@ -74,6 +74,7 @@ class Node:
         self.expanded = True
 
         self._add_pass_node()
+        self._add_leader_node()
 
         potential_cards = self._get_potential_cards()
         for card in potential_cards:
@@ -90,7 +91,7 @@ class Node:
                         # for technical reasons, the card has to be added to the player
                         # (active cards will be overwritten in next node/ random simulation)
                         if self.next_player_type is PlayerType.ENEMY:
-                            player_copy.hand.add(card.combat_row, card)
+                            environment_copy.add_card_to_source(player_copy, card)
 
                         environment_copy.step(player_copy, row, card)
 
@@ -130,6 +131,15 @@ class Node:
 
                     node = Node(environment_copy, self, self.next_player_type, self.next_player, decoy, row)
                     self.leafs.append(node)
+
+    def _add_leader_node(self):
+        if self.next_player.leader:
+            environment_copy = deepcopy(self.environment)
+            player_copy = environment_copy.board.get_player(self.next_player)
+            leader = player_copy.leader
+            environment_copy.step_leader(player_copy, leader)
+            node = Node(environment_copy, self, self.next_player_type, self.next_player, leader, None, None)
+            self.leafs.append(node)
 
     def simulate(self):
         environment_copy = deepcopy(self.environment)

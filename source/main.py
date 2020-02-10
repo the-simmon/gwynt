@@ -2,7 +2,7 @@ import asyncio
 import random
 
 from source.ai.mcts.mcts import MCTS
-from source.core.card import Ability
+from source.core.card import Ability, LeaderCard
 from source.core.cards.util import get_cards, get_leaders
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Faction, Player
@@ -62,6 +62,8 @@ class Main:
         card, row, replaced_card = mcts.run()
         if card and card.ability is Ability.DECOY:
             game_over = self.environment.step_decoy(current_player, row, card, replaced_card)
+        elif type(card) is LeaderCard:
+            game_over = self.environment.step_leader(current_player, card)
         else:
             game_over = self.environment.step(current_player, row, card)
 

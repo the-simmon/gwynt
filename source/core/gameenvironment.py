@@ -148,6 +148,14 @@ class GameEnvironment:
         elif CardSource.is_deck(self.next_card_source):
             player.deck.remove(card.combat_row, card)
 
+    def add_card_to_source(self, player: Player, card: Card):
+        if self.next_card_source is CardSource.HAND or CardSource.is_exchange_hand_4_deck(self.next_card_source):
+            player.hand.add(card.combat_row, card)
+        elif self.next_card_source is CardSource.GRAVEYARD:
+            player.graveyard.add(card.combat_row, card)
+        elif CardSource.is_deck(self.next_card_source):
+            player.deck.add(card.combat_row, card)
+
     def _add_card_to_destination(self, player: Player, row: CombatRow, card: Card):
         if self.next_card_destination is CardDestination.BOARD:
             self.board.add(player, row, card)
