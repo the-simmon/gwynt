@@ -77,7 +77,7 @@ class Game(tk.Frame):
         tk.Frame(self.info_frame, height=Card.HEIGHT).pack()
         tk.Label(self.info_frame, text=f'Enemy leader: {str(core_board.get_enemy_player(self.player).leader)}').pack()
         tk.Label(self.info_frame, text=f'Self leader: {str(self.player.leader)}').pack()
-        button_state = tk.DISABLED if self.player.leader.is_passive() else tk.NORMAL
+        button_state = tk.DISABLED if not self.player.leader and self.player.leader.is_passive() else tk.NORMAL
         tk.Button(self.info_frame, text="Leader", command=partial(self.clicker.leader_click, self.player),
                   state=button_state).pack()
 
