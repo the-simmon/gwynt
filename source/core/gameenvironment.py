@@ -28,6 +28,7 @@ class CardSource(enum.Enum):
     EXCHANGE_HAND_4_DECK2 = 8
     EXCHANGE_HAND_4_DECK1 = 9
     DECK = 10
+    AGILE_2_BEST_ROW = 11
 
     @staticmethod
     def is_weather(source: CardSource) -> bool:
@@ -204,12 +205,18 @@ class GameEnvironment:
         elif card.leader_ability is LeaderAbility.SWAP_CARDS:
             self.next_card_source = CardSource.EXCHANGE_HAND_4_DECK2
             self.next_card_destination = CardDestination.GRAVEYARD
+        elif card.leader_ability is LeaderAbility.OPTIMIZE_AGILE:
+            self.board.agile_to_best_row_leader(self.next_player)
+            # source and destination will be reverted by the if block below, as this leader does not play a card
+            self.next_card_source = CardSource.AGILE_2_BEST_ROW
 
         # revert leader ability if no cards can be placed on the board, to avoid blocking
         if not self.card_tracker.get_possible_cards(False):
             self.next_card_source = CardSource.HAND
             self.next_card_destination = CardDestination.BOARD
-            self.next_player = self.board.get_enemy_player(self.next_player)
+            enemy = self.board.get_enemy_player(self.next_player)
+            if not self.passed[enemy.id]:
+                self.next_player = enemy
 
     def _end_of_step(self, player: Player, card: Card):
         if len(player.hand.get_all_cards()) == 0 or not card:
@@ -313,6 +320,7 @@ class _PossibleCardsTracker:
     def get_possible_cards(self, obfuscate: bool) -> List[Card]:
         """Returns all cards current player can play. If obfuscate is true, the hand is ignored and only not played
         cards are returned """
+        result = []
         card_source = self.environment.next_card_source
         if card_source is CardSource.HAND or CardSource.is_weather(card_source) or CardSource.is_exchange_hand_4_deck(
                 card_source) or card_source is CardSource.DECK:

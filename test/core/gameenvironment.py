@@ -236,6 +236,21 @@ class GameEnvironmentTest(unittest.TestCase):
         self.assertIsNone(self.player1.leader)
         self.assertEqual(self.player2, self.environment.next_player)
 
+    def test_leader_no_cards_available_enemy_passed(self):
+        self.environment.passed[self.player2.id] = True
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.GRAVEYARD2HAND))
+        self.assertEqual(CardSource.HAND, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
+        self.assertIsNone(self.player1.leader)
+        self.assertEqual(self.player1, self.environment.next_player)
+
+    def test_leader_agile_best_row(self):
+        self.environment.step_leader(self.player1, LeaderCard(leader_ability=LeaderAbility.OPTIMIZE_AGILE))
+        self.assertEqual(CardSource.HAND, self.environment.next_card_source)
+        self.assertEqual(CardDestination.BOARD, self.environment.next_card_destination)
+        self.assertIsNone(self.player1.leader)
+        self.assertEqual(self.player2, self.environment.next_player)
+
 
 class PassiveLeaderStateTest(unittest.TestCase):
 
