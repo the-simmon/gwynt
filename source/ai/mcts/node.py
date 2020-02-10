@@ -129,7 +129,7 @@ class Node:
 
                     environment_copy.step_decoy(player_copy, row, decoy, card)
 
-                    node = Node(environment_copy, self, self.next_player_type, self.next_player, decoy, row)
+                    node = Node(environment_copy, self, self.next_player_type, self.next_player, decoy, row, card)
                     self.leafs.append(node)
 
     def _add_leader_node(self):
