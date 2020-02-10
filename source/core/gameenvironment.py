@@ -355,7 +355,7 @@ class _PossibleCardsTracker:
             result = self._filter_non_revivable_cards(result)
 
             # leader ability
-            if self.environment.passive_leader_state.random_medic:
+            if self.environment.passive_leader_state.random_medic and result:
                 result = [random.choice(result)]
         return result
 
