@@ -38,3 +38,16 @@ class CardCollectionTest(unittest.TestCase):
         expected = 48
         actual = self.card_collection.calculate_damage([Weather.CLEAR], [LeaderAbility.SPY_DAMAGE])
         self.assertEqual(expected, actual)
+
+    def test_2tight_bond(self):
+        self.card_collection = CardCollection(Card(CombatRow.CLOSE, 3, Ability.TIGHT_BOND) * 2)
+        self.assertEqual(12, self.card_collection.calculate_damage([Weather.CLEAR], []))
+
+    def test_3tight_bond(self):
+        self.card_collection = CardCollection(Card(CombatRow.CLOSE, 3, Ability.TIGHT_BOND) * 3)
+        self.assertEqual(36, self.card_collection.calculate_damage([Weather.CLEAR], []))
+
+    def test_3tight_bond_with_horn(self):
+        self.card_collection = CardCollection(Card(CombatRow.CLOSE, 3, Ability.TIGHT_BOND) * 3 +
+                                              [Card(CombatRow.CLOSE, 0, Ability.SPECIAL_COMMANDERS_HORN)])
+        self.assertEqual(72, self.card_collection.calculate_damage([Weather.CLEAR], []))
