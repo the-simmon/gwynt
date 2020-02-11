@@ -3,9 +3,10 @@ from __future__ import annotations
 import random
 from operator import xor
 from tkinter import messagebox
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, List
 
-from source.core.card import Card
+from source.core.card import Card, Ability
+from source.core.comabt_row import CombatRow
 from source.core.player import Faction, Player
 
 if TYPE_CHECKING:
@@ -17,9 +18,19 @@ def monster_ability_get_card_to_survive(board: Board, player: Player) -> Optiona
     """Keep random card on board"""
     if player.faction is Faction.MONSTER:
         cards = board.cards[player.id].get_all_cards()
+        cards = _filter_cards(cards)
+
         if cards:
             return random.choice(cards)
     return None
+
+
+def _filter_cards(cards: List[Card]) -> List[Card]:
+    result = []
+    for card in cards:
+        if card.ability is not Ability.DECOY and not card.hero or card.combat_row is CombatRow.SPECIAL:
+            result.append(card)
+    return result
 
 
 def nilfgaard_check_draw(environment: GameEnvironment):
