@@ -38,7 +38,7 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
 
     def get_all_cards(self) -> List[Card]:
         result = []
-        for cards in deepcopy(self.values()):
+        for cards in deepcopy(list(self.values())):
             result.extend(cards)
         return result
 
