@@ -374,7 +374,8 @@ class _PossibleCardsTracker:
     def _filter_non_revivable_cards(self, cards: List[Card]) -> List[Card]:
         # remove cards that cannot be revived
         for card in cards:
-            if card.hero or card.combat_row is CombatRow.SPECIAL or card.combat_row is CombatRow.NONE:
+            if card.hero or card.combat_row is CombatRow.SPECIAL or card.combat_row is CombatRow.NONE or \
+                    type(card) is LeaderCard:
                 cards.remove(card)
         return cards
 

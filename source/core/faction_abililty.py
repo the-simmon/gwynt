@@ -5,7 +5,7 @@ from operator import xor
 from tkinter import messagebox
 from typing import Optional, TYPE_CHECKING, List
 
-from source.core.card import Card, Ability
+from source.core.card import Card, Ability, LeaderCard
 from source.core.comabt_row import CombatRow
 from source.core.player import Faction, Player
 
@@ -28,7 +28,8 @@ def monster_ability_get_card_to_survive(board: Board, player: Player) -> Optiona
 def _filter_cards(cards: List[Card]) -> List[Card]:
     result = []
     for card in cards:
-        if card.ability is not Ability.DECOY and not card.hero or card.combat_row is CombatRow.SPECIAL:
+        if card.ability is not Ability.DECOY and not card.hero or card.combat_row is CombatRow.SPECIAL or \
+                type(card) is LeaderCard:
             result.append(card)
     return result
 

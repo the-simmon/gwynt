@@ -5,7 +5,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import DefaultDict, List, Dict
 
-from source.core.card import Card, Ability, LeaderAbility
+from source.core.card import Card, Ability, LeaderAbility, LeaderCard
 from source.core.cardcollection import CardCollection
 from source.core.comabt_row import CombatRow
 from source.core.faction_abililty import monster_ability_get_card_to_survive
@@ -62,7 +62,8 @@ class Board:
         # remove cards that cannot be revived
         for cards in player.graveyard.values():
             for card in cards:
-                if card.hero or card.combat_row is CombatRow.SPECIAL or card.combat_row is CombatRow.NONE:
+                if card.hero or card.combat_row is CombatRow.SPECIAL or card.combat_row is CombatRow.NONE or \
+                        type(card) is LeaderCard:
                     cards.remove(card)
 
     def check_commanders_horn(self, player: Player, horn_card: Card, row: CombatRow) -> bool:
