@@ -151,7 +151,7 @@ class Board:
         damage = _get_highest_index_and_damage(
             self.cards[player.id].get_damage_adjusted_cards(selected_row, self.weather, self.passive_leaders))
 
-        for card in self.cards[player.id][selected_row]:
+        for card in list(self.cards[player.id][selected_row]):
             if card.damage == damage:
                 self.remove(player, selected_row, card)
 

@@ -51,6 +51,14 @@ class BoardTest(unittest.TestCase):
         self.assertEqual([scorched_card], self.player2.graveyard[CombatRow.CLOSE])
         self.assertTrue(scorched_card not in self.board.cards[self.player2.id][scorched_card.combat_row])
 
+    def test_row_scorch_multiple(self):
+        scorched_card = Card(CombatRow.CLOSE, 11, Ability.NONE)
+        self.board.add(self.player2, scorched_card.combat_row, scorched_card)
+        self.board.add(self.player2, scorched_card.combat_row, scorched_card)
+        self.board.add(self.player1, CombatRow.CLOSE, Card(CombatRow.CLOSE, 2, Ability.SCORCH))
+        self.assertCountEqual([scorched_card, scorched_card], self.player2.graveyard[CombatRow.CLOSE])
+        self.assertTrue(scorched_card not in self.board.cards[self.player2.id][scorched_card.combat_row])
+
     def test_special_scorch(self):
         cards_to_scorch1 = [Card(CombatRow.CLOSE, 6, Ability.NONE), Card(CombatRow.SIEGE, 6, Ability.MORALE_BOOST)]
         surviving_cards1 = [Card(CombatRow.CLOSE, 3, Ability.NONE), Card(CombatRow.RANGE, 15, Ability.NONE, hero=True)]
