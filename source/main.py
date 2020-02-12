@@ -50,7 +50,7 @@ class Main:
         game_over = False
 
         while not game_over:
-            game_over = await self._run_async_mcts(current_player)
+            game_over = await self._run_async_mcts(self.environment.next_player)
 
     async def _run_async_mcts(self, current_player: Player) -> bool:
         result = await asyncio.get_event_loop().run_in_executor(None, self._run_mcts, current_player)
