@@ -36,6 +36,6 @@ leaders = [
     LeaderCard(leader_ability=LeaderAbility.FOG_DECK),
     LeaderCard(ability=Ability.CLEAR_WEATHER),
     LeaderCard(CombatRow.RANGE, ability=Ability.SCORCH),
-    LeaderCard(CombatRow.SIEGE, ability=Ability.COMMANDERS_HORN),
+    LeaderCard(CombatRow.SIEGE, ability=Ability.SPECIAL_COMMANDERS_HORN),
     LeaderCard(CombatRow.SIEGE, ability=Ability.SCORCH)
 ]

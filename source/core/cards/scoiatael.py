@@ -35,5 +35,5 @@ leaders = [
     LeaderCard(leader_ability=LeaderAbility.OPTIMIZE_AGILE),
     LeaderCard(leader_ability=LeaderAbility.FROST_DECK),
     LeaderCard(CombatRow.CLOSE, ability=Ability.SCORCH),
-    LeaderCard(CombatRow.RANGE, ability=Ability.COMMANDERS_HORN)
+    LeaderCard(CombatRow.RANGE, ability=Ability.SPECIAL_COMMANDERS_HORN)
 ]

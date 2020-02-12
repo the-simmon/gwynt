@@ -38,7 +38,7 @@ cards = flatten(cards)
 leaders = [
     LeaderCard(leader_ability=LeaderAbility.SPY_DAMAGE),
     LeaderCard(leader_ability=LeaderAbility.GRAVEYARD2HAND),
-    LeaderCard(CombatRow.CLOSE, 0, ability=Ability.COMMANDERS_HORN),
+    LeaderCard(CombatRow.CLOSE, 0, ability=Ability.SPECIAL_COMMANDERS_HORN),
     LeaderCard(leader_ability=LeaderAbility.SWAP_CARDS),
     LeaderCard(leader_ability=LeaderAbility.PICK_WEATHER),
 ]
