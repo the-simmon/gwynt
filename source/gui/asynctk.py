@@ -1,22 +1,14 @@
 import asyncio
 import tkinter as tk
 
-from source.core.gameenvironment import GameEnvironment
-from source.core.player import Player
-from source.gui.cookie_clicker import CookieClicker
-from source.gui.game import Game
 
+class AsyncTK(tk.Tk):
 
-class GUI(tk.Tk):
-
-    def __init__(self, environment: GameEnvironment, player: Player, clicker: CookieClicker):
+    def __init__(self):
         super().__init__()
-        self.game = Game(environment, player, clicker)
-        self.game.pack(in_=self)
         self.update_event = asyncio.Event()
 
     async def redraw(self):
-        self.game.redraw()
         self.update_event.set()
         await self.update_event.wait()
 

@@ -6,8 +6,9 @@ from source.core.card import Ability, LeaderCard
 from source.core.cards.util import get_cards, get_leaders
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Faction, Player
+from source.gui.asynctk import AsyncTK
 from source.gui.cookie_clicker import CookieClicker
-from source.gui.gui import GUI
+from source.gui.game import Game
 
 simulate_both_players = False
 
@@ -29,12 +30,15 @@ class Main:
 
         self.clicker = CookieClicker(self.environment, self._run_async_mcts, self._update_gui)
 
-        self.gui = GUI(self.environment, self.player1, self.clicker)
-        self.gui.after_idle(asyncio.create_task, self._start_game())
-        self.gui.mainloop()
+        self.master = AsyncTK()
+        self.gui = Game(self.environment, self.player1, self.clicker)
+        self.gui.pack(in_=self.master)
+        self.master.after_idle(asyncio.create_task, self._start_game())
+        self.master.mainloop()
 
     async def _update_gui(self):
-        await self.gui.redraw()
+        self.gui.redraw()
+        await self.master.redraw()
 
     async def _start_game(self):
         self.environment.init()
