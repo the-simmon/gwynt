@@ -1,5 +1,4 @@
 import tkinter as tk
-import tkinter.ttk as ttk
 from operator import attrgetter
 from typing import List, Callable
 
@@ -7,8 +6,8 @@ from source.cards import deck, faction, leader
 from source.core.card import Card as CoreCard
 from source.core.cardcollection import CardCollection
 from source.core.player import Player, Faction
-from source.gui.card import Card as GUICard
 from source.get_random_players import get_random_players
+from source.gui.card import Card as GUICard
 from source.gui.widgets.enum_combobox import EnumCombobox
 
 START_GAME = Callable[[Player, Player], None]
@@ -23,13 +22,16 @@ class CardLoader(tk.Frame):
         self.chosen_cards: List[CoreCard] = []
         self.faction = faction
         self.leader = leader
+
         self.card_frame = tk.Frame(self)
         self.card_frame.pack()
 
-        self.enemy_selection_frame = tk.Frame(self)
-        self.enemy_selection_frame.pack()
-        self.enemy_faction_combobox = EnumCombobox[Faction](self.enemy_selection_frame, Faction)
-        self._draw_enemy_selection()
+        enemy_selection_frame = tk.Frame(self)
+        enemy_selection_frame.pack()
+        tk.Label(enemy_selection_frame, text='Enemy faction').pack(side=tk.LEFT)
+        self.enemy_faction_combobox = EnumCombobox[Faction](enemy_selection_frame, Faction)
+        self.enemy_faction_combobox.pack(side=tk.LEFT)
+
         tk.Button(self, text='Start game', command=self._start).pack()
         self.redraw()
 
@@ -52,10 +54,6 @@ class CardLoader(tk.Frame):
         for card in sorted(cards, key=attrgetter('damage', 'ability')):
             card = GUICard(card, clicker)
             card.pack(in_=frame, side=tk.RIGHT, padx=GUICard.WIDTH * 0.1)
-
-    def _draw_enemy_selection(self):
-        tk.Label(self.enemy_selection_frame, text='Enemy faction').pack(side=tk.LEFT)
-        self.enemy_faction_combobox.pack(side=tk.LEFT)
 
     def _select_card(self, card: CoreCard):
         self.deck.remove(card)
