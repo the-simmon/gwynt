@@ -8,9 +8,11 @@ T = TypeVar('T', bound=Enum)
 
 class EnumCombobox(ttk.Combobox, Generic[T]):
 
-    def __init__(self, master, enum_: T):
+    def __init__(self, master, enum_: T, default=None):
         self.enum = enum_
         self.var = tk.StringVar()
+        if default:
+            self.var.set(default.name)
         values = [x.name for x in self.enum]
         super().__init__(master, textvariable=self.var, values=values)
 

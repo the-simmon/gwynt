@@ -8,6 +8,7 @@ from source.core.cardcollection import CardCollection
 from source.core.player import Player, Faction
 from source.get_random_players import get_random_players
 from source.gui.card import Card as GUICard
+from source.gui.widgets.card_editor import LeaderCardEditor
 from source.gui.widgets.enum_combobox import EnumCombobox
 
 START_GAME = Callable[[Player, Player], None]
@@ -30,7 +31,10 @@ class CardLoader(tk.Frame):
         enemy_selection_frame.pack()
         tk.Label(enemy_selection_frame, text='Enemy faction').pack(side=tk.LEFT)
         self.enemy_faction_combobox = EnumCombobox[Faction](enemy_selection_frame, Faction)
-        self.enemy_faction_combobox.pack(side=tk.LEFT)
+        self.enemy_faction_combobox.pack(side=tk.LEFT, pady=10)
+
+        self.leader_editor = LeaderCardEditor(self)
+        self.leader_editor.pack(pady=10)
 
         tk.Button(self, text='Start game', command=self._start).pack()
         self.redraw()
@@ -40,7 +44,7 @@ class CardLoader(tk.Frame):
         tk.Label(self.card_frame, text="Choose your starting cards").pack()
         self._draw_row(self.deck, self._select_card)
         canvas = tk.Canvas(self.card_frame, width=self.winfo_width(), height=5)
-        canvas.create_rectangle(0, 0, self.card_frame.winfo_width(), 5, fill='black')
+        canvas.create_rectangle(0, 0, self.winfo_width(), 5, fill='black')
         canvas.pack()
         self._draw_row(self.chosen_cards, self._deselect_card)
 
@@ -72,5 +76,6 @@ class CardLoader(tk.Frame):
 
         _, player2 = get_random_players()
         player2.faction = self.enemy_faction_combobox.get_value()
+        player2.leader = self.leader_editor.get_card()
         self.destroy()
         self.start_game(player1, player2)
