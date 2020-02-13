@@ -1,5 +1,5 @@
 from source.core.card import Card, Ability, Muster, LeaderCard, LeaderAbility
-from source.core.cards._flatten import flatten
+from source.core.cards.flatten import flatten
 from source.core.comabt_row import CombatRow
 
 cards = [
