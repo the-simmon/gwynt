@@ -6,8 +6,8 @@ from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
 from source.gui.board import Board
 from source.gui.card import Card
-from source.gui.cookie_clicker import CookieClicker
 from source.gui.cheat_menu import CheatMenu
+from source.gui.cookie_clicker import CookieClicker
 
 
 class Game(tk.Frame):
