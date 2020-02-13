@@ -42,6 +42,10 @@ class CardCollection(DefaultDict[CombatRow, List[Card]]):
             result.extend(cards)
         return result
 
+    def pop_first(self):
+        card = list(list(self.values())[0])[0]
+        self.remove(card.combat_row, card)
+
     def __deepcopy__(self, memodict={}):
         copy = CardCollection([])
         for row, cards in self.items():

@@ -44,6 +44,9 @@ class CheatMenu(tk.LabelFrame):
 
     def _play_card(self):
         player = self.environment.player2
+        # remove one card to decrease the amount of cards
+        player.hand.pop_first()
+
         self.environment.next_player = player
         self.environment.next_card_source = self.source_box.get_value()
         self.environment.next_card_destination = self.destination_box.get_value()
@@ -51,7 +54,11 @@ class CheatMenu(tk.LabelFrame):
         card = self.card_editor.get_card()
 
         self.environment.add_card_to_source(player, card)
+        if self.source_box.get_value() is CardSource.BOARD:
+            self.environment.board.cards[player.id].remove(target_row, card)
+            player.hand.add(card.combat_row, card)
         self.environment.step(player, target_row, card)
+
         self.update_gui()
 
     def _player_leader(self):
