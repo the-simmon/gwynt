@@ -47,6 +47,7 @@ class Main:
         if not play_against_witcher:
             self.environment.init()
         else:
+            # the user has to select the current player
             self.environment.next_player = self.player1
         await self._update_gui()
 
