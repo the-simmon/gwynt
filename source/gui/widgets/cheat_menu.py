@@ -1,15 +1,15 @@
 import tkinter as tk
 
 from source.core.comabt_row import CombatRow
-from source.core.gameenvironment import CardSource, CardDestination
+from source.core.gameenvironment import CardSource, CardDestination, GameEnvironment
 from source.gui.widgets.card_editor import CardEditor
 from source.gui.widgets.enum_combobox import EnumCombobox
 
 
 class CheatMenu(tk.LabelFrame):
 
-    def __init__(self):
-        super().__init__(text='Cheat menu')
+    def __init__(self, master, environment: GameEnvironment):
+        super().__init__(master, text='Cheat menu')
 
         tk.Label(self, text='Source').grid(row=0, column=0)
         values = [CardSource.HAND, CardSource.GRAVEYARD, CardSource.ENEMY_GRAVEYARD, CardSource.BOARD]

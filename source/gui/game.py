@@ -14,12 +14,12 @@ class Game(tk.Frame):
     WIDTH = 1920 / 2
     HEIGHT = 1080
 
-    def __init__(self, environment: GameEnvironment, player: Player, clicker: CookieClicker):
-        super().__init__(width=Game.WIDTH, height=Game.HEIGHT)
+    def __init__(self, master, environment: GameEnvironment, player: Player, clicker: CookieClicker):
+        super().__init__(master, width=Game.WIDTH, height=Game.HEIGHT)
         self.environment = environment
         self.player = player
         self.clicker = clicker
-        self.board = Board(environment, environment.board, player, clicker)
+        self.board = Board(self, environment, environment.board, player, clicker)
 
         self.info_frame = tk.Frame(self)
         self.info_frame.grid(column=0, row=0, padx=5)
@@ -27,10 +27,10 @@ class Game(tk.Frame):
         self.damage_frame = tk.Frame(self)
         self.damage_frame.grid(column=1, row=0)
 
-        self.board.grid(in_=self, column=2, row=0)
+        self.board.grid(column=2, row=0)
 
-        self.cheat_menu = CheatMenu()
-        self.cheat_menu.grid(in_=self, column=3, row=0)
+        self.cheat_menu = CheatMenu(self, self.environment)
+        self.cheat_menu.grid(column=3, row=0)
 
     def redraw(self):
         self._clear_frame()

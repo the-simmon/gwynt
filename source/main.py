@@ -19,7 +19,7 @@ class Main:
         self.player1, self.player2 = None, None
 
         if GameSettings.PLAY_AGAINST_WITCHER:
-            CardLoader(self.start_game).pack(in_=self.master)
+            CardLoader(self.master, self.start_game).pack()
         else:
             player1, player2 = get_random_players()
             self.master.after_idle(self.start_game, player1, player2)
@@ -33,8 +33,8 @@ class Main:
         self.player1, self.player2 = player1, player2
         self.environment = GameEnvironment(player1, player2)
         self.clicker = CookieClicker(self.environment, self._run_async_mcts, self._update_gui)
-        self.gui = Game(self.environment, self.player1, self.clicker)
-        self.gui.pack(in_=self.master)
+        self.gui = Game(self.master, self.environment, self.player1, self.clicker)
+        self.gui.pack()
         self.master.after_idle(asyncio.create_task, self._start_game())
 
     async def _update_gui(self):

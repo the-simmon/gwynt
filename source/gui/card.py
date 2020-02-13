@@ -8,8 +8,8 @@ class Card(tk.Canvas):
     HEIGHT = 100
     WIDTH = 56
 
-    def __init__(self, card: CoreCard, clicker: Optional[Callable[[CoreCard], None]]):
-        super().__init__(height=Card.HEIGHT, width=Card.WIDTH, background='white')
+    def __init__(self, master, card: CoreCard, clicker: Optional[Callable[[CoreCard], None]]):
+        super().__init__(master, height=Card.HEIGHT, width=Card.WIDTH, background='white')
         self.card = card
         self.clicker = clicker
 

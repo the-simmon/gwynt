@@ -16,8 +16,8 @@ class Board(tk.Frame):
     WIDTH = 1920 / 2
     HEIGHT = 1080
 
-    def __init__(self, environment: GameEnvironment, board: CoreBoard, player: Player, clicker: CookieClicker):
-        super().__init__(width=Board.WIDTH, height=Board.HEIGHT)
+    def __init__(self, master, environment: GameEnvironment, board: CoreBoard, player: Player, clicker: CookieClicker):
+        super().__init__(master, width=Board.WIDTH, height=Board.HEIGHT)
         self.environment = environment
         self.board = board
         self.player = player
@@ -73,6 +73,6 @@ class Board(tk.Frame):
 
         frame = tk.Frame(height=Card.HEIGHT * 1.1)
         for card in sorted(card_list, key=attrgetter('damage', 'ability')):
-            card = Card(card, clicker)
-            card.pack(in_=frame, side=tk.RIGHT, padx=Card.WIDTH * 0.1)
+            card = Card(frame, card, clicker)
+            card.pack(side=tk.RIGHT, padx=Card.WIDTH * 0.1)
         return frame

@@ -16,8 +16,8 @@ START_GAME = Callable[[Player, Player], None]
 
 class CardLoader(tk.Frame):
 
-    def __init__(self, start_game: START_GAME):
-        super().__init__()
+    def __init__(self, master, start_game: START_GAME):
+        super().__init__(master)
         self.start_game = start_game
         self.deck = list(deck)
         self.chosen_cards: List[CoreCard] = []
@@ -56,8 +56,8 @@ class CardLoader(tk.Frame):
         frame = tk.Frame(self.card_frame)
         frame.pack()
         for card in sorted(cards, key=attrgetter('damage', 'ability')):
-            card = GUICard(card, clicker)
-            card.pack(in_=frame, side=tk.RIGHT, padx=GUICard.WIDTH * 0.1)
+            card = GUICard(frame, card, clicker)
+            card.pack(side=tk.RIGHT, padx=GUICard.WIDTH * 0.1)
 
     def _select_card(self, card: CoreCard):
         self.deck.remove(card)
