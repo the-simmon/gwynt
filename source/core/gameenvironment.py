@@ -29,6 +29,7 @@ class CardSource(enum.Enum):
     EXCHANGE_HAND_4_DECK1 = 9
     DECK = 10
     AGILE_2_BEST_ROW = 11
+    BOARD = 12
 
     @staticmethod
     def is_weather(source: CardSource) -> bool:

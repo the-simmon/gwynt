@@ -11,7 +11,8 @@ class CheatMenu(tk.LabelFrame):
         super().__init__(text='Cheat menu')
 
         tk.Label(self, text='Source').grid(row=0, column=0)
-        self.source_box = EnumCombobox[CardSource](self, CardSource, default=CardSource.HAND)
+        values = [CardSource.HAND, CardSource.GRAVEYARD, CardSource.ENEMY_GRAVEYARD, CardSource.BOARD]
+        self.source_box = EnumCombobox[CardSource](self, CardSource, default=CardSource.HAND, values=values)
         self.source_box.grid(row=0, column=1)
 
         tk.Label(self, text='Destination').grid(row=0, column=2)
