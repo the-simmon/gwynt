@@ -7,6 +7,7 @@ from source.core.player import Player
 from source.gui.board import Board
 from source.gui.card import Card
 from source.gui.cookie_clicker import CookieClicker
+from source.gui.widgets.cheat_menu import CheatMenu
 
 
 class Game(tk.Frame):
@@ -27,6 +28,9 @@ class Game(tk.Frame):
         self.damage_frame.grid(column=1, row=0)
 
         self.board.grid(in_=self, column=2, row=0)
+
+        self.cheat_menu = CheatMenu()
+        self.cheat_menu.grid(in_=self, column=3, row=0)
 
     def redraw(self):
         self._clear_frame()
