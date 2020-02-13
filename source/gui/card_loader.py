@@ -1,3 +1,4 @@
+import random
 import tkinter as tk
 from operator import attrgetter
 from typing import List, Callable
@@ -5,8 +6,8 @@ from typing import List, Callable
 from source.cards import deck, faction, leader
 from source.core.card import Card as CoreCard
 from source.core.cardcollection import CardCollection
+from source.core.cards.util import get_cards, get_leaders
 from source.core.player import Player, Faction
-from source.get_random_players import get_random_players
 from source.gui.card import Card as GUICard
 from source.gui.widgets.card_editor import LeaderCardEditor
 from source.gui.widgets.enum_combobox import EnumCombobox
@@ -74,8 +75,10 @@ class CardLoader(tk.Frame):
         player1.hand = CardCollection(self.chosen_cards)
         player1.deck = CardCollection(self.deck)
 
-        _, player2 = get_random_players()
-        player2.faction = self.enemy_faction_combobox.get_value()
-        player2.leader = self.leader_editor.get_card()
+        enemy_faction = self.enemy_faction_combobox.get_value()
+        cards = get_cards(enemy_faction)
+        leader = random.choice(get_leaders(enemy_faction))
+        player2 = Player(1, faction, cards[:13], leader)
+        player2.hand = CardCollection(cards[13:23])
         self.destroy()
         self.start_game(player1, player2)

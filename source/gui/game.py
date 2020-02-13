@@ -29,7 +29,7 @@ class Game(tk.Frame):
 
         self.board.grid(column=2, row=0)
 
-        self.cheat_menu = CheatMenu(self, self.environment)
+        self.cheat_menu = CheatMenu(self, self.environment, self.redraw)
         self.cheat_menu.grid(column=3, row=0)
 
     def redraw(self):

@@ -1,11 +1,13 @@
 import asyncio
+import random
+from typing import Tuple
 
 from source.ai.mcts.mcts import MCTS
 from source.core.card import Ability, LeaderCard
+from source.core.cards.util import get_cards, get_leaders
 from source.core.gameenvironment import GameEnvironment
-from source.core.player import Player
+from source.core.player import Player, Faction
 from source.game_settings import GameSettings
-from source.get_random_players import get_random_players
 from source.gui.asynctk import AsyncTK
 from source.gui.card_loader import CardLoader
 from source.gui.cookie_clicker import CookieClicker
@@ -77,6 +79,20 @@ class Main:
             game_over = self.environment.step(current_player, row, card)
 
         return game_over
+
+
+def get_random_players() -> Tuple[Player, Player]:
+    faction = random.choice(list(Faction))
+    cards = get_cards(faction)
+    leader = random.choice(get_leaders(faction))
+    player1 = Player(0, faction, cards[:22], leader)
+
+    faction = random.choice(list(Faction))
+    cards = get_cards(faction)
+    leader = random.choice(get_leaders(faction))
+    player2 = Player(1, faction, cards[:22], leader)
+
+    return player1, player2
 
 
 if __name__ == '__main__':
