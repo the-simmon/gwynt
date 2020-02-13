@@ -8,6 +8,7 @@ from typing import Optional, TYPE_CHECKING, List
 from source.core.card import Card, Ability, LeaderCard
 from source.core.comabt_row import CombatRow
 from source.core.player import Faction, Player
+from source.game_settings import GameSettings
 
 if TYPE_CHECKING:
     from source.core.board import Board
@@ -56,7 +57,7 @@ def northern_realms_check_extra_card(player: Player):
 
 
 def scoiatael_decide_starting_player(environment: GameEnvironment) -> Player:
-    if environment.player1.faction is Faction.SCOIATAEL:
+    if environment.player1.faction is Faction.SCOIATAEL and not GameSettings.disable_scoiatael_ability():
         wants_to_start = messagebox.askyesno('Scoia´tael faction ability', 'Would you like to lay the first card?')
         result = environment.player1 if wants_to_start else environment.player2
     else:
