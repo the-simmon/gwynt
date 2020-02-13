@@ -23,9 +23,9 @@ class Board(tk.Frame):
         self.player = player
         self.clicker = clicker
 
-    def redraw(self, card_source: CardSource):
+    def redraw(self):
         self.clear_cards()
-        frames = self._get_frames_per_player(card_source)
+        frames = self._get_frames_per_player()
 
         enemy = self.board.get_enemy_player(self.player)
         frames[enemy].pack()
@@ -36,7 +36,7 @@ class Board(tk.Frame):
 
         frames[self.player].pack()
 
-    def _get_frames_per_player(self, card_source: CardSource) -> Dict[Player, tk.Frame]:
+    def _get_frames_per_player(self) -> Dict[Player, tk.Frame]:
 
         frame_dict: Dict[Player, tk.Frame] = {}
 

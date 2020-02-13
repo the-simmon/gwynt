@@ -1,47 +1,53 @@
 import asyncio
-import random
 
 from source.ai.mcts.mcts import MCTS
 from source.core.card import Ability, LeaderCard
-from source.core.cards.util import get_cards, get_leaders
 from source.core.gameenvironment import GameEnvironment
-from source.core.player import Faction, Player
+from source.core.player import Player
+from source.get_random_players import get_random_players
 from source.gui.asynctk import AsyncTK
+from source.gui.card_loader import CardLoader
 from source.gui.cookie_clicker import CookieClicker
 from source.gui.game import Game
 
 simulate_both_players = False
+play_against_witcher = True
 
 
 class Main:
 
     def __init__(self):
-        faction = random.choice(list(Faction))
-        cards = get_cards(faction)
-        leader = random.choice(get_leaders(faction))
-        self.player1 = Player(0, faction, cards[:22], leader)
-
-        faction = random.choice(list(Faction))
-        cards = get_cards(faction)
-        leader = random.choice(get_leaders(faction))
-        self.player2 = Player(1, faction, cards[:22], leader)
-
-        self.environment = GameEnvironment(self.player1, self.player2)
-
-        self.clicker = CookieClicker(self.environment, self._run_async_mcts, self._update_gui)
-
         self.master = AsyncTK()
+        self.player1, self.player2 = None, None
+
+        if play_against_witcher:
+            CardLoader(self.start_game).pack(in_=self.master)
+        else:
+            player1, player2 = get_random_players()
+            self.master.after_idle(self.start_game, player1, player2)
+
+        self.environment = None
+        self.clicker = None
+        self.gui = None
+        self.master.mainloop()
+
+    def start_game(self, player1: Player, player2: Player):
+        self.player1, self.player2 = player1, player2
+        self.environment = GameEnvironment(player1, player2)
+        self.clicker = CookieClicker(self.environment, self._run_async_mcts, self._update_gui)
         self.gui = Game(self.environment, self.player1, self.clicker)
         self.gui.pack(in_=self.master)
         self.master.after_idle(asyncio.create_task, self._start_game())
-        self.master.mainloop()
 
     async def _update_gui(self):
         self.gui.redraw()
         await self.master.redraw()
 
     async def _start_game(self):
-        self.environment.init()
+        if not play_against_witcher:
+            self.environment.init()
+        else:
+            self.environment.next_player = self.player1
         await self._update_gui()
 
         if simulate_both_players:
