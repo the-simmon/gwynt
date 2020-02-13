@@ -5,6 +5,7 @@ from source.core.card import Card, Ability
 from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
+from source.game_settings import GameSettings
 
 _MCTS = Callable[[Player], Awaitable[bool]]
 _UPDATE_GUI = Callable[[], Awaitable]
@@ -87,6 +88,7 @@ class CookieClicker:
                 await self._run_mcts(game_over, self.environment.next_player)
 
     async def _run_mcts(self, game_over: bool, player: Player):
-        # play enemy cards
-        while self.environment.next_player is player and not game_over:
-            game_over = await self.mcts(self.environment.next_player)
+        if not GameSettings.PLAY_AGAINST_WITCHER:
+            # play enemy cards
+            while self.environment.next_player is player and not game_over:
+                game_over = await self.mcts(self.environment.next_player)
