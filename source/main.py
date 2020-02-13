@@ -4,14 +4,12 @@ from source.ai.mcts.mcts import MCTS
 from source.core.card import Ability, LeaderCard
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
+from source.game_settings import GameSettings
 from source.get_random_players import get_random_players
 from source.gui.asynctk import AsyncTK
 from source.gui.card_loader import CardLoader
 from source.gui.cookie_clicker import CookieClicker
 from source.gui.game import Game
-
-simulate_both_players = False
-play_against_witcher = True
 
 
 class Main:
@@ -20,7 +18,7 @@ class Main:
         self.master = AsyncTK()
         self.player1, self.player2 = None, None
 
-        if play_against_witcher:
+        if GameSettings.PLAY_AGAINST_WITCHER:
             CardLoader(self.start_game).pack(in_=self.master)
         else:
             player1, player2 = get_random_players()
@@ -44,14 +42,14 @@ class Main:
         await self.master.redraw()
 
     async def _start_game(self):
-        if not play_against_witcher:
+        if not GameSettings.PLAY_AGAINST_WITCHER:
             self.environment.init()
         else:
             # the user has to select the current player
             self.environment.next_player = self.player1
         await self._update_gui()
 
-        if simulate_both_players:
+        if GameSettings.SIMULATE_BOTH_PLAYERS:
             await self._run_mcts_both_players(self.environment.next_player)
         else:
             while self.environment.next_player is not self.player1:
