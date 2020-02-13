@@ -14,7 +14,7 @@ class EnumCombobox(ttk.Combobox, Generic[T]):
         if default:
             self.var.set(default.name)
         values = [x.name for x in self.enum]
-        super().__init__(master, textvariable=self.var, values=values)
+        super().__init__(master=master, textvariable=self.var, values=values)
 
     def get_value(self) -> T:
         return self.enum[self.var.get()]
