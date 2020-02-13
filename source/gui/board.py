@@ -6,7 +6,7 @@ from typing import List, Dict
 from source.core.board import Board as CoreBoard
 from source.core.card import Card as CoreCard
 from source.core.comabt_row import CombatRow
-from source.core.gameenvironment import CardSource, GameEnvironment
+from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
 from source.gui.card import Card
 from source.gui.cookie_clicker import CookieClicker
