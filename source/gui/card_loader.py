@@ -80,5 +80,5 @@ class CardLoader(tk.Frame):
         leader = random.choice(get_leaders(enemy_faction))
         player2 = Player(1, faction, cards[:13], leader)
         player2.hand = CardCollection(cards[13:23])
-        self.destroy()
+        self.pack_forget()
         self.start_game(player1, player2)
