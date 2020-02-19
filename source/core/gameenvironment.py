@@ -14,6 +14,7 @@ from source.core.faction_abililty import nilfgaard_check_draw, northern_realms_c
     scoiatael_decide_starting_player
 from source.core.player import Player
 from source.core.weather import Weather
+from source.game_settings import GameSettings
 
 
 class CardSource(enum.Enum):

@@ -4,4 +4,4 @@ class GameSettings:
 
     @staticmethod
     def disable_scoiatael_ability() -> bool:
-        return not GameSettings.SIMULATE_BOTH_PLAYERS and not GameSettings.PLAY_AGAINST_WITCHER
+        return GameSettings.SIMULATE_BOTH_PLAYERS or GameSettings.PLAY_AGAINST_WITCHER

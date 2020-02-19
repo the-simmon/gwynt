@@ -1,8 +1,8 @@
 import time
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 
 from source.ai.mcts.node import Node, PlayerType
-from source.core.card import Card
+from source.core.card import Card, LeaderCard
 from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment
 from source.core.player import Player
@@ -18,7 +18,7 @@ class MCTS:
         enemy = self.environment.board.get_enemy_player(player)
         self.node = Node(environment, None, PlayerType.ENEMY, enemy, None, None)
 
-    def run(self) -> Tuple[Card, CombatRow, Optional[Card]]:
+    def run(self) -> Tuple[Union[Card, LeaderCard], CombatRow, Optional[Card]]:
         self.start_time = time.time()
         while time.time() - self.start_time < self.max_time:
             self.node.select()
