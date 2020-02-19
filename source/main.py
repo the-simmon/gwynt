@@ -52,12 +52,12 @@ class Main:
         await self._update_gui()
 
         if GameSettings.SIMULATE_BOTH_PLAYERS:
-            await self._run_mcts_both_players(self.environment.next_player)
+            await self._run_mcts_both_players()
         else:
             while self.environment.next_player is not self.player1:
                 await self._run_async_mcts(self.environment.next_player)
 
-    async def _run_mcts_both_players(self, current_player: Player):
+    async def _run_mcts_both_players(self):
         game_over = False
 
         while not game_over:
