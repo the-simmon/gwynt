@@ -5,7 +5,7 @@ from typing import Tuple
 from source.ai.mcts.mcts import MCTS
 from source.core.card import Ability, LeaderCard
 from source.core.cards.util import get_cards, get_leaders
-from source.core.gameenvironment import GameEnvironment
+from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player, Faction
 from source.game_settings import GameSettings
 from source.gui.asynctk import AsyncTK
@@ -71,7 +71,7 @@ class Main:
     def _run_mcts(self, current_player: Player) -> bool:
         mcts = MCTS(self.environment, current_player)
         card, row, replaced_card = mcts.run()
-        if card and card.ability is Ability.DECOY:
+        if card and card.ability is Ability.DECOY and self.environment.next_card_source is CardSource.HAND:
             game_over = self.environment.step_decoy(current_player, row, card, replaced_card)
         elif type(card) is LeaderCard:
             game_over = self.environment.step_leader(current_player, card)

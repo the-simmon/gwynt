@@ -25,29 +25,26 @@ class ExperimentRunner:
 
 
 def _run_game(_):
-    try:
-        player1, player2 = get_random_players()
-        environment = GameEnvironment(player1, player2)
-        environment.init()
-        game_over = False
-        while not game_over:
-            current_player = environment.next_player
-            mcts = MCTS(environment, current_player)
+    player1, player2 = get_random_players()
+    environment = GameEnvironment(player1, player2)
+    environment.init()
+    game_over = False
+    while not game_over:
+        current_player = environment.next_player
+        mcts = MCTS(environment, current_player, max_time=1)
 
-            card, row, replaced_card = mcts.run()
-            if card and card.ability is Ability.DECOY:
-                game_over = environment.step_decoy(current_player, row, card, replaced_card)
-            elif type(card) is LeaderCard:
-                game_over = environment.step_leader(current_player, card)
-            else:
-                game_over = environment.step(current_player, row, card)
+        card, row, replaced_card = mcts.run()
+        if card and card.ability is Ability.DECOY:
+            game_over = environment.step_decoy(current_player, row, card, replaced_card)
+        elif type(card) is LeaderCard:
+            game_over = environment.step_leader(current_player, card)
+        else:
+            game_over = environment.step(current_player, row, card)
 
-        winner = environment.get_winner()
-        winner_id = winner.id if winner else 0
-        round = environment.current_round - 1
-        logging.info(f'{winner_id}, {player1.rounds_won}, {player2.rounds_won}, {round}')
-    except Exception as e:
-        logging.warning(repr(e))
+    winner = environment.get_winner()
+    winner_id = winner.id if winner else 0
+    round = environment.current_round - 1
+    logging.info(f'{winner_id}, {player1.rounds_won}, {player2.rounds_won}, {round}')
 
 
 ExperimentRunner().run(200)

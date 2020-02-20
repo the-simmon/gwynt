@@ -3,7 +3,7 @@ from typing import List, Tuple
 
 from source.core.card import Card, Ability, LeaderCard
 from source.core.comabt_row import CombatRow
-from source.core.gameenvironment import GameEnvironment
+from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 
 
@@ -22,7 +22,7 @@ def simulate_random_game(environment: GameEnvironment) -> Player:
         else:
             row = None
 
-        if random_card and random_card.ability is Ability.DECOY:
+        if random_card and random_card.ability is Ability.DECOY and environment.next_card_source is CardSource.HAND:
             row, card = _get_decoy(environment)
             if card:
                 game_over = environment.step_decoy(environment.next_player, row, random_card, card)

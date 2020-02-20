@@ -302,25 +302,6 @@ class GameEnvironment:
 
         return result
 
-    def __deepcopy__(self, memodict={}):
-        copy = GameEnvironment(deepcopy(self.player1), deepcopy(self.player2))
-
-        board = copy.board
-        board.player1 = copy.player1
-        board.player2 = copy.player2
-        board.cards = deepcopy(self.board.cards)
-        board.weather = deepcopy(self.board.weather)
-
-        copy.next_player = copy.board.get_player(self.next_player)
-        copy.passed = deepcopy(self.passed)
-        copy.next_card_source = deepcopy(self.next_card_source)
-        copy.next_card_destination = deepcopy(self.next_card_destination)
-        copy.current_round = deepcopy(self.current_round)
-        copy.passive_leader_state = deepcopy(self.passive_leader_state)
-        copy.played_cards = deepcopy(self.played_cards)
-        copy.card_tracker = _PossibleCardsTracker(copy)
-        return copy
-
 
 class _PossibleCardsTracker:
 
