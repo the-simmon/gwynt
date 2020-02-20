@@ -13,13 +13,15 @@ from source.main import get_random_players
 class ExperimentRunner:
 
     def __init__(self):
-        self.cpu_cores = multiprocessing.cpu_count()
-        self.log_file_name = sys.argv[1]
+        self.cpu_cores = round(multiprocessing.cpu_count() / 2)
+        # self.log_file_name = sys.argv[1]
+        self.log_file_name = 'test'
         logging.basicConfig(filename=f'../logs/{self.log_file_name}.txt', level=logging.INFO)
         GameSettings.PLAY_AGAINST_WITCHER = False
         GameSettings.SIMULATE_BOTH_PLAYERS = True
 
     def run(self, simulation_count: int):
+        logging.info('------')
         with multiprocessing.Pool(self.cpu_cores) as p:
             p.map(_run_game, range(simulation_count), chunksize=10)
 
@@ -41,10 +43,10 @@ def _run_game(_):
         else:
             game_over = environment.step(current_player, row, card)
 
-    winner = environment.get_winner()
-    winner_id = winner.id if winner else 0
-    round = environment.current_round - 1
-    logging.info(f'{winner_id}, {player1.rounds_won}, {player2.rounds_won}, {round}')
+    player1_cards = len(player1.hand.get_all_cards())
+    player2_cards = len(player2.hand.get_all_cards())
+    text = f'{player1.rounds_won},{player2.rounds_won},{player1.faction},{player2.faction},{player1_cards},{player2_cards}'
+    logging.info(text)
 
 
 ExperimentRunner().run(200)
