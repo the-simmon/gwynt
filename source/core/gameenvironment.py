@@ -32,6 +32,10 @@ class CardSource(enum.Enum):
     AGILE_2_BEST_ROW = 11
     BOARD = 12
 
+    # only for witcher mode
+    SPY2 = 13
+    SPY1 = 14
+
     @staticmethod
     def is_weather(source: CardSource) -> bool:
         return source is CardSource.WEATHER_DECK or source is CardSource.WEATHER_RAIN or \
@@ -43,7 +47,11 @@ class CardSource(enum.Enum):
 
     @staticmethod
     def is_deck(source: CardSource) -> bool:
-        return CardSource.is_weather(source) or source is CardSource.DECK
+        return CardSource.is_weather(source) or source is CardSource.DECK or CardSource.is_spy(source)
+
+    @staticmethod
+    def is_spy(source: CardSource) -> bool:
+        return source is CardSource.SPY2 or source is CardSource.SPY1
 
 
 class CardDestination(enum.Enum):
@@ -287,6 +295,13 @@ class GameEnvironment:
         if played_card and played_card.ability is Ability.MEDIC and len(player.graveyard.get_all_cards()):
             result = self.next_player, CardSource.GRAVEYARD, CardDestination.BOARD
 
+        # pick cards obtained by spy manually when playing in witcher mode
+        elif played_card and played_card.ability is Ability.SPY and player.id == 0 and GameSettings.PLAY_AGAINST_WITCHER:
+            result = player, CardSource.SPY2, CardDestination.HAND
+
+        elif self.next_card_source is CardSource.SPY2:
+            result = player, CardSource.SPY1, CardDestination.HAND
+
         elif CardSource.is_exchange_hand_4_deck(self.next_card_source):
             if self.next_card_source is CardSource.EXCHANGE_HAND_4_DECK2:
                 result = player, CardSource.EXCHANGE_HAND_4_DECK1, CardDestination.GRAVEYARD
@@ -313,8 +328,7 @@ class _PossibleCardsTracker:
         cards are returned """
         result = []
         card_source = self.environment.next_card_source
-        if card_source is CardSource.HAND or CardSource.is_weather(card_source) or CardSource.is_exchange_hand_4_deck(
-                card_source) or card_source is CardSource.DECK:
+        if card_source is CardSource.HAND or CardSource.is_deck(card_source):
             if obfuscate:
                 result = self._get_available_cards()
                 result = list(set(result))
