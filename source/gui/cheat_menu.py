@@ -81,7 +81,7 @@ class CheatMenu(tk.LabelFrame):
         player = self.environment.player1
         self.environment.next_player = player
         self.environment.next_card_source = CardSource.HAND
-        self.environment.next_card_destination = CardSource.BOARD
+        self.environment.next_card_destination = CardDestination.BOARD
         self.update_gui()
 
     def _run_mcts(self):
