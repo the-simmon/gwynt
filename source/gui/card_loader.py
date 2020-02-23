@@ -77,7 +77,7 @@ class CardLoader(tk.Frame):
 
         enemy_faction = self.enemy_faction_combobox.get_value()
         cards = get_cards(enemy_faction)
-        leader = random.choice(get_leaders(enemy_faction))
+        leader = self.leader_editor.get_card()
         player2 = Player(1, faction, cards[:13], leader)
         player2.hand = CardCollection(cards[13:23])
         self.pack_forget()
