@@ -11,6 +11,7 @@ from source.core.comabt_row import CombatRow
 from source.core.faction_abililty import monster_ability_get_card_to_survive
 from source.core.player import Player
 from source.core.weather import Weather
+from source.game_settings import GameSettings
 
 
 class Board:
@@ -117,8 +118,10 @@ class Board:
         elif ability is Ability.MUSTER:
             self._check_muster(player, card)
         elif ability is Ability.SPY:
-            player.pick_random_from_deck()
-            player.pick_random_from_deck()
+            # random cards obtained by spies are selected manually in witcher mode
+            if not GameSettings.PLAY_AGAINST_WITCHER:
+                player.pick_random_from_deck()
+                player.pick_random_from_deck()
         elif ability is Ability.SCORCH:
             self._check_scorch(card, player)
 
