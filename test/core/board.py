@@ -5,9 +5,14 @@ from source.core.card import Card, Ability, Muster, LeaderCard
 from source.core.comabt_row import CombatRow
 from source.core.player import Faction, Player
 from source.core.weather import Weather
+from source.game_settings import GameSettings
 
 
 class BoardTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        GameSettings.PLAY_AGAINST_WITCHER = False
 
     def setUp(self):
         self.player1_deck_cards = [Card(CombatRow.CLOSE, 4, Ability.NONE), Card(CombatRow.CLOSE, 5, Ability.NONE)]

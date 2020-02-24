@@ -47,7 +47,8 @@ class CardSource(enum.Enum):
 
     @staticmethod
     def is_deck(source: CardSource) -> bool:
-        return CardSource.is_weather(source) or source is CardSource.DECK or CardSource.is_spy(source)
+        return CardSource.is_weather(source) or source is CardSource.DECK or CardSource.is_spy(
+            source) or CardSource.is_exchange_hand_4_deck(source)
 
     @staticmethod
     def is_spy(source: CardSource) -> bool:

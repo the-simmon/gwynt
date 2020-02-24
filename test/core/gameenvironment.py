@@ -9,9 +9,14 @@ from source.core.gameenvironment import GameEnvironment, CardSource, PassiveLead
     CardDestination
 from source.core.player import Player, Faction
 from source.core.weather import Weather
+from source.game_settings import GameSettings
 
 
 class GameEnvironmentTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        GameSettings.PLAY_AGAINST_WITCHER = False
 
     def setUp(self):
         self.player1 = Player(1, Faction.NOTHERN_REALMS, Card(CombatRow.CLOSE, 6) * 22, LeaderCard())
@@ -308,6 +313,10 @@ class PassiveLeaderStateTest(unittest.TestCase):
 
 
 class PossibleCardsTrackerTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        GameSettings.PLAY_AGAINST_WITCHER = False
 
     def setUp(self):
         self.player1_cards = get_cards(Faction.NOTHERN_REALMS)
