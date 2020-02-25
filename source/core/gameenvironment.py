@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import enum
 import random
-from copy import deepcopy
 from typing import Tuple, Dict, Optional, List
 
 from source.core.board import Board

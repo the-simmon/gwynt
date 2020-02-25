@@ -1,7 +1,6 @@
-import multiprocessing
-
-import sys
 import logging
+import multiprocessing
+import sys
 
 from source.ai.mcts.mcts import MCTS
 from source.core.card import Ability, LeaderCard

@@ -1,4 +1,3 @@
-import random
 import tkinter as tk
 from operator import attrgetter
 from typing import List, Callable
@@ -6,7 +5,7 @@ from typing import List, Callable
 from source.cards import deck, faction, leader
 from source.core.card import Card as CoreCard
 from source.core.cardcollection import CardCollection
-from source.core.cards.util import get_cards, get_leaders
+from source.core.cards.util import get_cards
 from source.core.player import Player, Faction
 from source.gui.card import Card as GUICard
 from source.gui.widgets.card_editor import LeaderCardEditor
