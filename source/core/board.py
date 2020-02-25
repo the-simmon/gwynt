@@ -119,7 +119,7 @@ class Board:
             self._check_muster(player, card)
         elif ability is Ability.SPY:
             # random cards obtained by spies are selected manually in witcher mode
-            if not GameSettings.PLAY_AGAINST_WITCHER:
+            if not GameSettings.PLAY_AGAINST_WITCHER and player.id != 1:
                 player.pick_random_from_deck()
                 player.pick_random_from_deck()
         elif ability is Ability.SCORCH:
