@@ -297,7 +297,8 @@ class GameEnvironment:
             result = self.next_player, CardSource.GRAVEYARD, CardDestination.BOARD
 
         # pick cards obtained by spy manually when playing in witcher mode
-        elif played_card and played_card.ability is Ability.SPY and player.id == 0 and GameSettings.PLAY_AGAINST_WITCHER:
+        elif played_card and played_card.ability is Ability.SPY and player.id == 0 and \
+                GameSettings.PLAY_AGAINST_WITCHER and self.next_card_source is CardSource.HAND:
             result = player, CardSource.SPY2, CardDestination.HAND
 
         elif self.next_card_source is CardSource.SPY2:
