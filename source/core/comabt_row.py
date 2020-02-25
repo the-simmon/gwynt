@@ -15,6 +15,9 @@ class CombatRow(enum.Enum):
     AGILE = 4
     NONE = 5
 
+    def __lt__(self, other):
+        return self.value < other.value
+
     @staticmethod
     def get_possible_rows(input: Union[Card, CombatRow]) -> List[CombatRow]:
         combat_row = input if type(input) is CombatRow else input.combat_row

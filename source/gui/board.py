@@ -72,7 +72,7 @@ class Board(tk.Frame):
         clicker = partial(self.clicker.card_click, player, row) if enable_clicking else None
 
         frame = tk.Frame(height=Card.HEIGHT * 1.1)
-        for card in sorted(card_list, key=attrgetter('damage', 'ability')):
+        for card in sorted(card_list, key=attrgetter('damage', 'combat_row'), reverse=True):
             card = Card(frame, card, clicker)
             card.pack(side=tk.RIGHT, padx=Card.WIDTH * 0.1)
         return frame

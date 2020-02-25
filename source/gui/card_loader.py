@@ -56,7 +56,7 @@ class CardLoader(tk.Frame):
     def _draw_row(self, cards: List[CoreCard], clicker: Callable[[CoreCard], None]):
         frame = tk.Frame(self.card_frame)
         frame.pack()
-        for card in sorted(cards, key=attrgetter('damage', 'ability')):
+        for card in sorted(cards, key=attrgetter('damage', 'combat_row'), reverse=True):
             card = GUICard(frame, card, clicker)
             card.pack(side=tk.RIGHT, padx=GUICard.WIDTH * 0.1)
 
