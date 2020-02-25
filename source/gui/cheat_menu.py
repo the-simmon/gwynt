@@ -100,10 +100,15 @@ class CheatMenu(tk.LabelFrame):
         self.best_card_label.config(text=text)
 
     def _revert_card(self):
-        enemy = self.environment.player2
         card = self.card_editor.get_card()
-        target_row = self.target_row_box.get_value()
-        self.environment.board.cards[enemy.id].remove(target_row, card)
+        if card.ability is Ability.SPY:
+            player = self.environment.player1
+        else:
+            player = self.environment.player2
+           
         # add random card to adjust card count, will be ignored anyway
-        enemy.hand.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 1))
+        self.environment.player2.hand.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 1))
+
+        target_row = self.target_row_box.get_value()
+        self.environment.board.cards[player.id].remove(target_row, card)
         self.update_gui()
