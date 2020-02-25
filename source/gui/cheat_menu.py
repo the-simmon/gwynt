@@ -3,7 +3,7 @@ import tkinter as tk
 from typing import Callable
 
 from source.ai.mcts.mcts import MCTS
-from source.core.card import Ability
+from source.core.card import Ability, Card
 from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import CardSource, CardDestination, GameEnvironment
 from source.gui.widgets.card_editor import CardEditor
@@ -44,7 +44,8 @@ class CheatMenu(tk.LabelFrame):
         tk.Button(button_frame, text='Play Leader', command=self._player_leader).grid(row=0, column=1)
         tk.Button(button_frame, text='Pass', command=self._pass).grid(row=0, column=2)
         tk.Button(button_frame, text='Next player = self', command=self._set_next_player_self).grid(row=0, column=3)
-        tk.Button(button_frame, text='MCTS', command=self._run_mcts).grid(row=1, column=0, columnspan=4)
+        tk.Button(button_frame, text='MCTS', command=self._run_mcts).grid(row=1, column=0, columnspan=2)
+        tk.Button(button_frame, text='Revert', command=self._revert_card).grid(row=1, column=2, columnspan=2)
         self.best_card_label = tk.Label(button_frame, text='')
         self.best_card_label.grid(row=2, column=0, columnspan=4)
 
@@ -97,3 +98,12 @@ class CheatMenu(tk.LabelFrame):
         else:
             text = f'Card: {row}, {card}'
         self.best_card_label.config(text=text)
+
+    def _revert_card(self):
+        enemy = self.environment.player2
+        card = self.card_editor.get_card()
+        target_row = self.target_row_box.get_value()
+        self.environment.board.cards[enemy.id].remove(target_row, card)
+        # add random card to adjust card count, will be ignored anyway
+        enemy.hand.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 1))
+        self.update_gui()
