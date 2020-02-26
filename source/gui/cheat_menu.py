@@ -103,11 +103,12 @@ class CheatMenu(tk.LabelFrame):
         card = self.card_editor.get_card()
         if card.ability is Ability.SPY:
             player = self.environment.player1
+            # remove two card because of spy
+            self.environment.player2.hand.pop_first()
         else:
             player = self.environment.player2
-           
-        # add random card to adjust card count, will be ignored anyway
-        self.environment.player2.hand.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 1))
+            # add random card to adjust card count, will be ignored anyway
+            self.environment.player2.hand.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 1))
 
         target_row = self.target_row_box.get_value()
         self.environment.board.cards[player.id].remove(target_row, card)
