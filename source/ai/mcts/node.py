@@ -11,7 +11,7 @@ from source.ai.random_simulator import simulate_random_game
 from source.core.card import Card, Ability
 from source.core.cardcollection import CardCollection
 from source.core.comabt_row import CombatRow
-from source.core.gameenvironment import GameEnvironment
+from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 
 
@@ -79,7 +79,7 @@ class Node:
 
         potential_cards = self._get_potential_cards()
         for card in potential_cards:
-            if card.ability is Ability.DECOY:
+            if card.ability is Ability.DECOY and self.environment.next_card_source is CardSource.HAND:
                 self._add_decoys(card)
             else:
                 for row in card.combat_row.get_possible_rows(card):
@@ -105,7 +105,7 @@ class Node:
 
     def _get_next_player_type(self, next_player: Player) -> PlayerType:
         player_type = deepcopy(self.current_player_type)
-        if next_player.id is not self.current_player.id:
+        if next_player.id != self.current_player.id:
             player_type = deepcopy(self.current_player_type.invert())
         return player_type
 
