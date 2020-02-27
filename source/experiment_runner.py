@@ -4,7 +4,7 @@ import sys
 
 from source.ai.mcts.mcts import MCTS
 from source.core.card import Ability, LeaderCard
-from source.core.gameenvironment import GameEnvironment
+from source.core.gameenvironment import GameEnvironment, CardSource
 from source.game_settings import GameSettings
 from source.main import get_random_players
 
@@ -34,7 +34,7 @@ def _run_game(_):
         mcts = MCTS(environment, current_player, max_time=1)
 
         card, row, replaced_card = mcts.run()
-        if card and card.ability is Ability.DECOY:
+        if card and card.ability is Ability.DECOY and environment.next_card_source is CardSource.HAND:
             game_over = environment.step_decoy(current_player, row, card, replaced_card)
         elif type(card) is LeaderCard:
             game_over = environment.step_leader(current_player, card)
