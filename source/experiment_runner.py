@@ -32,7 +32,7 @@ def _run_game(_):
     game_over = False
     while not game_over:
         current_player = environment.next_player
-        Node.PARAM_C = 1.414 if current_player.id == 0 else 0
+        Node.PARAM_C = 1.414 if current_player.id == 0 else 0.2
         mcts = MCTS(environment, current_player, max_time=1)
 
         card, row, replaced_card = mcts.run()
