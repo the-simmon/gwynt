@@ -10,6 +10,7 @@ function run_experiment() {
 }
 
 cd gwynt
+mkdir logs
 branches=( "mcts" )
 for branch in "${branches[@]}"
 do
