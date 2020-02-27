@@ -31,7 +31,7 @@ def _run_game(_):
     game_over = False
     while not game_over:
         current_player = environment.next_player
-        max_time = 5 if current_player.id == 0 else 1
+        max_time = 5
         mcts = MCTS(environment, current_player, max_time)
 
         card, row, replaced_card = mcts.run()
