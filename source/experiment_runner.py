@@ -3,6 +3,7 @@ import multiprocessing
 import sys
 
 from source.ai.mcts.mcts import MCTS
+from source.ai.mcts.node import Node
 from source.core.card import Ability, LeaderCard
 from source.core.gameenvironment import GameEnvironment
 from source.game_settings import GameSettings
@@ -31,6 +32,7 @@ def _run_game(_):
     game_over = False
     while not game_over:
         current_player = environment.next_player
+        Node.ADD_HALF = False if current_player.id == 0 else True
         mcts = MCTS(environment, current_player, max_time=1)
 
         card, row, replaced_card = mcts.run()

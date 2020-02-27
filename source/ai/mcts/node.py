@@ -26,6 +26,7 @@ class PlayerType(Enum):
 
 
 class Node:
+    ADD_HALF = False
 
     def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, current_player: Player,
                  card: Card, row: CombatRow, replaced_card: Optional[Card] = None):
@@ -100,7 +101,11 @@ class Node:
 
     def _get_potential_cards(self) -> List[Card]:
         obfuscate = self.next_player_type is PlayerType.ENEMY
-        return self.environment.card_tracker.get_possible_cards(obfuscate)
+        cards = self.environment.card_tracker.get_possible_cards(obfuscate)
+        if Node.ADD_HALF:
+            random.shuffle(cards)
+            cards = cards[:len(cards) / 2]
+        return cards
 
     def _get_next_player_type(self, next_player: Player) -> PlayerType:
         player_type = deepcopy(self.current_player_type)
