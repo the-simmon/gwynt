@@ -26,6 +26,7 @@ class PlayerType(Enum):
 
 
 class Node:
+    PARAM_C = 1.414
 
     def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, current_player: Player,
                  card: Card, row: CombatRow, replaced_card: Optional[Card] = None):
@@ -68,7 +69,7 @@ class Node:
 
     def get_ucb1(self):
         simulations = self.simulations or sys.float_info.epsilon * 10
-        return self.wins / simulations + 1.414 * math.sqrt(math.log(self.parent.simulations) / simulations)
+        return self.wins / simulations + Node.PARAM_C * math.sqrt(math.log(self.parent.simulations) / simulations)
 
     def expand(self):
         self.expanded = True
