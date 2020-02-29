@@ -104,7 +104,7 @@ class Node:
         cards = self.environment.card_tracker.get_possible_cards(obfuscate)
         if Node.ADD_HALF:
             random.shuffle(cards)
-            cards = cards[:len(cards) / 2]
+            cards = cards[:round(len(cards) / 2)]
         return cards
 
     def _get_next_player_type(self, next_player: Player) -> PlayerType:
