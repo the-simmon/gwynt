@@ -47,4 +47,4 @@ def _run_game(_):
     logging.info(text)
 
 
-ExperimentRunner().run(200)
+ExperimentRunner().run(600)
