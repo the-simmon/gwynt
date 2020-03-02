@@ -31,7 +31,7 @@ def _run_game(_):
     game_over = False
     while not game_over:
         current_player = environment.next_player
-        mcts = MCTS(environment, current_player, max_time=1)
+        mcts = MCTS(environment, current_player)
 
         card, row, replaced_card = mcts.run()
         if card and card.ability is Ability.DECOY and environment.next_card_source is CardSource.HAND:
