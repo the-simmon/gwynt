@@ -18,7 +18,7 @@ class ExperimentRunner:
 
     def __init__(self):
         self.cpu_cores = round(multiprocessing.cpu_count() / 2)
-        self.log_file_name = 'test'
+        self.log_file_name = sys.argv[1]
         logging.basicConfig(filename=f'../logs/{self.log_file_name}.txt', level=logging.INFO)
         GameSettings.PLAY_AGAINST_WITCHER = False
         GameSettings.SIMULATE_BOTH_PLAYERS = True
