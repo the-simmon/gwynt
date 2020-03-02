@@ -1,10 +1,15 @@
 import logging
 import multiprocessing
+import random
 import sys
+from copy import deepcopy
 
 from source.ai.mcts.mcts import MCTS
+from source.ai.mcts.node import PlayerType
 from source.core.card import Ability, LeaderCard
+from source.core.cardcollection import CardCollection
 from source.core.gameenvironment import GameEnvironment, CardSource
+from source.core.player import Player
 from source.game_settings import GameSettings
 from source.main import get_random_players
 
@@ -13,7 +18,7 @@ class ExperimentRunner:
 
     def __init__(self):
         self.cpu_cores = round(multiprocessing.cpu_count() / 2)
-        self.log_file_name = sys.argv[1]
+        self.log_file_name = 'test'
         logging.basicConfig(filename=f'../logs/{self.log_file_name}.txt', level=logging.INFO)
         GameSettings.PLAY_AGAINST_WITCHER = False
         GameSettings.SIMULATE_BOTH_PLAYERS = True
@@ -31,7 +36,18 @@ def _run_game(_):
     game_over = False
     while not game_over:
         current_player = environment.next_player
-        mcts = MCTS(environment, current_player, max_time=1)
+
+        if current_player.id == 1:
+            environment_copy = deepcopy(environment)
+            environment.player1 = add_random_cards_to_player(player1, environment)
+            GameEnvironment.BLOCK_OBFUSCATE = True
+        else:
+            GameEnvironment.BLOCK_OBFUSCATE = False
+
+        mcts = MCTS(environment, current_player)
+
+        if current_player.id == 1:
+            environment = environment_copy
 
         card, row, replaced_card = mcts.run()
         if card and card.ability is Ability.DECOY and environment.next_card_source is CardSource.HAND:
@@ -45,6 +61,18 @@ def _run_game(_):
     player2_cards = len(player2.hand.get_all_cards())
     text = f'{player1.rounds_won},{player2.rounds_won},{player1.faction},{player2.faction},{player1_cards},{player2_cards}'
     logging.info(text)
+
+
+def add_random_cards_to_player(player_to_add_cards: Player, environment: GameEnvironment) -> Player:
+    player_to_add_cards = deepcopy(player_to_add_cards)
+    all_cards = environment.card_tracker.get_possible_cards(True)
+    total_hand = len(player_to_add_cards.hand.get_all_cards())
+    random.shuffle(all_cards)
+
+    player_to_add_cards.hand = CardCollection(all_cards[:total_hand + 1])
+    player_to_add_cards.deck = CardCollection(all_cards[total_hand + 1:])
+
+    return player_to_add_cards
 
 
 ExperimentRunner().run(600)

@@ -98,6 +98,7 @@ class PassiveLeaderState:
 
 
 class GameEnvironment:
+    BLOCK_OBFUSCATE = False
 
     def __init__(self, player1: Player, player2: Player):
         self.player1 = player1
@@ -327,6 +328,7 @@ class _PossibleCardsTracker:
     def get_possible_cards(self, obfuscate: bool) -> List[Card]:
         """Returns all cards current player can play. If obfuscate is true, the hand is ignored and only not played
         cards are returned """
+        obfuscate = obfuscate if not GameEnvironment.BLOCK_OBFUSCATE else False
         result = []
         card_source = self.environment.next_card_source
         if card_source is CardSource.HAND or CardSource.is_deck(card_source):
