@@ -3,7 +3,8 @@ import multiprocessing
 import sys
 
 from source.ai.mcts.mcts import MCTS
-from source.core.card import Ability, LeaderCard
+from source.core.card import Ability, LeaderCard, Card
+from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.game_settings import GameSettings
 from source.main import get_random_players
@@ -29,11 +30,22 @@ def _run_game(_):
     environment = GameEnvironment(player1, player2)
     environment.init()
     game_over = False
+    mcts_tree = None
     while not game_over:
         current_player = environment.next_player
-        mcts = MCTS(environment, current_player)
+
+        if current_player.id == 1:
+            if not mcts_tree:
+                mcts_tree = MCTS(environment, current_player)
+            mcts = mcts_tree
+        else:
+            mcts = MCTS(environment, current_player)
 
         card, row, replaced_card = mcts.run()
+
+        if mcts_tree:
+            _update_tree(mcts_tree, card, row, replaced_card)
+
         if card and card.ability is Ability.DECOY and environment.next_card_source is CardSource.HAND:
             game_over = environment.step_decoy(current_player, row, card, replaced_card)
         elif type(card) is LeaderCard:
@@ -45,6 +57,13 @@ def _run_game(_):
     player2_cards = len(player2.hand.get_all_cards())
     text = f'{player1.rounds_won},{player2.rounds_won},{player1.faction},{player2.faction},{player1_cards},{player2_cards}'
     logging.info(text)
+
+
+def _update_tree(mcts: MCTS, card: Card, row: CombatRow, replaced_card: Card) -> MCTS:
+    for node in mcts.node.leafs:
+        if node.card == card and node.row == row and node.replaced_card == replaced_card:
+            mcts.node = node
+            return mcts
 
 
 ExperimentRunner().run(600)
