@@ -7,6 +7,10 @@ from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 
 
+class Toggle:
+    EXPERT_SIMULATION = False
+
+
 def simulate_random_game(environment: GameEnvironment) -> Player:
     game_over = environment.game_over()
     while not game_over:
@@ -17,7 +21,7 @@ def simulate_random_game(environment: GameEnvironment) -> Player:
 
         random_card = random.choice(potential_cards)
 
-        if _should_pass(environment):
+        if Toggle.EXPERT_SIMULATION and _should_pass(environment):
             random_card = None
 
         if random_card:

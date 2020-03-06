@@ -3,6 +3,7 @@ import multiprocessing
 import sys
 
 from source.ai.mcts.mcts import MCTS
+from source.ai.random_simulator import Toggle
 from source.core.card import Ability, LeaderCard
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.game_settings import GameSettings
@@ -32,6 +33,11 @@ def _run_game(_):
     while not game_over:
         current_player = environment.next_player
         mcts = MCTS(environment, current_player)
+
+        if current_player.id == 1:
+            Toggle.EXPERT_SIMULATION = True
+        else:
+            Toggle.EXPERT_SIMULATION = False
 
         card, row, replaced_card = mcts.run()
         if card and card.ability is Ability.DECOY and environment.next_card_source is CardSource.HAND:
