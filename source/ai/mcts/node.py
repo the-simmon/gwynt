@@ -117,9 +117,13 @@ class Node:
         self.leafs.append(node)
 
     def _add_decoys(self, decoy: Card):
+        highest_damage = 0
+        highest_card = None
+        highest_row = None
         for row, card_list in self.environment.board.cards[self.next_player.id].items():
             for card in card_list:
-                if card.ability is not Ability.DECOY and card.ability is not Ability.SPECIAL_COMMANDERS_HORN and not card.hero:
+                if card.ability is not Ability.DECOY and card.ability is not Ability.SPECIAL_COMMANDERS_HORN \
+                        and not card.hero and (card.ability is Ability.MEDIC or card.ability is Ability.SPY):
                     environment_copy = deepcopy(self.environment)
                     player_copy = environment_copy.board.get_player(self.next_player)
 
@@ -131,6 +135,24 @@ class Node:
 
                     node = Node(environment_copy, self, self.next_player_type, self.next_player, decoy, row, card)
                     self.leafs.append(node)
+
+                if card.damage > highest_damage:
+                    highest_damage = card.damage
+                    highest_card = card
+                    highest_row = row
+
+        if highest_card:
+            environment_copy = deepcopy(self.environment)
+            player_copy = environment_copy.board.get_player(self.next_player)
+
+            # for technical reasons, the card has to be added to the player
+            if self.next_player_type is PlayerType.ENEMY:
+                player_copy.hand.add(decoy.combat_row, decoy)
+
+            environment_copy.step_decoy(player_copy, highest_row, decoy, highest_card)
+
+            node = Node(environment_copy, self, self.next_player_type, self.next_player, decoy, highest_row, highest_card)
+            self.leafs.append(node)
 
     def _add_leader_node(self):
         if self.next_player.leader:
