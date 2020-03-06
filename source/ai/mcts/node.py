@@ -26,6 +26,7 @@ class PlayerType(Enum):
 
 
 class Node:
+    EXPERT_DECOY = False
 
     def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, current_player: Player,
                  card: Card, row: CombatRow, replaced_card: Optional[Card] = None):
@@ -123,7 +124,8 @@ class Node:
         for row, card_list in self.environment.board.cards[self.next_player.id].items():
             for card in card_list:
                 if card.ability is not Ability.DECOY and card.ability is not Ability.SPECIAL_COMMANDERS_HORN \
-                        and not card.hero and (card.ability is Ability.MEDIC or card.ability is Ability.SPY):
+                        and not card.hero and (
+                        card.ability is Ability.MEDIC or card.ability is Ability.SPY or not Node.EXPERT_DECOY):
                     environment_copy = deepcopy(self.environment)
                     player_copy = environment_copy.board.get_player(self.next_player)
 
@@ -141,7 +143,7 @@ class Node:
                     highest_card = card
                     highest_row = row
 
-        if highest_card:
+        if highest_card and Node.EXPERT_DECOY:
             environment_copy = deepcopy(self.environment)
             player_copy = environment_copy.board.get_player(self.next_player)
 
@@ -151,7 +153,8 @@ class Node:
 
             environment_copy.step_decoy(player_copy, highest_row, decoy, highest_card)
 
-            node = Node(environment_copy, self, self.next_player_type, self.next_player, decoy, highest_row, highest_card)
+            node = Node(environment_copy, self, self.next_player_type, self.next_player, decoy, highest_row,
+                        highest_card)
             self.leafs.append(node)
 
     def _add_leader_node(self):
