@@ -17,6 +17,9 @@ def simulate_random_game(environment: GameEnvironment) -> Player:
 
         random_card = random.choice(potential_cards)
 
+        if _should_pass(environment):
+            random_card = None
+
         if random_card:
             row = random.choice(CombatRow.get_possible_rows(random_card))
         else:
@@ -47,3 +50,15 @@ def _get_decoy(environment: GameEnvironment) -> Tuple[CombatRow, Card]:
         row, card = None, None
 
     return row, card
+
+
+def _should_pass(environment: GameEnvironment) -> bool:
+    current_player = environment.next_player
+    enemy = environment.board.get_enemy_player(current_player)
+    damage_delta = abs(environment.board.calculate_damage(current_player) - environment.board.calculate_damage(enemy))
+
+    if enemy.rounds_won == 1 or damage_delta < 25:
+        result = False
+    else:
+        result = True
+    return result
