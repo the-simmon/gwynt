@@ -1,5 +1,5 @@
 import time
-from typing import Tuple, Optional, Union
+from typing import Tuple, Optional, Union, List
 
 from source.ai.mcts.node import Node, PlayerType
 from source.core.card import Card, LeaderCard
@@ -23,17 +23,26 @@ class MCTS:
         while time.time() - self.start_time < self.max_time:
             self.node.select()
 
-        max_simulations = 0
-        best_card: Card = None
-        row: CombatRow = None
+        if Node.META_NODES:
+            leaf_nodes = [leafs.leafs for leafs in self.node.leafs]
+        else:
+            leaf_nodes = self.node.leafs
 
-        # for decoys
-        replaced_card: Card = None
-        for node in self.node.leafs:
-            if node.simulations > max_simulations:
-                max_simulations = node.simulations
-                best_card = node.card
-                row = node.row
-                replaced_card = node.replaced_card
+        return _get_best_card(leaf_nodes)
 
-        return best_card, row, replaced_card
+
+def _get_best_card(leafs: List[Node]) -> Tuple[Union[Card, LeaderCard], CombatRow, Optional[Card]]:
+    max_simulations = 0
+    best_card: Card = None
+    row: CombatRow = None
+
+    # for decoys
+    replaced_card: Card = None
+    for node in leafs:
+        if node.simulations > max_simulations:
+            max_simulations = node.simulations
+            best_card = node.card
+            row = node.row
+            replaced_card = node.replaced_card
+
+    return best_card, row, replaced_card

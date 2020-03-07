@@ -3,6 +3,7 @@ import multiprocessing
 import sys
 
 from source.ai.mcts.mcts import MCTS
+from source.ai.mcts.node import Node
 from source.core.card import Ability, LeaderCard
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.game_settings import GameSettings
@@ -13,7 +14,7 @@ class ExperimentRunner:
 
     def __init__(self):
         self.cpu_cores = round(multiprocessing.cpu_count() / 2)
-        self.log_file_name = sys.argv[1]
+        self.log_file_name = 'test'
         logging.basicConfig(filename=f'../logs/{self.log_file_name}.txt', level=logging.INFO)
         GameSettings.PLAY_AGAINST_WITCHER = False
         GameSettings.SIMULATE_BOTH_PLAYERS = True
@@ -32,6 +33,11 @@ def _run_game(_):
     while not game_over:
         current_player = environment.next_player
         mcts = MCTS(environment, current_player)
+
+        if current_player.id == 1:
+            Node.META_NODES = True
+        else:
+            Node.META_NODES = False
 
         card, row, replaced_card = mcts.run()
         if card and card.ability is Ability.DECOY and environment.next_card_source is CardSource.HAND:

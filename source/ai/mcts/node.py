@@ -5,6 +5,8 @@ import random
 import sys
 from copy import deepcopy
 from enum import Enum
+from itertools import groupby
+from operator import attrgetter
 from typing import List, Optional
 
 from source.ai.random_simulator import simulate_random_game
@@ -26,6 +28,7 @@ class PlayerType(Enum):
 
 
 class Node:
+    META_NODES = False
 
     def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, current_player: Player,
                  card: Card, row: CombatRow, replaced_card: Optional[Card] = None):
@@ -77,6 +80,17 @@ class Node:
         self._add_leader_node()
 
         potential_cards = self._get_potential_cards()
+        if Node.META_NODES:
+            groups = [list(group) for _, group in groupby(potential_cards, key=attrgetter('combat_row'))]
+            for cards in groups:
+                environment_copy = deepcopy(self.environment)
+                player_copy = environment_copy.board.get_player(self.next_player)
+                node = MetaNode(environment_copy, self, self.next_player_type, player_copy, cards)
+                self.leafs.append(node)
+        else:
+            self._expand_normal(potential_cards)
+
+    def _expand_normal(self, potential_cards: List[Card]):
         for card in potential_cards:
             if card.ability is Ability.DECOY and self.environment.next_card_source is CardSource.HAND:
                 self._add_decoys(card)
@@ -168,3 +182,13 @@ class Node:
             self.wins += 1
         if self.parent:
             self.parent.backpropagate(winner)
+
+
+class MetaNode(Node):
+    def __init__(self, environment: GameEnvironment, parent: Node, player_type: PlayerType, current_player: Player,
+                 cards: List[Card]):
+        super().__init__(environment, parent, player_type, current_player, None, None, None)
+        self.cards = cards
+
+    def _get_potential_cards(self) -> List[Card]:
+        return self.cards
