@@ -102,7 +102,7 @@ class Node:
     def _get_potential_cards(self) -> List[Card]:
         obfuscate = self.next_player_type is PlayerType.ENEMY
         cards = self.environment.card_tracker.get_possible_cards(obfuscate)
-        if Node.ADD_HALF:
+        if Node.ADD_HALF and self.next_player_type is PlayerType.ENEMY:
             random.shuffle(cards)
             cards = cards[:round(len(cards) / 2)]
         return cards
