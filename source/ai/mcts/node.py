@@ -190,5 +190,7 @@ class MetaNode(Node):
         super().__init__(environment, parent, player_type, current_player, None, None, None)
         self.cards = cards
 
-    def _get_potential_cards(self) -> List[Card]:
-        return self.cards
+    def expand(self):
+        self.expanded = True
+        self._add_pass_node()
+        super()._expand_normal(self.cards)
