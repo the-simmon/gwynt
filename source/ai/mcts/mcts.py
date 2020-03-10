@@ -24,7 +24,7 @@ class MCTS:
             self.node.select()
 
         if Node.META_NODES:
-            leaf_nodes = [leafs.leafs for leafs in self.node.leafs]
+            leaf_nodes = [leaf for leafs in self.node.leafs for leaf in leafs.leafs]
         else:
             leaf_nodes = self.node.leafs
 
