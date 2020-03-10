@@ -125,7 +125,8 @@ class Node:
             for card in card_list:
                 if card.ability is not Ability.DECOY and card.ability is not Ability.SPECIAL_COMMANDERS_HORN \
                         and not card.hero and (
-                        card.ability is Ability.MEDIC or card.ability is Ability.SPY or not Node.EXPERT_DECOY):
+                        card.ability is Ability.MEDIC or card.ability is Ability.SPY or not Node.EXPERT_DECOY or
+                        self.next_player_type is PlayerType.SELF):
                     environment_copy = deepcopy(self.environment)
                     player_copy = environment_copy.board.get_player(self.next_player)
 
