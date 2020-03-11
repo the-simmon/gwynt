@@ -1,11 +1,13 @@
 import asyncio
 import tkinter as tk
+from functools import partial
 from typing import Callable
 
 from source.ai.mcts.mcts import MCTS
 from source.core.card import Ability, Card
 from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import CardSource, CardDestination, GameEnvironment
+from source.core.weather import Weather
 from source.gui.widgets.card_editor import CardEditor
 from source.gui.widgets.enum_combobox import EnumCombobox
 
@@ -48,6 +50,13 @@ class CheatMenu(tk.LabelFrame):
         tk.Button(button_frame, text='Revert', command=self._revert_card).grid(row=1, column=2, columnspan=2)
         self.best_card_label = tk.Label(button_frame, text='')
         self.best_card_label.grid(row=2, column=0, columnspan=4)
+
+        weather_frame = tk.Frame(self)
+        weather_frame.grid(row=4, column=0, columnspan=3)
+        tk.Button(weather_frame, text='Clear', command=self._clear_weather).grid(row=0, column=0)
+        tk.Button(weather_frame, text='Frost', command=partial(self._set_weather, Weather.FROST)).grid(row=0, column=1)
+        tk.Button(weather_frame, text='Fog', command=partial(self._set_weather, Weather.FOG)).grid(row=0, column=2)
+        tk.Button(weather_frame, text='Rain', command=partial(self._set_weather, Weather.RAIN)).grid(row=0, column=3)
 
     def _play_card(self):
         player = self.environment.player2
@@ -112,4 +121,14 @@ class CheatMenu(tk.LabelFrame):
 
         target_row = self.target_row_box.get_value()
         self.environment.board.cards[player.id].remove(target_row, card)
+        self.update_gui()
+
+    def _clear_weather(self):
+        self.environment.board.weather = [Weather.CLEAR]
+        self.update_gui()
+
+    def _set_weather(self, weather: Weather):
+        if Weather.CLEAR in self.environment.board.weather:
+            self.environment.board.weather.remove(Weather.CLEAR)
+        self.environment.board.weather.append(weather)
         self.update_gui()
