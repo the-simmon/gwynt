@@ -52,11 +52,12 @@ class CheatMenu(tk.LabelFrame):
         self.best_card_label.grid(row=2, column=0, columnspan=4)
 
         weather_frame = tk.Frame(self)
-        weather_frame.grid(row=4, column=0, columnspan=3)
+        weather_frame.grid(row=4, column=0, columnspan=4)
         tk.Button(weather_frame, text='Clear', command=self._clear_weather).grid(row=0, column=0)
         tk.Button(weather_frame, text='Frost', command=partial(self._set_weather, Weather.FROST)).grid(row=0, column=1)
         tk.Button(weather_frame, text='Fog', command=partial(self._set_weather, Weather.FOG)).grid(row=0, column=2)
         tk.Button(weather_frame, text='Rain', command=partial(self._set_weather, Weather.RAIN)).grid(row=0, column=3)
+        tk.Button(weather_frame, text='add card to enemy', command=self._add_card_to_enemy).grid(row=0, column=4)
 
     def _play_card(self):
         player = self.environment.player2
@@ -132,4 +133,8 @@ class CheatMenu(tk.LabelFrame):
         if Weather.CLEAR in self.environment.board.weather:
             self.environment.board.weather.remove(Weather.CLEAR)
         self.environment.board.weather.append(weather)
+        self.update_gui()
+
+    def _add_card_to_enemy(self):
+        self.environment.player2.hand.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 0))
         self.update_gui()
