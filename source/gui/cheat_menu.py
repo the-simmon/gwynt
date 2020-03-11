@@ -60,8 +60,9 @@ class CheatMenu(tk.LabelFrame):
 
     def _play_card(self):
         player = self.environment.player2
-        # remove one card to decrease the amount of cards
-        player.hand.pop_first()
+        if self.environment.next_card_source is CardSource.HAND:
+            # remove one card to decrease the amount of cards
+            player.hand.pop_first()
 
         self.environment.next_player = player
         self.environment.next_card_source = self.source_box.get_value()
