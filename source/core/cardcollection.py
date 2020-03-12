@@ -86,7 +86,7 @@ def _calculate_damage_for_row(cards: List[Card], row: CombatRow, weather: List[W
                 if current_damage == 0:
                     bonds.update({card: card.damage})
                 else:
-                    bonds.update({card: current_damage * 2})
+                    bonds.update({card: current_damage + card.damage})
 
         for bond_card, new_damage in bonds.items():
             for card in cards:

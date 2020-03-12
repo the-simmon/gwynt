@@ -45,9 +45,9 @@ class CardCollectionTest(unittest.TestCase):
 
     def test_3tight_bond(self):
         self.card_collection = CardCollection(Card(CombatRow.CLOSE, 3, Ability.TIGHT_BOND) * 3)
-        self.assertEqual(36, self.card_collection.calculate_damage([Weather.CLEAR], []))
+        self.assertEqual(27, self.card_collection.calculate_damage([Weather.CLEAR], []))
 
     def test_3tight_bond_with_horn(self):
         self.card_collection = CardCollection(Card(CombatRow.CLOSE, 3, Ability.TIGHT_BOND) * 3 +
                                               [Card(CombatRow.CLOSE, 0, Ability.SPECIAL_COMMANDERS_HORN)])
-        self.assertEqual(72, self.card_collection.calculate_damage([Weather.CLEAR], []))
+        self.assertEqual(54, self.card_collection.calculate_damage([Weather.CLEAR], []))
