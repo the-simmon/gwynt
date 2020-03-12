@@ -51,13 +51,14 @@ class CheatMenu(tk.LabelFrame):
         self.best_card_label = tk.Label(button_frame, text='')
         self.best_card_label.grid(row=2, column=0, columnspan=4)
 
-        weather_frame = tk.Frame(self)
-        weather_frame.grid(row=4, column=0, columnspan=4)
-        tk.Button(weather_frame, text='Clear', command=self._clear_weather).grid(row=0, column=0)
-        tk.Button(weather_frame, text='Frost', command=partial(self._set_weather, Weather.FROST)).grid(row=0, column=1)
-        tk.Button(weather_frame, text='Fog', command=partial(self._set_weather, Weather.FOG)).grid(row=0, column=2)
-        tk.Button(weather_frame, text='Rain', command=partial(self._set_weather, Weather.RAIN)).grid(row=0, column=3)
-        tk.Button(weather_frame, text='add card to enemy', command=self._add_card_to_enemy).grid(row=0, column=4)
+        misc_frame = tk.Frame(self)
+        misc_frame.grid(row=4, column=0, columnspan=5)
+        tk.Button(misc_frame, text='Clear', command=self._clear_weather).grid(row=0, column=0)
+        tk.Button(misc_frame, text='Frost', command=partial(self._set_weather, Weather.FROST)).grid(row=0, column=1)
+        tk.Button(misc_frame, text='Fog', command=partial(self._set_weather, Weather.FOG)).grid(row=0, column=2)
+        tk.Button(misc_frame, text='Rain', command=partial(self._set_weather, Weather.RAIN)).grid(row=0, column=3)
+        tk.Button(misc_frame, text='add card to enemy', command=self._add_card_to_enemy).grid(row=0, column=4)
+        tk.Button(misc_frame, text='add card to player', command=self._add_card_to_player).grid(row=0, column=5)
 
     def _play_card(self):
         player = self.environment.player2
@@ -137,4 +138,10 @@ class CheatMenu(tk.LabelFrame):
 
     def _add_card_to_enemy(self):
         self.environment.player2.hand.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 0))
+        self.update_gui()
+
+    def _add_card_to_player(self):
+        card = self.card_editor.get_card()
+        player = self.environment.player1
+        player.hand.add(card.combat_row, card)
         self.update_gui()
