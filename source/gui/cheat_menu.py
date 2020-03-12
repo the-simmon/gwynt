@@ -4,6 +4,7 @@ from functools import partial
 from typing import Callable
 
 from source.ai.mcts.mcts import MCTS
+from source.ai.mcts.node import PlayerType
 from source.core.card import Ability, Card
 from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import CardSource, CardDestination, GameEnvironment
@@ -22,26 +23,30 @@ class CheatMenu(tk.LabelFrame):
         self.board = environment.board
         self.update_gui = update_gui
 
-        tk.Label(self, text='Source').grid(row=0, column=0)
+        tk.Label(self, text='Player').grid(row=0, column=0)
+        self.player_box = EnumCombobox[PlayerType](self, PlayerType, default=PlayerType.ENEMY)
+        self.player_box.grid(row=0, column=1)
+
+        tk.Label(self, text='Source').grid(row=1, column=0)
         values = [CardSource.HAND, CardSource.GRAVEYARD, CardSource.ENEMY_GRAVEYARD, CardSource.BOARD]
         self.source_box = EnumCombobox[CardSource](self, CardSource, default=CardSource.HAND, values=values)
-        self.source_box.grid(row=0, column=1)
+        self.source_box.grid(row=1, column=1)
 
-        tk.Label(self, text='Destination').grid(row=0, column=2)
+        tk.Label(self, text='Destination').grid(row=1, column=2)
         self.destination_box = EnumCombobox[CardDestination](self, CardDestination, default=CardDestination.BOARD)
-        self.destination_box.grid(row=0, column=3)
+        self.destination_box.grid(row=1, column=3)
 
         self.card_editor = CardEditor(self)
-        self.card_editor.grid(row=1, column=0, columnspan=4)
+        self.card_editor.grid(row=2, column=0, columnspan=4)
 
         row_frame = tk.Frame(self)
-        row_frame.grid(row=2, column=0, columnspan=4)
+        row_frame.grid(row=3, column=0, columnspan=4)
         tk.Label(row_frame, text='Target row').grid(row=0, column=0)
         self.target_row_box = EnumCombobox[CombatRow](row_frame, CombatRow)
         self.target_row_box.grid(row=0, column=1)
 
         button_frame = tk.Frame(self)
-        button_frame.grid(row=3, column=0, columnspan=4)
+        button_frame.grid(row=4, column=0, columnspan=4)
         tk.Button(button_frame, text='Play Card', command=self._play_card).grid(row=0, column=0)
         tk.Button(button_frame, text='Play Leader', command=self._player_leader).grid(row=0, column=1)
         tk.Button(button_frame, text='Pass', command=self._pass).grid(row=0, column=2)
@@ -52,21 +57,22 @@ class CheatMenu(tk.LabelFrame):
         self.best_card_label.grid(row=2, column=0, columnspan=4)
 
         weather_frame = tk.Frame(self)
-        weather_frame.grid(row=4, column=0, columnspan=4)
+        weather_frame.grid(row=5, column=0, columnspan=4)
         tk.Button(weather_frame, text='Clear', command=self._clear_weather).grid(row=0, column=0)
         tk.Button(weather_frame, text='Frost', command=partial(self._set_weather, Weather.FROST)).grid(row=0, column=1)
         tk.Button(weather_frame, text='Fog', command=partial(self._set_weather, Weather.FOG)).grid(row=0, column=2)
         tk.Button(weather_frame, text='Rain', command=partial(self._set_weather, Weather.RAIN)).grid(row=0, column=3)
 
         card_frame = tk.Frame(self)
-        card_frame.grid(row=5, column=0, columnspan=4)
+        card_frame.grid(row=6, column=0, columnspan=4)
         tk.Button(card_frame, text='add card to enemy', command=self._add_card_to_enemy).grid(row=0, column=0)
         tk.Button(card_frame, text='add card to player', command=self._add_card_to_player).grid(row=0, column=1)
         tk.Button(card_frame, text='remove card to player', command=self._remove_card_from_player).grid(row=0, column=2)
 
     def _play_card(self):
-        player = self.environment.player2
-        if self.environment.next_card_source is CardSource.HAND:
+        player_type = self.player_box.get_value()
+        player = self.environment.player2 if player_type is PlayerType.ENEMY else self.environment.player1
+        if self.environment.next_card_source is CardSource.HAND and player_type is PlayerType.ENEMY:
             # remove one card to decrease the amount of cards
             player.hand.pop_first()
 
