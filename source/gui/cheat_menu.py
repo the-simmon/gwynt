@@ -59,7 +59,7 @@ class CheatMenu(tk.LabelFrame):
         tk.Button(weather_frame, text='Rain', command=partial(self._set_weather, Weather.RAIN)).grid(row=0, column=3)
 
         card_frame = tk.Frame(self)
-        card_frame.grid(row=5, column=0, columnspan=3)
+        card_frame.grid(row=5, column=0, columnspan=4)
         tk.Button(card_frame, text='add card to enemy', command=self._add_card_to_enemy).grid(row=0, column=0)
         tk.Button(card_frame, text='add card to player', command=self._add_card_to_player).grid(row=0, column=1)
         tk.Button(card_frame, text='remove card to player', command=self._remove_card_from_player).grid(row=0, column=2)
