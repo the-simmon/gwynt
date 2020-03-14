@@ -155,9 +155,14 @@ class Board:
         damage = _get_highest_index_and_damage(
             self.cards[player.id].get_damage_adjusted_cards(selected_row, self.weather, self.passive_leaders))
 
-        for card in list(self.cards[player.id][selected_row]):
-            if card.damage == damage:
-                self.remove(player, selected_row, card)
+        cards_to_remove = []
+        for index, card in enumerate(
+                self.cards[player.id].get_damage_adjusted_cards(selected_row, self.weather, self.passive_leaders)):
+            if card.damage is damage and not card.hero:
+                card_to_remove = self.cards[player.id][selected_row][index]
+                cards_to_remove.append(card_to_remove)
+        for card_to_remove in cards_to_remove:
+            self.remove(player, selected_row, card_to_remove)
 
     def _scorch_special(self):
         max_damage = 0

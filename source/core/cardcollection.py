@@ -115,7 +115,8 @@ def _calculate_damage_for_row(cards: List[Card], row: CombatRow, weather: List[W
             if current_card.ability is Ability.MORALE_BOOST:
                 apply_function(morale_boost, cards, current_card)
 
-            elif current_card.ability is Ability.COMMANDERS_HORN and not horn_applied:
+        for current_card in cards:
+            if current_card.ability is Ability.COMMANDERS_HORN and not horn_applied:
                 apply_function(horn, cards, current_card)
                 horn_applied = True
 
