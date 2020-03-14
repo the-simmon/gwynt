@@ -19,6 +19,7 @@ class Card(tk.Canvas):
         self.create_text(15, 15, text=str(self.card.damage), font="Times 20")
         self.create_text(Card.WIDTH * 0.7, Card.HEIGHT * 0.9, text=self.card.ability.name, font="Times 8")
         self.create_text(Card.WIDTH * 0.5, Card.HEIGHT * 0.5, text=self.card.combat_row.name, font="Times 10")
+        self.create_text(Card.WIDTH * 0.5, Card.HEIGHT * 0.7, text=self.card.muster.name, font="Times 4")
 
         if clicker:
             self.bind('<Enter>', self._highlight)
