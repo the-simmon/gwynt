@@ -52,7 +52,7 @@ def nilfgaard_check_draw(environment: GameEnvironment):
 
 def northern_realms_check_extra_card(player: Player):
     """Nothern Reamls gets an extra card when winning a round"""
-    if player.faction is Faction.NOTHERN_REALMS:
+    if player.faction is Faction.NORTHERN_REALMS:
         player.pick_random_from_deck()
 
 

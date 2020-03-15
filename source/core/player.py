@@ -9,7 +9,7 @@ from source.core.cardcollection import CardCollection
 class Faction(enum.Enum):
     MONSTER = 0
     NILFGAARD = 1
-    NOTHERN_REALMS = 2
+    NORTHERN_REALMS = 2
     SCOIATAEL = 3
 
 

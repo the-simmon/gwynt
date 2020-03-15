@@ -20,7 +20,7 @@ def get_cards(faction: Faction) -> List[Card]:
         result.extend(monster_cards)
     elif faction is Faction.NILFGAARD:
         result.extend(nilfgaard_cards)
-    elif faction is Faction.NOTHERN_REALMS:
+    elif faction is Faction.NORTHERN_REALMS:
         result.extend(nothern_realms_cards)
     elif faction is Faction.SCOIATAEL:
         result.extend(scoiatael_cards)
@@ -35,7 +35,7 @@ def get_leaders(faction: Faction) -> List[LeaderCard]:
         result = monster_leaders
     elif faction is Faction.NILFGAARD:
         result = nilfgaard_leaders
-    elif faction is Faction.NOTHERN_REALMS:
+    elif faction is Faction.NORTHERN_REALMS:
         result = nothern_realms_leaders
     elif faction is Faction.SCOIATAEL:
         result = scoiatael_leaders

@@ -22,7 +22,7 @@ class BoardTest(unittest.TestCase):
 
         self.player2_muster_cards = Card(CombatRow.CLOSE, 8, Ability.MUSTER, muster=Muster.NEKKER) * 3
         self.player2_deck_cards = [Card(CombatRow.CLOSE, 3, Ability.NONE)] + self.player2_muster_cards
-        self.player2 = Player(1, Faction.NOTHERN_REALMS, self.player2_deck_cards, LeaderCard())
+        self.player2 = Player(1, Faction.NORTHERN_REALMS, self.player2_deck_cards, LeaderCard())
         self.player2.hand.add(CombatRow.CLOSE, Card(CombatRow.CLOSE, 0))
 
         self.board = Board(self.player1, self.player2, [])

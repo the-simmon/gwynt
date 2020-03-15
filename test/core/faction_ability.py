@@ -34,6 +34,6 @@ class FactionAbilityText(unittest.TestCase):
         self.assertEqual(1, player2.rounds_won)
 
     def test_northern_realms(self):
-        player1 = Player(0, Faction.NOTHERN_REALMS, [Card(CombatRow.CLOSE, 2)], LeaderCard())
+        player1 = Player(0, Faction.NORTHERN_REALMS, [Card(CombatRow.CLOSE, 2)], LeaderCard())
         northern_realms_check_extra_card(player1)
         self.assertEqual(1, len(player1.hand))

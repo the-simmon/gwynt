@@ -19,7 +19,7 @@ class GameEnvironmentTest(unittest.TestCase):
         GameSettings.PLAY_AGAINST_WITCHER = False
 
     def setUp(self):
-        self.player1 = Player(1, Faction.NOTHERN_REALMS, Card(CombatRow.CLOSE, 6) * 22, LeaderCard())
+        self.player1 = Player(1, Faction.NORTHERN_REALMS, Card(CombatRow.CLOSE, 6) * 22, LeaderCard())
         self.player2 = Player(2, Faction.NILFGAARD, Card(CombatRow.RANGE, 10) * 22, LeaderCard())
         self.environment = GameEnvironment(self.player1, self.player2)
         self.environment.init()
@@ -319,11 +319,11 @@ class PossibleCardsTrackerTest(unittest.TestCase):
         GameSettings.PLAY_AGAINST_WITCHER = False
 
     def setUp(self):
-        self.player1_cards = get_cards(Faction.NOTHERN_REALMS)
+        self.player1_cards = get_cards(Faction.NORTHERN_REALMS)
 
         self.player2_cards = get_cards(Faction.NILFGAARD)
 
-        self.player1 = Player(1, Faction.NOTHERN_REALMS, self.player1_cards, LeaderCard())
+        self.player1 = Player(1, Faction.NORTHERN_REALMS, self.player1_cards, LeaderCard())
         self.player2 = Player(2, Faction.NILFGAARD, self.player2_cards, LeaderCard())
         self.environment = GameEnvironment(self.player1, self.player2)
         self.tracker = _PossibleCardsTracker(self.environment)
