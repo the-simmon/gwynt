@@ -1,6 +1,7 @@
 import logging
 import multiprocessing
 import sys
+from copy import deepcopy
 
 from source.ai.mcts.mcts import MCTS
 from source.core.card import Ability, LeaderCard, Card
@@ -43,15 +44,16 @@ def _run_game(_):
 
         card, row, replaced_card = mcts.run()
 
-        if mcts_tree:
-            _update_tree(mcts_tree, card, row, replaced_card)
-
         if card and card.ability is Ability.DECOY and environment.next_card_source is CardSource.HAND:
             game_over = environment.step_decoy(current_player, row, card, replaced_card)
         elif type(card) is LeaderCard:
             game_over = environment.step_leader(current_player, card)
         else:
             game_over = environment.step(current_player, row, card)
+
+        if mcts_tree:
+            _update_tree(mcts_tree, card, row, replaced_card)
+            environment = deepcopy(mcts_tree.node.environment)
 
     player1_cards = len(player1.hand.get_all_cards())
     player2_cards = len(player2.hand.get_all_cards())
@@ -66,4 +68,6 @@ def _update_tree(mcts: MCTS, card: Card, row: CombatRow, replaced_card: Card) ->
             return mcts
 
 
-ExperimentRunner().run(600)
+# ExperimentRunner().run(600)
+while True:
+    _run_game(0)
