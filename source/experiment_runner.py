@@ -2,12 +2,14 @@ import logging
 import multiprocessing
 import random
 import sys
+from collections import Counter
 from copy import deepcopy
+from typing import Tuple, Union
 
 from source.ai.mcts.mcts import MCTS
-from source.ai.mcts.node import PlayerType
-from source.core.card import Ability, LeaderCard
+from source.core.card import Ability, LeaderCard, Card
 from source.core.cardcollection import CardCollection
+from source.core.comabt_row import CombatRow
 from source.core.gameenvironment import GameEnvironment, CardSource
 from source.core.player import Player
 from source.game_settings import GameSettings
@@ -37,19 +39,8 @@ def _run_game(_):
     while not game_over:
         current_player = environment.next_player
 
-        if current_player.id == 1:
-            environment_copy = deepcopy(environment)
-            environment.player1 = add_random_cards_to_player(player1, environment)
-            GameEnvironment.BLOCK_OBFUSCATE = True
-        else:
-            GameEnvironment.BLOCK_OBFUSCATE = False
+        card, row, replaced_card = get_mcts_result(environment)
 
-        mcts = MCTS(environment, current_player)
-
-        if current_player.id == 1:
-            environment = environment_copy
-
-        card, row, replaced_card = mcts.run()
         if card and card.ability is Ability.DECOY and environment.next_card_source is CardSource.HAND:
             game_over = environment.step_decoy(current_player, row, card, replaced_card)
         elif type(card) is LeaderCard:
@@ -61,6 +52,30 @@ def _run_game(_):
     player2_cards = len(player2.hand.get_all_cards())
     text = f'{player1.rounds_won},{player2.rounds_won},{player1.faction},{player2.faction},{player1_cards},{player2_cards}'
     logging.info(text)
+
+
+def get_mcts_result(environment: GameEnvironment) -> Tuple[Union[Card, LeaderCard], CombatRow, Card]:
+    current_player = environment.next_player
+    if current_player.id == 1:
+        GameEnvironment.BLOCK_OBFUSCATE = True
+        card, row, replaced_card = run_determinazition(environment)
+    else:
+        GameEnvironment.BLOCK_OBFUSCATE = False
+        mcts = MCTS(environment, current_player)
+        card, row, replaced_card = mcts.run()
+
+    return card, row, replaced_card
+
+
+def run_determinazition(environment: GameEnvironment) -> Tuple[Union[Card, LeaderCard], CombatRow, Card]:
+    counter = Counter()
+    for _ in range(10):
+        environment_copy = deepcopy(environment)
+        environment_copy.player1 = add_random_cards_to_player(environment_copy.player1, environment_copy)
+        mcts = MCTS(environment_copy, environment_copy.next_player, max_time=0.5)
+        card, row, replaced_card = mcts.run()
+        counter.update({(card, row, replaced_card): 1})
+    return counter.most_common(1)[0][0]
 
 
 def add_random_cards_to_player(player_to_add_cards: Player, environment: GameEnvironment) -> Player:
