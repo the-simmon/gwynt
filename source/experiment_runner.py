@@ -15,7 +15,7 @@ class ExperimentRunner:
 
     def __init__(self):
         self.cpu_cores = round(multiprocessing.cpu_count() / 2)
-        self.log_file_name = sys.argv[1]
+        self.log_file_name = 'test'
         logging.basicConfig(filename=f'../logs/{self.log_file_name}.txt', level=logging.INFO)
         GameSettings.PLAY_AGAINST_WITCHER = False
         GameSettings.SIMULATE_BOTH_PLAYERS = True
@@ -44,16 +44,19 @@ def _run_game(_):
 
         card, row, replaced_card = mcts.run()
 
-        if card and card.ability is Ability.DECOY and environment.next_card_source is CardSource.HAND:
-            game_over = environment.step_decoy(current_player, row, card, replaced_card)
-        elif type(card) is LeaderCard:
-            game_over = environment.step_leader(current_player, card)
-        else:
-            game_over = environment.step(current_player, row, card)
+        try:
+            if card and card.ability is Ability.DECOY and environment.next_card_source is CardSource.HAND:
+                game_over = environment.step_decoy(current_player, row, card, replaced_card)
+            elif type(card) is LeaderCard:
+                game_over = environment.step_leader(current_player, card)
+            else:
+                game_over = environment.step(current_player, row, card)
+
+        except:
+            mcts_tree = None
 
         if mcts_tree:
-            _update_tree(mcts_tree, card, row, replaced_card)
-            environment = deepcopy(mcts_tree.node.environment)
+            mcts_tree = _update_tree(mcts_tree, card, row, replaced_card)
 
     player1_cards = len(player1.hand.get_all_cards())
     player2_cards = len(player2.hand.get_all_cards())
@@ -68,6 +71,4 @@ def _update_tree(mcts: MCTS, card: Card, row: CombatRow, replaced_card: Card) ->
             return mcts
 
 
-# ExperimentRunner().run(600)
-while True:
-    _run_game(0)
+ExperimentRunner().run(600)
