@@ -169,7 +169,8 @@ class GameEnvironment:
     def _add_card_to_destination(self, player: Player, row: CombatRow, card: Card):
         if self.next_card_destination is CardDestination.BOARD:
             self.board.add(player, row, card)
-            self.played_cards[player.id].append(card)
+            if self.next_card_source is CardSource.HAND:
+                self.played_cards[player.id].append(card)
         elif self.next_card_destination is CardDestination.HAND:
             player.hand.add(card.combat_row, card)
         elif self.next_card_destination is CardDestination.GRAVEYARD:
