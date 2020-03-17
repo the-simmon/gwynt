@@ -68,6 +68,4 @@ def _update_tree(mcts: MCTS, card: Card, row: CombatRow, replaced_card: Card) ->
             return mcts
 
 
-# ExperimentRunner().run(600)
-while True:
-    _run_game(0)
+ExperimentRunner().run(600)
