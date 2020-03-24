@@ -33,7 +33,7 @@ def _run_game(_):
     while not game_over:
         current_player = environment.next_player
         Node.PARAM_C = 1.414 if current_player.id == 0 else 0
-        mcts = MCTS(environment, current_player)
+        mcts = MCTS(environment, current_player, max_time=1)
 
         card, row, replaced_card = mcts.run()
         if card and card.ability is Ability.DECOY and environment.next_card_source is CardSource.HAND:
@@ -49,4 +49,4 @@ def _run_game(_):
     logging.info(text)
 
 
-ExperimentRunner().run(600)
+ExperimentRunner().run(200)
